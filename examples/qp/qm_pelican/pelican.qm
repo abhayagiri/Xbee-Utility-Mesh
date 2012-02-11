@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="2.0.00" framework="qpcpp">
+ <package name="components" stereotype="0x02">
+  <class name="Pelican" superclass="qpcpp::QActive">
+   <documentation>PEdestrian LIght CONtrolled (PELICAN) crossing</documentation>
+   <attribute name="m_timeout" type="QTimeEvt" visibility="0x02" properties="0x00"/>
+   <attribute name="m_flashCtr" type="uint8_t" visibility="0x02" properties="0x00"/>
+   <operation name="Pelican" type="QActive((QStateHandler)&amp;Pelican::initial), m_timeout(TIMEOUT_SIG)" visibility="0x00" properties="0x02">
+    <documentation>constructor</documentation>
+   </operation>
+   <statechart>
+    <initial target="../1">
+     <action>me-&gt;subscribe(PEDS_WAITING_SIG);</action>
+     <initial_glyph conn="2,2,5,1,72,4,-2">
+      <action box="1,-2,27,4"/>
+     </initial_glyph>
+    </initial>
+    <state name="operational">
+     <entry brief="CARS_RED; PEDS_DONT_WALK">BSP_signalCars(CARS_RED);
+BSP_signalPeds(PEDS_DONT_WALK);</entry>
+     <initial target="../2">
+      <initial_glyph conn="3,9,5,1,34,8,-2">
+       <action box="1,-2,6,2"/>
+      </initial_glyph>
+     </initial>
+     <tran trig="OFF" target="../../2">
+      <tran_glyph conn="2,13,3,1,72,67,-2">
+       <action box="0,-2,5,2"/>
+      </tran_glyph>
+     </tran>
+     <state name="carsEnabled">
+      <exit brief="CARS_RED">BSP_signalCars(CARS_RED);</exit>
+      <initial target="../1">
+       <initial_glyph conn="5,21,5,1,26,4,-2">
+        <action box="1,-2,6,2"/>
+       </initial_glyph>
+      </initial>
+      <state name="carsGreen">
+       <entry brief="CARS_GREEN">BSP_signalCars(CARS_GREEN);
+me-&gt;m_timeout.postIn(me, CARS_GREEN_MIN_TOUT);</entry>
+       <exit>me-&gt;m_timeout.disarm();</exit>
+       <initial target="../1">
+        <initial_glyph conn="7,31,5,1,17,3,-2">
+         <action box="0,-2,6,2"/>
+        </initial_glyph>
+       </initial>
+       <state name="carsGreenNoPed">
+        <entry>BSP_showState(&quot;carsGreenNoPed&quot;);</entry>
+        <tran trig="PEDS_WAITING" target="../../3">
+         <tran_glyph conn="8,38,3,1,19,15,-5">
+          <action box="0,-2,11,2"/>
+         </tran_glyph>
+        </tran>
+        <tran trig="TIMEOUT" target="../../2">
+         <tran_glyph conn="8,41,3,1,17,4,-3">
+          <action box="0,-2,10,2"/>
+         </tran_glyph>
+        </tran>
+        <state_glyph node="8,32,14,10">
+         <entry box="1,2,5,2"/>
+        </state_glyph>
+       </state>
+       <state name="carsGreenInt">
+        <entry>BSP_showState(&quot;carsGreenInt&quot;);</entry>
+        <tran trig="PEDS_WAITING" target="../../../2">
+         <tran_glyph conn="8,49,3,1,25,20,-4">
+          <action box="0,-2,11,2"/>
+         </tran_glyph>
+        </tran>
+        <state_glyph node="8,43,14,7">
+         <entry box="1,2,5,2"/>
+        </state_glyph>
+       </state>
+       <state name="carsGreenPedWait">
+        <entry>BSP_showState(&quot;carsGreenPedWait&quot;);</entry>
+        <tran trig="TIMEOUT" target="../../../2">
+         <tran_glyph conn="8,57,3,1,23,9,-2">
+          <action box="0,-2,10,2"/>
+         </tran_glyph>
+        </tran>
+        <state_glyph node="8,51,14,7">
+         <entry box="1,2,5,2"/>
+        </state_glyph>
+       </state>
+       <state_glyph node="6,23,23,37">
+        <entry box="1,2,17,2"/>
+        <exit box="1,4,5,2"/>
+       </state_glyph>
+      </state>
+      <state name="carsYellow">
+       <entry brief="CARS_YELLOW">BSP_showState(&quot;carsYellow&quot;);
+BSP_signalCars(CARS_YELLOW);
+me-&gt;m_timeout.postIn(me, CARS_YELLOW_TOUT);</entry>
+       <exit>me-&gt;m_timeout.disarm();</exit>
+       <tran trig="TIMEOUT" target="../../../3">
+        <tran_glyph conn="6,71,3,3,33">
+         <action box="0,-2,8,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="6,62,23,10">
+        <entry box="1,2,17,2"/>
+        <exit box="1,4,5,2"/>
+       </state_glyph>
+      </state>
+      <state_glyph node="4,15,31,59">
+       <exit box="1,2,5,2"/>
+      </state_glyph>
+     </state>
+     <state name="pedsEnabled">
+      <exit brief="PEDS_DONT_WALK">BSP_signalPeds(PEDS_DONT_WALK);</exit>
+      <initial target="../1">
+       <initial_glyph conn="40,21,5,1,21,4,-2">
+        <action box="0,-2,6,2"/>
+       </initial_glyph>
+      </initial>
+      <state name="pedsWalk">
+       <entry brief="PEDS_WALK">BSP_showState(&quot;pedsWalk&quot;);
+BSP_signalPeds(PEDS_WALK);
+me-&gt;m_timeout.postIn(me, PEDS_WALK_TOUT);</entry>
+       <exit>me-&gt;m_timeout.disarm();</exit>
+       <tran trig="TIMEOUT" target="../../2">
+        <tran_glyph conn="41,31,3,1,27,7,-2">
+         <action box="0,-2,8,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="41,23,18,10">
+        <entry box="1,2,15,2"/>
+        <exit box="1,4,5,2"/>
+       </state_glyph>
+      </state>
+      <state name="pedsFlash">
+       <entry>BSP_showState(&quot;pedsWalk&quot;);
+me-&gt;m_timeout.postEvery(me, PEDS_FLASH_TOUT);
+me-&gt;m_flashCtr = PEDS_FLASH_NUM*2 + 1;</entry>
+       <exit>me-&gt;m_timeout.disarm();</exit>
+       <tran trig="TIMEOUT">
+        <choice guard="me-&gt;m_flashCtr != 0">
+         <action>--me-&gt;m_flashCtr;</action>
+         <choice guard="(me-&gt;m_flashCtr &amp; 1) == 0">
+          <action>BSP_signalPeds(PEDS_DONT_WALK);</action>
+          <choice_glyph conn="49,54,5,-1,-5,9,16">
+           <action box="-7,9,26,5"/>
+          </choice_glyph>
+         </choice>
+         <choice guard="else">
+          <action>BSP_signalPeds(PEDS_BLANK);</action>
+          <choice_glyph conn="49,54,4,-1,3,11">
+           <action box="0,3,22,4"/>
+          </choice_glyph>
+         </choice>
+         <choice_glyph conn="49,45,5,-1,11,9,-11">
+          <action box="1,0,16,4"/>
+         </choice_glyph>
+        </choice>
+        <choice guard="else" target="../../../../2">
+         <choice_glyph conn="49,45,4,1,3,-14">
+          <action box="-7,3,6,2"/>
+         </choice_glyph>
+        </choice>
+        <tran_glyph conn="41,45,3,-1,8">
+         <action box="0,-2,8,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="41,36,25,32">
+        <entry box="1,2,5,2"/>
+        <exit box="1,4,5,2"/>
+       </state_glyph>
+      </state>
+      <state_glyph node="39,15,31,59">
+       <exit box="1,2,5,2"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="2,4,70,72">
+      <entry box="1,2,28,2"/>
+     </state_glyph>
+    </state>
+    <state name="offline">
+     <entry>BSP_showState(&quot;offline&quot;);
+me-&gt;m_timeout.postEvery(me, OFF_FLASH_TOUT);
+me-&gt;m_flashCtr = 0;</entry>
+     <exit>me-&gt;m_timeout.disarm();</exit>
+     <tran trig="TIMEOUT">
+      <action>me-&gt;m_flashCtr ^= 1;</action>
+      <choice guard="(me-&gt;m_flashCtr &amp; 1) == 0">
+       <action brief="\CARS_RED; PEDS_DONT_WALK;">BSP_signalCars(CARS_RED);
+BSP_signalPeds(PEDS_DONT_WALK);</action>
+       <choice_glyph conn="36,89,5,-1,29">
+        <action box="1,0,23,4"/>
+       </choice_glyph>
+      </choice>
+      <choice guard="else">
+       <action brief="CARS_BLANK; PEDS_BLANK;">BSP_signalCars(CARS_BLANK);
+BSP_signalPeds(PEDS_BLANK);</action>
+       <choice_glyph conn="36,89,4,-1,5,29">
+        <action box="1,5,26,2"/>
+       </choice_glyph>
+      </choice>
+      <tran_glyph conn="2,89,3,-1,34">
+       <action box="0,-2,16,4"/>
+      </tran_glyph>
+     </tran>
+     <tran trig="ON" target="../../1">
+      <tran_glyph conn="2,86,3,2,63,-10">
+       <action box="0,-2,6,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,78,70,19">
+      <entry box="1,2,5,2"/>
+      <exit box="1,4,5,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="76,99"/>
+   </statechart>
+  </class>
+  <attribute name="AO_Pelican" type="QActive * const" visibility="0x00" properties="0x00"/>
+ </package>
+ <filesystem path=".">
+  <file name="bsp.h">
+   <text>#ifndef bsp_h
+#define bsp_h
+
+#include &lt;avr/io.h&gt;  // AVR I/O
+
+// Sys timer tick per seconds
+#define BSP_TICKS_PER_SEC    100
+
+// street signals ...
+enum BSP_CarsSignal {
+    CARS_BLANK, CARS_RED, CARS_YELLOW, CARS_GREEN
+};
+
+enum BSP_PedsSignal {
+    PEDS_BLANK, PEDS_DONT_WALK, PEDS_WALK
+};
+
+void BSP_init(void);
+void BSP_signalCars(enum BSP_CarsSignal sig);
+void BSP_signalPeds(enum BSP_PedsSignal sig);
+void BSP_showState (char const *state);
+
+/////////////////////////////////////////////////////////////////////
+// NOTE: The CPU clock frequency F_CPU is defined externally for each
+// Arduino board
+
+#endif  // bsp_h</text>
+  </file>
+  <file name="bsp.cpp">
+   <text>#include &quot;qp_port.h&quot;
+#include &quot;pelican.h&quot;
+#include &quot;bsp.h&quot;
+#include &quot;WProgram.h&quot;                                  // Arduino include file
+
+Q_DEFINE_THIS_FILE
+
+//#define SAVE_POWER
+
+#define USER_LED_ON()      (PORTB |= (1 &lt;&lt; (5)))
+#define USER_LED_OFF()     (PORTB &amp;= ~(1 &lt;&lt; (5)))
+#define USER_LED_TOGGLE()  (PORTB ^= (1 &lt;&lt; (5)))
+
+#define TICK_DIVIDER       ((F_CPU / BSP_TICKS_PER_SEC / 1024) - 1)
+
+#if TICK_DIVIDER &gt; 255
+#   error BSP_TICKS_PER_SEC too small
+#elif TICK_DIVIDER &lt; 2
+#   error BSP_TICKS_PER_SEC too large
+#endif
+
+#ifdef Q_SPY
+uint8_t l_TIMER2_COMPA;
+#endif
+
+// ISRs ----------------------------------------------------------------------
+ISR(TIMER2_COMPA_vect) {
+
+    // No need to clear the interrupt source since the Timer2 compare
+    // interrupt is automatically cleard in hardware when the ISR runs.
+
+    QF::TICK(&amp;l_TIMER2_COMPA);                // process all armed time events
+
+    if (Serial.available() &gt; 0) {
+        switch (Serial.read()) {                     // read the incoming byte
+            case 'p':
+            case 'P':
+                QF::PUBLISH(Q_NEW(QEvent, PEDS_WAITING_SIG),
+                            &amp;l_TIMER2_COMPA);
+                break;
+            case 'o':
+            case 'O':
+                AO_Pelican-&gt;POST(Q_NEW(QEvent, ON_SIG), &amp;l_TIMER2_COMPA);
+                break;
+            case 'f':
+            case 'F':
+                AO_Pelican-&gt;POST(Q_NEW(QEvent, OFF_SIG), &amp;l_TIMER2_COMPA);
+                break;
+        }
+    }
+}
+
+//............................................................................
+void BSP_init(void) {
+    DDRB  = 0xFF;                     // All PORTB pins are outputs (user LED)
+    PORTB = 0x00;                                        // drive all pins low
+
+    Serial.begin(115200);   // set the highest stanard baud rate of 115200 bps
+    Serial.println(&quot;Start&quot;);
+
+    if (QS_INIT((void *)0) == 0) {       // initialize the QS software tracing
+        Q_ERROR();
+    }
+
+    QS_OBJ_DICTIONARY(&amp;l_SysTick_Handler);
+}
+//............................................................................
+void QF::onStartup(void) {
+          // set Timer2 in CTC mode, 1/1024 prescaler, start the timer ticking
+    TCCR2A = (1 &lt;&lt; WGM21) | (0 &lt;&lt; WGM20);
+    TCCR2B = (1 &lt;&lt; CS22 ) | (1 &lt;&lt; CS21) | (1 &lt;&lt; CS20);               // 1/2^10
+    ASSR &amp;= ~(1 &lt;&lt; AS2);
+    TIMSK2 = (1 &lt;&lt; OCIE2A);                 // Enable TIMER2 compare Interrupt
+    TCNT2 = 0;
+    OCR2A = TICK_DIVIDER;     // must be loaded last for Atmega168 and friends
+}
+//............................................................................
+void QF::onCleanup(void) {
+}
+//............................................................................
+void QF::onIdle(QF_INT_KEY_TYPE key) {
+
+    USER_LED_ON();     // toggle the User LED on Arduino on and off, see NOTE1
+    USER_LED_OFF();
+
+#ifdef SAVE_POWER
+
+    SMCR = (0 &lt;&lt; SM0) | (1 &lt;&lt; SE);  // idle sleep mode, adjust to your project
+
+    // never separate the following two assembly instructions, see NOTE2
+    __asm__ __volatile__ (&quot;sei&quot; &quot;\n\t&quot; :: );
+    __asm__ __volatile__ (&quot;sleep&quot; &quot;\n\t&quot; :: );
+
+    SMCR = 0;                                              // clear the SE bit
+
+#else
+    QF_INT_UNLOCK(key);
+#endif
+}
+
+//............................................................................
+void BSP_signalCars(enum BSP_CarsSignal sig) {
+    switch (sig) {
+        case CARS_BLANK:
+            Serial.println(&quot;Cars: BLANK&quot;);
+            break;
+        case CARS_RED:
+            Serial.println(&quot;Cars: RED&quot;);
+            break;
+        case CARS_YELLOW:
+            Serial.println(&quot;Cars: YELLOW&quot;);
+            break;
+        case CARS_GREEN:
+            Serial.println(&quot;Cars: GREEN&quot;);
+            break;
+    }
+}
+//............................................................................
+void BSP_signalPeds(enum BSP_PedsSignal sig) {
+    switch (sig) {
+        case PEDS_BLANK:
+            Serial.println(&quot;Peds: BLANK&quot;);
+            break;
+        case PEDS_DONT_WALK:
+            Serial.println(&quot;Peds: DON'T WALK&quot;);
+            break;
+        case PEDS_WALK:
+            Serial.println(&quot;Peds: WALK&quot;);
+            break;
+    }
+}
+//............................................................................
+void BSP_showState(char const *state) {
+    Serial.print(&quot;State-&gt;&quot;);
+    Serial.println(state);
+}
+
+//............................................................................
+void Q_onAssert(char const Q_ROM * const Q_ROM_VAR file, int line) {
+    cli();                                              // lock all interrupts
+    USER_LED_ON();                                  // User LED permanently ON
+    asm volatile (&quot;jmp 0x0000&quot;);    // perform a software reset of the Arduino
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE1:
+// The Arduino's User LED is used to visualize the idle loop activity.
+// The brightness of the LED is proportional to the frequency of invcations
+// of the idle loop. Please note that the LED is toggled with interrupts
+// locked, so no interrupt execution time contributes to the brightness of
+// the User LED.
+//
+// NOTE2:
+// The QF_onIdle() callback is called with interrupts *locked* to prevent
+// a race condtion of posting a new event from an interrupt while the
+// system is already committed to go to sleep. The only *safe* way of
+// going to sleep mode is to do it ATOMICALLY with enabling interrupts.
+// As described in the &quot;AVR Datasheet&quot; in Section &quot;Reset and Interrupt
+// Handling&quot;, when using the SEI instruction to enable interrupts, the
+// instruction following SEI will be executed before any pending interrupts.
+// As the Datasheet shows in the assembly example, the pair of instructions
+//     SEI       ; enable interrupts
+//     SLEEP     ; go to the sleep mode
+// executes ATOMICALLY, and so *no* interrupt can be serviced between these
+// instructins. You should NEVER separate these two lines.
+//
+</text>
+  </file>
+  <file name="pelican.h">
+   <text>#ifndef pelican_h
+#define pelican_h
+
+enum PelicanSignals {
+    PEDS_WAITING_SIG = Q_USER_SIG,
+    MAX_PUB_SIG,  // the last published signal
+
+    ON_SIG,
+    OFF_SIG,
+    TIMEOUT_SIG,
+};
+
+// active objects ..................................................
+$declare(components::AO_Pelican)   // &quot;opaque&quot; pointer to Pelican AO
+
+#endif // pelican_h</text>
+  </file>
+  <file name="pelican.cpp">
+   <text>#include &quot;qp_port.h&quot;
+#include &quot;bsp.h&quot;
+#include &quot;pelican.h&quot;
+
+Q_DEFINE_THIS_FILE
+
+enum PelicanTimeouts {                            // various timeouts in ticks
+    CARS_GREEN_MIN_TOUT = BSP_TICKS_PER_SEC * 8,         // min green for cars
+    CARS_YELLOW_TOUT = BSP_TICKS_PER_SEC * 3,               // yellow for cars
+    PEDS_WALK_TOUT   = BSP_TICKS_PER_SEC * 3,         // walking time for peds
+    PEDS_FLASH_TOUT  = BSP_TICKS_PER_SEC / 5,     // flashing timeout for peds
+    PEDS_FLASH_NUM   = 5*2,                      // number of flashes for peds
+    OFF_FLASH_TOUT   = BSP_TICKS_PER_SEC / 2      // flashing timeout when off
+};
+
+// Pelican class -------------------------------------------------------------
+$declare(components::Pelican)
+
+// Local objects -------------------------------------------------------------
+static Pelican l_Pelican;      // the single instance of Pelican active object
+
+// Global objects ------------------------------------------------------------
+QActive * const AO_Pelican = &amp;l_Pelican;                 // the opaque pointer
+
+// Pelican class definition --------------------------------------------------
+$define(components::Pelican)</text>
+  </file>
+  <file name="qm_pelican.pde">
+   <text>#include &quot;qp_port.h&quot;
+#include &quot;pelican.h&quot;
+#include &quot;bsp.h&quot;
+
+// Local-scope objects -------------------------------------------------------
+static QEvent const *l_pelicanQueueSto[2];
+static QEvent const *l_pedQueueSto[3];
+static QSubscrList   l_subscrSto[MAX_PUB_SIG];
+
+static union SmallEvents {
+    void   *e0;                                          // minimum event size
+    uint8_t e1[sizeof(QEvent)];
+    // ... other event types to go into this pool
+} l_smlPoolSto[10];                        // storage for the small event pool
+
+//............................................................................
+void setup() {
+    BSP_init();                                          // initialize the BSP
+
+    QF::init();       // initialize the framework and the underlying RT kernel
+
+                                                  // initialize event pools...
+    QF::poolInit(l_smlPoolSto, sizeof(l_smlPoolSto), sizeof(l_smlPoolSto[0]));
+
+    QF::psInit(l_subscrSto, Q_DIM(l_subscrSto));     // init publish-subscribe
+
+                                                // start the active objects...
+    AO_Pelican-&gt;start(1, l_pelicanQueueSto, Q_DIM(l_pelicanQueueSto),
+                      (void *)0, 0);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// NOTE: Do not define the loop() function, because this function is
+// already defined in the QP port to Arduino</text>
+  </file>
+ </filesystem>
+</model>

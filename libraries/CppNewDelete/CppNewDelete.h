@@ -1,0 +1,12 @@
+#ifndef CppNewDelete_h
+#define CppNewDelete_h
+
+#include "WProgram.h"
+
+
+void* operator new(size_t size);;
+void* operator new[](size_t size);
+void operator delete(void* ptr);
+void operator delete[](void* ptr);
+
+#endif
