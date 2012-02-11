@@ -1,10 +1,10 @@
 void updateLCD() {
   if (LCDState == 0 && millis() > nextLCDUpdate) { //normal case - update LCD every 5 min.
-    nextLCDUpdate = millis() + (60000ul *5ul);
+    nextLCDUpdate = millis() + (1000ul * 5ul); //5 seconds
     printStandardData();
   }
   else if (LCDState == 1) { //ratio mode display
-    nextLCDUpdate = millis() + 500;
+    nextLCDUpdate = millis() + 500; // 1/2 second, so the second countdown works
     printRatioData();
   }
   else if (LCDState == 2 && millis() > infoDismissTime) { //if displaying a temp. message, dismiss after some designated time

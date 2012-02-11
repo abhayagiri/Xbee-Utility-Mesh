@@ -29,15 +29,9 @@ void loop ()  {
   
   //reset buttons
   ba = bb = bc = bd = 0;
-  
-  //Update LCD and PSI data every X minutes
-  if (millis()-lastDataUpdateTime > 60000ul * 5ul) {
-    lastDataUpdateTime = millis();
 
-    valvestate();
-    sensorCheck();
-  }
-
+  valvestate();
+  sensorCheck();
   updateRatioMode();
   menuOpt();
   txandtr();
