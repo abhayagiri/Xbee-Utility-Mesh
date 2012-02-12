@@ -53,12 +53,14 @@ unsigned long infoDismissTime = 0; //time to dismiss temporary info messages
 
 //ratio mode variables
 unsigned long ratioUnit = 2700000; //45 min. time unit
-unsigned long ratioClosedTime = 2700000; //ratio is 1:1 at first
-unsigned long ratioOpenTime = 2700000;
 unsigned long ratioOpenWaitTime = 270000; //wait 4.5 min. with just vA open when moving to open ratio time
-short ratioClosed = 1;
+short ratioClosed = 1; //ratio is 1:1 at first
 short ratioOpen = 1;
+unsigned long ratioClosedTime = 0; //
+unsigned long ratioOpenTime = 0;
 short ratioState = 3; //0-closed, 1-wait open, 2-full open, 3-reset
+bool ratioChangeRequested = 0;
+short ratioChangeStep = 0; // 0 - init, 1 - changing closed ratio, 2 - changing open ratio, 3 - waiting for accept
 
 /*    Define misc. variables      */
 int symbol = 0;
@@ -67,9 +69,10 @@ int numPacketsSent = 0; //number packets sent during send period
 unsigned long nextPacketTime = 15ul * 1000ul; //next packet send time in millis; initalize to 15 sec. just for fun...
 unsigned long delayTime;// hold time variables for "true" or "working"
 short currState = 0;
-short controlMode = 0; //0 - Auto, 1 - Manual
-short LCDState = 0; //0 - normal display, 1 - ratio mode, 2 - temporary info display
+short controlMode = 0; //0 - Auto, 1 - Manual, 2 - Ratio mode
+short LCDState = 0; //0 - normal display, 1 - temporary info display
 int psi = 0;
+
 short ba; // for reading button a
 short baLast;
 short bb; // for reading button b
@@ -78,5 +81,6 @@ short bc; // for reading button c
 short bcLast;
 short bd; // for reading button d
 short bdLast;
+
 char vopen [5]  ;       //     variable that will hold which valves are open 
 char title [21] ;            //     variable for misc. sentences

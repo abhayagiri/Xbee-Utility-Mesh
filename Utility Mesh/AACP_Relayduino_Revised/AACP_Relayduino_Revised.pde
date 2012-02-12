@@ -39,10 +39,9 @@ void loop ()  {
 }
 
 void menuOpt(){
-//  readbutt(); //check for button presses on the serial port
-
-    if (ba==1){                //ba was pressed
-    ;
+  if (ba==1){                //ba was pressed
+    if (controlMode == 2)    //ratio mode reconfiguration
+    ratioChangeRequested = 1;
   }
   if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
     if (controlMode == 0){
@@ -56,6 +55,11 @@ void menuOpt(){
       printInfo ();
     }
     else if (controlMode == 2) {
+      //close valves from ratio mode, reset currState
+      sprintf(title, "Closing Valves"); printInfo();
+      adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
+      currState = 0;
+      
       controlMode = 0;
       sprintf (title, "Begin Manual Control");
       printInfo ();
@@ -95,20 +99,20 @@ void updateRatioMode()
       ratioState = 1;
       adjValve(va, OPEN);
     }
-    else if (ratioState == 1 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
+    if (ratioState == 1 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
       ratioState = 2;
       adjValve(vc, OPEN);
     }
-    else if ( (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenTime)) ||
+    if ( (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenTime)) ||
               ratioState == 3) {
+      adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
+      ratioClosedTime = (ratioClosed * ratioUnit) + millis();
+      ratioOpenTime = (ratioOpen * ratioUnit) + ratioClosedTime;
       lastRatioCycleTime = millis();
-      adjValve (va, CLOSE);
-      adjValve (vb, CLOSE);
-      adjValve (vc, CLOSE);
+      ratioState = 0;
     }
-
   } 
-}
+} 
 
 
 
