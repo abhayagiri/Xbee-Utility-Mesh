@@ -38,8 +38,8 @@ void loop ()  {
   updateLCD();
 }
 
-void menuOpt(){
-  if (ba==1){                //ba was pressed
+void menuOpt() {
+  if (ba==1) {               //ba was pressed
     if (controlMode == 2)    //ratio mode reconfiguration
     ratioChangeRequested = 1;
   }
@@ -66,15 +66,20 @@ void menuOpt(){
     }
   }
 
-  if(bc==1) {                 //bc was pressed
-    sprintf (title, "   Stepping Up...");
-    printInfo ();
-    openFunct();
+  if (bc==1) {                 //bc was pressed
+    if (controlMode == 0 || controlMode == 1) {
+      sprintf (title, "   Stepping Up...");
+      printInfo ();
+      openFunct();
+    }
   }
-  if(bd==1) {                  //bd was pressed
-    sprintf (title, "  Stepping Down...");
-    printInfo ();
-    closeFunct();
+
+  if (bd==1) {                  //bd was pressed
+    if (controlMode == 0 || controlMode == 1) {
+      sprintf (title, "  Stepping Down...");
+      printInfo ();
+      closeFunct();
+    }
   } 
 }
 
