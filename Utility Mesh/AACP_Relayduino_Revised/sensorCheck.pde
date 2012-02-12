@@ -12,14 +12,6 @@ void sensorCheck() {
         closeFunct ();
       }
     } 
-    if ((psi < 200) && (currState == 1))
-    {
-      lcd.clear();
-      lcd.setCursor (0,0);
-      lcd.print ("PSI Falling");
-      lcd.setCursor (0,1);
-      lcd.print ("Last valve open");
-    }
   }
 }
 

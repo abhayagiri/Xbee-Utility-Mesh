@@ -3,7 +3,8 @@ void updateLCD() {
     if (controlMode == 0 || controlMode == 1) {  //auto and manual modes - standard display
       nextLCDUpdate = millis() + (1000ul * 5ul); //5 seconds
       printStandardData();
-    } else if (controlMode == 2) { //ratio mode - special display
+    } 
+    else if (controlMode == 2) { //ratio mode - special display
       nextLCDUpdate = millis() + 500; // 1/2 second, so the second countdown works
       printRatioData();
     }
@@ -12,7 +13,8 @@ void updateLCD() {
     LCDState = 0;
     if (controlMode == 2) { //in ratio mode
       printRatioData();
-    } else {
+    } 
+    else {
       printStandardData();
     }
   }
@@ -23,17 +25,25 @@ void printStandardData() {
   lcd.clear ();
   lcd.setCursor (0,0);
 
-  lcd.print("PSI="); //psi data
-  lcd.print(psi);
+  //this if() code originally in sensorCheck, moved out
+  //to keep it from thrashing the LCD, since we will
+  //change to continuous reads w/averaging
+  if ((psi < 200) && (currState == 1)) {
+    lcd.print ("PSI Falling");
+    lcd.setCursor (0,1);
+    lcd.print ("Last valve open");
+  } 
+  else { //normal case
+    lcd.print("PSI="); //psi data
+    lcd.print(psi);
 
-  if (controlMode == 1){ //manual mode
-    lcd.print(' ');
-    lcd.print("*manual*");
+    if (controlMode == 1)  //manual mode
+      lcd.print(" *manual*");
+
+    lcd.setCursor (0,1); //valve data
+    lcd.print("Valves Open:");
+    lcd.print(vopen);
   }
-
-  lcd.setCursor (0,1); //valve data
-  lcd.print("Valves Open:");
-  lcd.print(vopen);
 }
 
 //handle ratio mode data and manage changes
@@ -63,16 +73,23 @@ void printRatioData() {
       lcd.print(((ratioClosedTime+ratioOpenTime)-timePast)/60000ul);
       lcd.print("m");
     }
-  } else { //handling a ratio change request
+  } 
+  else { //handling a ratio change request
     short tmpRatioClosed = ratioClosed; //tmp vars for storing changes until accepted
     short tmpRatioOpen = ratioOpen;
-    
+
     if (ratioChangeStep == 0) { //init
       lcd.clear();
-      lcd.setCursor(0,0); lcd.print("Ratio Open:Closd");
-      lcd.setCursor(0,1); lcd.print(ratioClosed); lcd.print(':'); lcd.print(ratioOpen);
-      lcd.setCursor(11,1); lcd.print("Accpt");
-      lcd.setCursor(0,1); lcd.blink();
+      lcd.setCursor(0,0); 
+      lcd.print("Ratio Open:Closd");
+      lcd.setCursor(0,1); 
+      lcd.print(ratioClosed); 
+      lcd.print(':'); 
+      lcd.print(ratioOpen);
+      lcd.setCursor(11,1); 
+      lcd.print("Accpt");
+      lcd.setCursor(0,1); 
+      lcd.blink();
       ratioChangeStep = 1;
     } 
     if (ratioChangeStep == 1) { //cursor on 1st number
@@ -80,10 +97,14 @@ void printRatioData() {
         if (bc && ++tmpRatioClosed > 20) tmpRatioClosed = 1; //increment or decrement ratioClosed, wrapping at 20
         if (bd && --tmpRatioClosed < 1) tmpRatioClosed = 20;
         lcd.noBlink();
-        lcd.print(tmpRatioClosed); lcd.print(" : "); lcd.print(tmpRatioOpen); 
-        lcd.print(' '); lcd.setCursor(0,1); 
+        lcd.print(tmpRatioClosed); 
+        lcd.print(" : "); 
+        lcd.print(tmpRatioOpen); 
+        lcd.print(' '); 
+        lcd.setCursor(0,1); 
         lcd.blink();
-      } else if (ba) { //accept button
+      } 
+      else if (ba) { //accept button
         lcd.setCursor((tmpRatioClosed < 10 ? 4 : 5), 1);
         ratioChangeStep = 2;
       }
@@ -91,24 +112,28 @@ void printRatioData() {
     if (ratioChangeStep == 2) { //cursor on 2nd number
       short cursorLoc = (tmpRatioClosed < 10 ? 4 : 5);
       if (bc || bd) { //change value buttons
-         if (bc && ++tmpRatioOpen > 20) tmpRatioOpen = 1; //increment or decrement ratioOpen, wrapping at 20
+        if (bc && ++tmpRatioOpen > 20) tmpRatioOpen = 1; //increment or decrement ratioOpen, wrapping at 20
         if (bd && --tmpRatioOpen < 1) tmpRatioOpen = 20;
         lcd.noBlink(); 
-        lcd.print(tmpRatioOpen); lcd.print(' ');
+        lcd.print(tmpRatioOpen); 
+        lcd.print(' ');
         lcd.setCursor(cursorLoc,1); 
         lcd.blink();
-      } else if (ba) {
+      } 
+      else if (ba) {
         lcd.setCursor(11,1);
         ratioChangeStep = 3;
       }
     }
     if (ratioChangeStep == 3) { //cursor on "Accpt"
-       if (bc || bd) { //accept changes; reset everyting relevent
-         ratioClosed = tmpRatioClosed;
-         ratioOpen = tmpRatioOpen;
-         ratioChangeStep = 0; ratioChangeRequested = 0;
-         ratioState = 3; //this forces a reset on the next loop
-      } else if (ba) { //go back to 1st number
+      if (bc || bd) { //accept changes; reset everyting relevent
+        ratioClosed = tmpRatioClosed;
+        ratioOpen = tmpRatioOpen;
+        ratioChangeStep = 0; 
+        ratioChangeRequested = 0;
+        ratioState = 3; //this forces a reset on the next loop
+      } 
+      else if (ba) { //go back to 1st number
         lcd.setCursor(0,1);
         ratioChangeStep = 1;
       }
@@ -123,6 +148,7 @@ void printInfo () { //print a temporary message
   infoDismissTime = millis() + 2000; //message is dismissed at this time (2 sec later)
   LCDState = 1; //tells updateLCD() we are displaying a temp. message
 }
+
 
 
 

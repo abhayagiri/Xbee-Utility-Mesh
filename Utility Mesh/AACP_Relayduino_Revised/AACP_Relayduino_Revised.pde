@@ -27,14 +27,13 @@ void setup () {
 
 void loop ()  {  
   
-  //reset buttons
-  ba = bb = bc = bd = 0;
-
+  ba = bb = bc = bd = 0;   //reset buttons
+  txandtr();               //get serial data and buttons
+  
   valvestate();
   sensorCheck();
   updateRatioMode();
   menuOpt();
-  txandtr();
   updateLCD();
 }
 
@@ -44,7 +43,7 @@ void menuOpt() {
     ratioChangeRequested = 1;
   }
   if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
-    if (controlMode == 0){
+    if (controlMode == 0) {
       controlMode = 1;
       sprintf (title, "Begin Auto Control");
       printInfo ();
