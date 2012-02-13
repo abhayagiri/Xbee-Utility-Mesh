@@ -1,5 +1,6 @@
 void sensorCheck() {
-  psi = map (analogRead(psisensor), 0, 1024, 0, 250);
+  if (newSecond) //once a second  
+    psiValues[currSecond % 30] = map (analogRead(psisensor), 0, 1024, 0, 250);
 
   if (controlMode == 0) { //check for auto mode
     if ((psi < 180) && (currState != 4 ) && (currState > 0)) // State 1 means valve ABC is open

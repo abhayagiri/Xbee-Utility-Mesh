@@ -28,6 +28,7 @@ void setup () {
 void loop ()  {  
   
   ba = bb = bc = bd = 0;   //reset buttons
+  updateTime();            //keeps track of seconds
   txandtr();               //get serial data and buttons
   
   valvestate();
@@ -118,7 +119,16 @@ void updateRatioMode()
   } 
 } 
 
-
+void updateTime() {
+  if (newSecond)
+    newSecond = false;
+  
+  if (millis() >= nextSecond) {
+    nextSecond += 1000;
+    currSecond++;
+    newSecond = true;
+  }  
+}
 
 
 

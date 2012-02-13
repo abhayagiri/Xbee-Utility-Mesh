@@ -71,7 +71,15 @@ unsigned long delayTime;// hold time variables for "true" or "working"
 short currState = 0;
 short controlMode = 0; //0 - Auto, 1 - Manual, 2 - Ratio mode
 short LCDState = 0; //0 - normal display, 1 - temporary info display
-int psi = 0;
+unsigned short psi = 0;
+
+//some timing variables
+unsigned long nextSecond = 1000;
+bool newSecond = false;
+unsigned long currSecond = 0;
+
+//variables for doing running averages of psi value
+unsigned short psiValues[30];
 
 short ba; // for reading button a
 short baLast;

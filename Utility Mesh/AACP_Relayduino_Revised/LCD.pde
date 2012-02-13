@@ -34,8 +34,15 @@ void printStandardData() {
     lcd.print ("Last valve open");
   } 
   else { //normal case
+    
+    //calculate average psi
+    unsigned int psi = 0;
+    for (int i=0; i<30; i++)
+      psi += psiValues[i];
+    psi = psi/30;
+    
     lcd.print("PSI="); //psi data
-    lcd.print(psi);
+    (currSecond >= 30 ? lcd.print(psi) : lcd.print("..."));
 
     if (controlMode == 1)  //manual mode
       lcd.print(" *manual*");
