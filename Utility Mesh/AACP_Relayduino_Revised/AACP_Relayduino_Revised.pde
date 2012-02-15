@@ -18,6 +18,12 @@ void setup () {
   pinMode (ledB, OUTPUT);
   pinMode (ledC, OUTPUT);
 
+  //close all valves
+//  lcd.clear(); lcd.home(); lcd.blink();
+//  lcd.print("Reset valves...");
+//  adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
+//  lcd.clear(); lcd.noBlink();
+  
   // for invoking the code in the Memory tab - 
   // usefull for troubleshooting string literal problems
   //  printMemoryProfile();

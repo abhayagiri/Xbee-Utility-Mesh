@@ -35,14 +35,8 @@ void printStandardData() {
   } 
   else { //normal case
     
-    //calculate average psi
-    unsigned int psi = 0;
-    for (int i=0; i<30; i++)
-      psi += psiValues[i];
-    psi = psi/30;
-    
     lcd.print("PSI="); //psi data
-    (currSecond >= 30 ? lcd.print(psi) : lcd.print("..."));
+    (currSecond >= 30 ? lcd.print(psi) : lcd.print(30-currSecond));
 
     if (controlMode == 1)  //manual mode
       lcd.print(" *manual*");
