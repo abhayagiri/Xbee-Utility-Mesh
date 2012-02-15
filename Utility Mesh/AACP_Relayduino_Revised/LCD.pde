@@ -21,30 +21,18 @@ void updateLCD() {
 }
 
 void printStandardData() {
-
   lcd.clear ();
   lcd.setCursor (0,0);
-
-  //this if() code originally in sensorCheck, moved out
-  //to keep it from thrashing the LCD, since we will
-  //change to continuous reads w/averaging
-  if ((psi < 200) && (currState == 1)) {
-    lcd.print ("PSI Falling");
-    lcd.setCursor (0,1);
-    lcd.print ("Last valve open");
-  } 
-  else { //normal case
     
-    lcd.print("PSI="); //psi data
-    (currSecond >= 30 ? lcd.print(psi) : lcd.print(30-currSecond));
+  lcd.print("PSI="); //psi data
+  (currSecond >= 30 ? lcd.print(psi) : lcd.print(30-currSecond));
 
-    if (controlMode == 1)  //manual mode
-      lcd.print(" *manual*");
+  if (controlMode == 1)  //manual mode
+    lcd.print(" *manual*");
 
-    lcd.setCursor (0,1); //valve data
-    lcd.print("Valves Open:");
-    lcd.print(vopen);
-  }
+  lcd.setCursor (0,1); //valve data
+  lcd.print("Valves Open:");
+  lcd.print(vopen);
 }
 
 //handle ratio mode data and manage changes
