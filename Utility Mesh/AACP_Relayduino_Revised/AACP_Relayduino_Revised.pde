@@ -19,10 +19,10 @@ void setup () {
   pinMode (ledC, OUTPUT);
 
   //close all valves
-//  lcd.clear(); lcd.home(); lcd.blink();
-//  lcd.print("Reset valves...");
-//  adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
-//  lcd.clear(); lcd.noBlink();
+  lcd.clear(); lcd.home(); lcd.blink();
+  lcd.print("Reset valves...");
+  adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
+  lcd.clear(); lcd.noBlink();
   
   // for invoking the code in the Memory tab - 
   // usefull for troubleshooting string literal problems
@@ -52,7 +52,7 @@ void menuOpt() {
   if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
     if (controlMode == 0) {
       controlMode = 1;
-      sprintf (title, "Begin Auto Control");
+      sprintf (title, "Begin Manual Control");
       printInfo ();
     } 
     else if (controlMode == 1) {
@@ -67,7 +67,7 @@ void menuOpt() {
       currState = 0;
       
       controlMode = 0;
-      sprintf (title, "Begin Manual Control");
+      sprintf (title, "Begin Auto Control");
       printInfo ();
     }
   }
@@ -110,11 +110,11 @@ void updateRatioMode()
       ratioState = 1;
       adjValve(va, OPEN);
     }
-    if (ratioState == 1 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
+    else if (ratioState == 1 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
       ratioState = 2;
       adjValve(vc, OPEN);
     }
-    if ( (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenTime)) ||
+    else if ( (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenTime)) ||
               ratioState == 3) {
       adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
       ratioClosedTime = (ratioClosed * ratioUnit) + millis();

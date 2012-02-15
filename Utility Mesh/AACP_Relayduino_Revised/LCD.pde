@@ -1,7 +1,7 @@
 void updateLCD() {
-  if (LCDState == 0 && millis() > nextLCDUpdate) {
+  if (LCDState == 0 && (millis() > nextLCDUpdate || ba||bb||bc||bd)) {
     if (controlMode == 0 || controlMode == 1) {  //auto and manual modes - standard display
-      nextLCDUpdate = millis() + (1000ul * 5ul); //5 seconds
+      nextLCDUpdate = millis() + (1000ul * 1ul); //1 second
       printStandardData();
     } 
     else if (controlMode == 2) { //ratio mode - special display
@@ -49,43 +49,57 @@ void printStandardData() {
 
 //handle ratio mode data and manage changes
 void printRatioData() {
+  const char str_timeLeft[] = "Time Left: ";
+  const char str_m[] = "m "; const char str_s[] = "s ";
+  const char str_seperator[] = " : ";
+  const char str_ratioMode[] = "Ratio Mode:";
+  
   unsigned long timePast = millis()-lastRatioCycleTime;
-
+  
   if (!ratioChangeRequested) { //normal case
     lcd.clear ();
     lcd.setCursor (0,0);
     if (ratioState == 0) { //waiting to open valves
-      lcd.print("Closed");
+      lcd.print(str_ratioMode); lcd.print("Closd");
       lcd.setCursor(0,1);
-      lcd.print("Time Left: ");
+      lcd.print(str_timeLeft);
       lcd.print((ratioClosedTime-timePast)/60000ul);
-      lcd.print("m");
+      lcd.print(str_m);
+      lcd.print(((ratioClosedTime-timePast)%60000ul)/1000);
+      lcd.print(str_s);
     }
     else if (ratioState == 1) { //open valve A for 5 min to prime inverter
       lcd.print("Priming Inverter");
       lcd.setCursor(0,1);
-      lcd.print("Time Left: ");
+      lcd.print(str_timeLeft);
       lcd.print(((ratioClosedTime+ratioOpenWaitTime)-timePast)/60000ul);
-      lcd.print("m");
+      lcd.print(str_m);
+      lcd.print((((ratioClosedTime+ratioOpenWaitTime)-timePast)%60000ul)/1000);
+      lcd.print(str_s);
     }
     else if (ratioState == 2) { //both valves open
+      lcd.print(str_ratioMode); lcd.print("Open");
       lcd.setCursor(0,1);
-      lcd.print("Time Left: ");
-      lcd.print(((ratioClosedTime+ratioOpenTime)-timePast)/60000ul);
-      lcd.print("m");
+      lcd.print(str_timeLeft);
+      lcd.print( ((ratioClosedTime+ratioOpenTime)-timePast)/60000ul);
+      lcd.print(str_m);
+      lcd.print((((ratioClosedTime+ratioOpenTime)-timePast)%60000ul)/1000);
+      lcd.print(str_s);
     }
   } 
   else { //handling a ratio change request
-    short tmpRatioClosed = ratioClosed; //tmp vars for storing changes until accepted
-    short tmpRatioOpen = ratioOpen;
+    static short tmpRatioClosed; //tmp vars for storing changes until accepted
+    static short tmpRatioOpen;
 
     if (ratioChangeStep == 0) { //init
+      tmpRatioClosed = ratioClosed;
+      tmpRatioOpen = ratioOpen;
       lcd.clear();
       lcd.setCursor(0,0); 
       lcd.print("Ratio Open:Closd");
       lcd.setCursor(0,1); 
       lcd.print(ratioClosed); 
-      lcd.print(':'); 
+      lcd.print(str_seperator); 
       lcd.print(ratioOpen);
       lcd.setCursor(11,1); 
       lcd.print("Accpt");
@@ -93,13 +107,13 @@ void printRatioData() {
       lcd.blink();
       ratioChangeStep = 1;
     } 
-    if (ratioChangeStep == 1) { //cursor on 1st number
+    else if (ratioChangeStep == 1) { //cursor on 1st number
       if (bc || bd) { //change value buttons
         if (bc && ++tmpRatioClosed > 20) tmpRatioClosed = 1; //increment or decrement ratioClosed, wrapping at 20
         if (bd && --tmpRatioClosed < 1) tmpRatioClosed = 20;
         lcd.noBlink();
         lcd.print(tmpRatioClosed); 
-        lcd.print(" : "); 
+        lcd.print(str_seperator); 
         lcd.print(tmpRatioOpen); 
         lcd.print(' '); 
         lcd.setCursor(0,1); 
@@ -110,7 +124,7 @@ void printRatioData() {
         ratioChangeStep = 2;
       }
     } 
-    if (ratioChangeStep == 2) { //cursor on 2nd number
+    else if (ratioChangeStep == 2) { //cursor on 2nd number
       short cursorLoc = (tmpRatioClosed < 10 ? 4 : 5);
       if (bc || bd) { //change value buttons
         if (bc && ++tmpRatioOpen > 20) tmpRatioOpen = 1; //increment or decrement ratioOpen, wrapping at 20
@@ -126,13 +140,14 @@ void printRatioData() {
         ratioChangeStep = 3;
       }
     }
-    if (ratioChangeStep == 3) { //cursor on "Accpt"
+    else if (ratioChangeStep == 3) { //cursor on "Accpt"
       if (bc || bd) { //accept changes; reset everyting relevent
         ratioClosed = tmpRatioClosed;
         ratioOpen = tmpRatioOpen;
         ratioChangeStep = 0; 
         ratioChangeRequested = 0;
         ratioState = 3; //this forces a reset on the next loop
+        lcd.clear(); lcd.home(); lcd.noBlink();
       } 
       else if (ba) { //go back to 1st number
         lcd.setCursor(0,1);
