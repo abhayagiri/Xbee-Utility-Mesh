@@ -27,6 +27,8 @@ void closeFunct (){      //    CLOSE FUNCTION
   if (currState < 1) {
     currState = 0;
   }
+  
+  printInfo();
 }
 
 void openFunct (){      //    OPEN FUNCTION
@@ -52,6 +54,8 @@ void openFunct (){      //    OPEN FUNCTION
   if (currState >6) {
     currState = 7;
   }
+  
+  printInfo();
 }
 
 void adjValve (int valve, int action) {

@@ -2,9 +2,7 @@ void txandtr(){
 //  /* Send valve state and psi data every 30 sec */
   if (millis()-lastSerialTX >= 60000ul*5ul) {// &&&&& when this number is above 1000*30, it never enters this if loop!!! ideally this number should be set to 10 minutes 
     lastSerialTX = millis();
-    char buf[32];
-    sprintf(buf,"~XB=%s,PT=TRB,V=%s,P=%d~\n",XBEE,vopen,psi);
-    Serial.print(buf);
+    sendSerialStatus();
   }
   
   /*	Check for remote commands	*/
@@ -25,8 +23,13 @@ void txandtr(){
             closeFunct();
             sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
           }
+          sendSerialStatus();
         }
       }
+     else if(keyExists(rx.data,"PT") == true && strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
+       Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
+       sendSerialStatus();
+     }
     }
   }
 }

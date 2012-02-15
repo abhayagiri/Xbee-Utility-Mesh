@@ -58,30 +58,13 @@ int getSerialData(char s[BUF_SIZE]) {
     return 1;
 }
 
-void readbutt(){
-    if (Serial.peek() == '*') {
-        Serial.read ();
-        symbol = Serial.read();
 
-        if (symbol == 65)
-            ba = 1;
 
-        if (symbol == 66)
-            bb = 1;
-
-        if (symbol == 67)
-            bc = 1;
-
-        if (symbol == 68)
-            bd = 1;
-    }
-}
-
-int sendSerialData (char *xbee, char *str)
+int sendSerialStatus ()
 {
-    char tx[32];
-    sprintf (tx,"~XB=%s,PT=TRB,%s~",xbee,str);
-    Serial.print (tx);
+    char buf[32];
+    sprintf(buf,"~XB=%s,PT=TRB,V=%s,P=%d~\n",XBEE,vopen,psi);
+    Serial.print(buf);
     return 0;
 }
 

@@ -1,6 +1,7 @@
 void sensorCheck() {
-  if (newSecond) { //once a second  
-    psiValues[currSecond % 30] = map (analogRead(psisensor), 0, 1024, 0, 250);
+  if (newSecond) { //once a second 
+    //adding 4 to normalize reading from sensor 
+    psiValues[currSecond % 30] = 4 + map(analogRead(psisensor), 0, 1024, 0, 250);
     for (int i=0; i<30; i++)
       psi += psiValues[i];
     psi = psi/30;
