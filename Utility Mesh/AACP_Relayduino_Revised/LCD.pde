@@ -37,8 +37,7 @@ void printStandardData() {
 
 //handle ratio mode data and manage changes
 void printRatioData() {
-  const char str_timeLeft[] = "Time Left: ";
-  const char str_m[] = "m "; const char str_s[] = "s ";
+  const char str_timeLeft[] = "Time: ";
   const char str_seperator[] = " : ";
   const char str_ratioMode[] = "Ratio Mode:";
   
@@ -51,28 +50,19 @@ void printRatioData() {
       lcd.print(str_ratioMode); lcd.print("Closd");
       lcd.setCursor(0,1);
       lcd.print(str_timeLeft);
-      lcd.print((ratioClosedTime-timePast)/60000ul);
-      lcd.print(str_m);
-      lcd.print(((ratioClosedTime-timePast)%60000ul)/1000);
-      lcd.print(str_s);
+      printMinSecString(ratioClosedTime-timePast);
     }
-    else if (ratioState == 1) { //open valve A for 5 min to prime inverter
+    else if (ratioState == 1) { //open valve A for ~5 min to prime inverter
       lcd.print("Priming Inverter");
       lcd.setCursor(0,1);
       lcd.print(str_timeLeft);
-      lcd.print(((ratioClosedTime+ratioOpenWaitTime)-timePast)/60000ul);
-      lcd.print(str_m);
-      lcd.print((((ratioClosedTime+ratioOpenWaitTime)-timePast)%60000ul)/1000);
-      lcd.print(str_s);
+      printMinSecString((ratioClosedTime+ratioOpenWaitTime)-timePast);
     }
     else if (ratioState == 2) { //both valves open
       lcd.print(str_ratioMode); lcd.print("Open");
       lcd.setCursor(0,1);
       lcd.print(str_timeLeft);
-      lcd.print( ((ratioClosedTime+ratioOpenTime)-timePast)/60000ul);
-      lcd.print(str_m);
-      lcd.print((((ratioClosedTime+ratioOpenTime)-timePast)%60000ul)/1000);
-      lcd.print(str_s);
+      printMinSecString((ratioClosedTime+ratioOpenTime)-timePast);
     }
   } 
   else { //handling a ratio change request
@@ -153,7 +143,21 @@ void printInfo () { //print a temporary message
   LCDState = 1; //tells updateLCD() we are displaying a temp. message
 }
 
-
+void printMinSecString(unsigned long msecs) {
+    //msecs = msecs % 60039000; //mod out values above 999:99
+    short i = 0; //index for buffer
+    unsigned int m = 0;
+    unsigned int s = 0;
+    
+    while (msecs >= 60000) {
+      m++; msecs -= 60000;
+    }
+    s = msecs / 1000;
+    
+    lcd.print(m); lcd.print(':');
+    if (s<10) lcd.print(0);
+    lcd.print(s);
+}
 
 
 

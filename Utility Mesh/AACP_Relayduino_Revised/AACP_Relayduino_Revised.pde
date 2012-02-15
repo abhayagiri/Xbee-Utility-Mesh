@@ -57,6 +57,7 @@ void menuOpt() {
     } 
     else if (controlMode == 1) {
       controlMode = 2;
+      ratioState = 3;
       sprintf (title, "Begin Ratio Mode");
       printInfo ();
     }
@@ -117,8 +118,8 @@ void updateRatioMode()
     else if ( (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenTime)) ||
               ratioState == 3) {
       adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
-      ratioClosedTime = (ratioClosed * ratioUnit) + millis();
-      ratioOpenTime = (ratioOpen * ratioUnit) + ratioClosedTime;
+      ratioClosedTime = (ratioClosed * ratioUnit);
+      ratioOpenTime = (ratioOpen * ratioUnit);
       lastRatioCycleTime = millis();
       ratioState = 0;
     }

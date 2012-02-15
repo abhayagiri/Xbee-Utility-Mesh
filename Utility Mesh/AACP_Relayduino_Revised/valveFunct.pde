@@ -20,6 +20,7 @@ void closeFunct (){      //    CLOSE FUNCTION
   }
   if (currState == 0){
     sprintf (title, "All Valves Closed");
+    printInfo();
    sendSerialValveOp(XBEE,"VLV=0,OP=ALLC");// 
     delay (2000);
   }
@@ -27,8 +28,6 @@ void closeFunct (){      //    CLOSE FUNCTION
   if (currState < 1) {
     currState = 0;
   }
-  
-  printInfo();
 }
 
 void openFunct (){      //    OPEN FUNCTION
@@ -46,16 +45,15 @@ void openFunct (){      //    OPEN FUNCTION
     adjValve (vc, OPEN);
   }
   if (currState == 7){
-    sprintf (title, "All Valves Open");   
-   sendSerialValveOp(XBEE,"VLV=0,OP=ALLO");//
+    sprintf (title, "All Valves Open");
+    printInfo();  
+    sendSerialValveOp(XBEE,"VLV=0,OP=ALLO");//
     delay (2000);
   }
   currState++;
   if (currState >6) {
     currState = 7;
   }
-  
-  printInfo();
 }
 
 void adjValve (int valve, int action) {
@@ -112,7 +110,8 @@ void adjValve (int valve, int action) {
     digitalWrite (valve, LOW);
   }
   
- sendSerialValveOp(XBEE, opPacket);
+  sendSerialValveOp(XBEE, opPacket);
+  printInfo();
   
   if (r == REAL){
     delayTime = (15000);// &&&&& should be 15000 - see also txandtr for more &&&&&
