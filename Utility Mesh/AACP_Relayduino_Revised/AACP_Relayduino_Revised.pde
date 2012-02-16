@@ -52,12 +52,12 @@ void menuOpt() {
   if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
     if (controlMode == 0) {
       controlMode = 1;
-      sprintf (title, "Begin Manual Control");
+      sprintf (title, "Begin Manual Mode");
       printInfo ();
     } 
     else if (controlMode == 1) {
       controlMode = 2;
-      ratioState = 3;
+      ratioState = 0; ratioConfirmTimer = millis() + 5000; //wait 5 sec
       sprintf (title, "Begin Ratio Mode");
       printInfo ();
     }
@@ -68,14 +68,14 @@ void menuOpt() {
       currState = 0;
       
       controlMode = 0;
-      sprintf (title, "Begin Auto Control");
+      sprintf (title, "Begin Auto Mode");
       printInfo ();
     }
   }
 
   if (bc==1) {                 //bc was pressed
     if (controlMode == 0 || controlMode == 1) {
-      sprintf (title, "   Stepping Up...");
+      sprintf (title, "Stepping Up...");
       printInfo ();
       openFunct();
     }
@@ -83,7 +83,7 @@ void menuOpt() {
 
   if (bd==1) {                  //bd was pressed
     if (controlMode == 0 || controlMode == 1) {
-      sprintf (title, "  Stepping Down...");
+      sprintf (title, "Stepping Down...");
       printInfo ();
       closeFunct();
     }
@@ -107,21 +107,21 @@ void updateRatioMode()
   if (controlMode == 2) {
     unsigned long timePast = millis() - lastRatioCycleTime;
 
-    if (ratioState == 0 && timePast > ratioClosedTime) {
+    if (ratioState == 1 && timePast > ratioClosedTime) {
       ratioState = 1;
       adjValve(va, OPEN);
     }
-    else if (ratioState == 1 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
+    else if (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
       ratioState = 2;
       adjValve(vc, OPEN);
     }
-    else if ( (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenTime)) ||
-              ratioState == 3) {
+    else if ( (ratioState == 3 && timePast > (ratioClosedTime + ratioOpenTime)) ||
+              ratioState == 4) {
       adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
       ratioClosedTime = (ratioClosed * ratioUnit);
       ratioOpenTime = (ratioOpen * ratioUnit);
       lastRatioCycleTime = millis();
-      ratioState = 0;
+      ratioState = 1;
     }
   } 
 } 

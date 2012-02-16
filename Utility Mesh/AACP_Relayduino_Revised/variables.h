@@ -51,6 +51,7 @@ unsigned long nextLCDUpdate = 0;
 unsigned long infoDismissTime = 0; //time to dismiss temporary info messages
 
 //ratio mode variables
+unsigned long ratioConfirmTimer = 0; //used to give user a few seconds before RM kicks in
 unsigned long ratioUnit = 2700000; //45 min. time unit
 unsigned long ratioOpenWaitTime = 270000; //wait 4.5 min. with just vA open when moving to open ratio time
 short ratioClosed = 1; //ratio is 1:1 at first

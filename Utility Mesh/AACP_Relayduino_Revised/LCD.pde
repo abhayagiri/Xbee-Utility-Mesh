@@ -5,7 +5,7 @@ void updateLCD() {
       printStandardData();
     } 
     else if (controlMode == 2) { //ratio mode - special display
-      nextLCDUpdate = millis() + 500; // 1/2 second, so the second countdown works
+      nextLCDUpdate = millis() + 500; // 1/2 second, so the second countdowns works
       printRatioData();
     }
   }
@@ -46,19 +46,29 @@ void printRatioData() {
   if (!ratioChangeRequested) { //normal case
     lcd.clear ();
     lcd.setCursor (0,0);
-    if (ratioState == 0) { //waiting to open valves
+    
+    if (ratioState == 0) { //waiting on confirmation countdown
+      if (millis() < ratioConfirmTimer) {
+        lcd.print("Enter Ratio Mode");
+        lcd.setCursor(0,1); lcd.print("in ");
+        lcd.print(((ratioConfirmTimer - millis())/1000) + 1);
+      } else {
+        ratioState = 4;
+      }  
+    }
+    else if (ratioState == 1) { //waiting to open valves
       lcd.print(str_ratioMode); lcd.print("Closd");
       lcd.setCursor(0,1);
       lcd.print(str_timeLeft);
       printMinSecString(ratioClosedTime-timePast);
     }
-    else if (ratioState == 1) { //open valve A for ~5 min to prime inverter
+    else if (ratioState == 2) { //open valve A for ~5 min to prime inverter
       lcd.print("Priming Inverter");
       lcd.setCursor(0,1);
       lcd.print(str_timeLeft);
       printMinSecString((ratioClosedTime+ratioOpenWaitTime)-timePast);
     }
-    else if (ratioState == 2) { //both valves open
+    else if (ratioState == 3) { //both valves open
       lcd.print(str_ratioMode); lcd.print("Open");
       lcd.setCursor(0,1);
       lcd.print(str_timeLeft);
@@ -124,7 +134,7 @@ void printRatioData() {
         ratioOpen = tmpRatioOpen;
         ratioChangeStep = 0; 
         ratioChangeRequested = 0;
-        ratioState = 3; //this forces a reset on the next loop
+        ratioState = 4; //this forces a reset on the next loop
         lcd.clear(); lcd.home(); lcd.noBlink();
       } 
       else if (ba) { //go back to 1st number
