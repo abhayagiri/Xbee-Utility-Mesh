@@ -1,10 +1,10 @@
 void txandtr(){
-//  /* Send valve state and psi data every 30 sec */
+  //  /* Send valve state and psi data every 30 sec */
   if (millis()-lastSerialTX >= 60000ul*5ul) {// &&&&& when this number is above 1000*30, it never enters this if loop!!! ideally this number should be set to 10 minutes 
     lastSerialTX = millis();
     sendSerialStatus();
   }
-  
+
   /*	Check for remote commands	*/
   if (getSerialData(rx.str) == 0) {
     parseData (rx.data,rx.str);
@@ -26,10 +26,11 @@ void txandtr(){
           sendSerialStatus();
         }
       }
-     else if(keyExists(rx.data,"PT") == true && strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
-       Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
-       sendSerialStatus();
-     }
+    }
+    else if(keyExists(rx.data,"PT") == true && strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
+      Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
+      sendSerialStatus();
     }
   }
 }
+
