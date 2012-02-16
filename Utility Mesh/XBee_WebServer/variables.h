@@ -60,10 +60,10 @@ int webState = WEB_NORMAL; //set when handling button press on web page
 #define LENGTH(a,t)	((sizeof(a))/(sizeof(t)))
 
 struct timerStruct {
-	unsigned long day;
-	int hour;
-	int min;
-	int sec;
+	unsigned int day;
+	unsigned int hour;
+	unsigned int min;
+	unsigned int sec;
 	bool justOverflowed;
 };
 struct timerStruct timer = {0,0,0,0,false};

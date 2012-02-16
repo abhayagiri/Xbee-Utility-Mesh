@@ -56,8 +56,8 @@ void setup() {
     Serial.begin(9600);
     debugPrintln_p(PSTR("Setup finished"));
     
-    //printMemoryProfile();
-    //delay(300000);
+//    printMemoryProfile();
+//    delay(300000);
 }
 
 void loop() {
@@ -179,7 +179,7 @@ void loop() {
                                  PSTR("2") );
               }
               else
-                debugPrintln("no valid option found");
+                debugPrintln_p(PSTR("no valid option found"));
 
             }
             else if (webState == WEB_CMD_SENT) {

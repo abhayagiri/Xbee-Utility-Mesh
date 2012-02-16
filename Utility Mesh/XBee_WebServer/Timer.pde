@@ -13,13 +13,13 @@ void resetMillis() {
 // in Days, Hours, Minutes, Seconds
 char *timePastStr(char *str, struct timerStruct *t, struct timerStruct *stmp) {
     unsigned long tmp =     ((t->day*86400ul)
-                                     +(t->hour*3600)
-                                     +(t->min*60)
+                                     +(t->hour*3600ul)
+                                     +(t->min*60ul)
                                      +(t->sec)
                             )
                            -((stmp->day*86400)
-                                     +(stmp->hour*3600)
-                                     +(stmp->min*60)
+                                     +(stmp->hour*3600ul)
+                                     +(stmp->min*60ul)
                                      +(stmp->sec)
                             );
     int s = tmp%60;
@@ -35,14 +35,14 @@ char *timePastStr(char *str, struct timerStruct *t, struct timerStruct *stmp) {
 
 // Convert time difference to minutes
 unsigned long timePastMinutes(struct timerStruct *t, struct timerStruct *stmp) {
-    unsigned long tmp =     ((t->day*86400)
-                                     +(t->hour*3600)
-                                     +(t->min*60)
+    unsigned long tmp =     ((t->day*86400ul)
+                                     +(t->hour*3600ul)
+                                     +(t->min*60ul)
                                      +(t->sec)
                             )
-                           -((stmp->day*86400)
-                                     +(stmp->hour*3600)
-                                     +(stmp->min*60)
+                           -((stmp->day*86400ul)
+                                     +(stmp->hour*3600ul)
+                                     +(stmp->min*60ul)
                                      +(stmp->sec)
                             );
     unsigned long m = tmp/60;
@@ -51,16 +51,23 @@ unsigned long timePastMinutes(struct timerStruct *t, struct timerStruct *stmp) {
 
 unsigned long timePastSeconds(struct timerStruct *t, struct timerStruct *stmp) {
     unsigned long tmp =     ((t->day*86400)
-                                     +(t->hour*3600)
-                                     +(t->min*60)
+                                     +(t->hour*3600ul)
+                                     +(t->min*60ul)
                                      +(t->sec)
                             )
                            -((stmp->day*86400)
-                                     +(stmp->hour*3600)
-                                     +(stmp->min*60)
+                                     +(stmp->hour*3600ul)
+                                     +(stmp->min*60ul)
                                      +(stmp->sec)
                             );
     return tmp;
+}
+
+boolean timeStampIsZero(struct timerStruct t) {
+  if (t.sec==0 && t.min==0 && t.hour==0 && t.day==0)
+    return true;
+  else
+    return false;
 }
 
 int updateTimer(struct timerStruct *t) {
