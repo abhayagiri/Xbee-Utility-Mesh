@@ -174,7 +174,7 @@ void printMainPage(Client client) {
     if (alerts[i]->active && alerts[i]->dismissed) {
       char timestr[32] = "";
       printlnEther_p(client, PSTR("<tr><td>"));
-      printlnEther_p(client, PSTR("<table border=1 width=100%><tr><td><b>ALERT</b></td><td><b>"));
+      printlnEther_p(client, PSTR("<table border=1 width=100% bgcolor=\"SandyBrown\"><tr><td><b>ALERT</b></td><td><b>"));
       client.print(timePastMinutes(&timer,&(alerts[i]->timeStamp)));
       printlnEther_p(client, (PSTR(" Minutes Old</b></td></tr>")));
       printlnEther_p(client, PSTR("<tr><td colspan=\"2\"><b>"));
@@ -239,6 +239,11 @@ void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_c
   printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
 }
 
+void printRedirect(Client client) {
+  printlnEther_p(client, PSTR("HTTP/1.1 303 See Other"));
+  printEther_p(client, PSTR("Location: "));
+  printlnEther_p(client, myUrl);
+}
 
 
 

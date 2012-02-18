@@ -10,15 +10,21 @@ int saveHydroWattsData(struct hydroWattsStruct *hW, struct dataStruct d[]) {
 
 // Save data from temporary packet buffer (rx.data) and store in a special
 // struct for water tank data
-int saveTankData(struct tankStruct *t, struct dataStruct d[]) {
-	strlcpy(t->id,getDataVal(d,"XB"),4);
+int saveTankData(int tankID, struct dataStruct d[]) {
+	struct tankStruct *t = &tanks[tankID];
+
+        strlcpy(t->id,getDataVal(d,"XB"),4);
 	t->level = atoi(getDataVal(d,"LVL"));
 	t->timeStamp = timer; // save current time to calculate difference later
-        if (t->level <=2 && !tankAlert.active) { //alert!
-          tankAlert.active = true;
-          tankAlert.dismissed = false;
-          tankAlert.timeStamp = timer;
-        } else tankAlert.active = false;
+
+        struct alertStruct *tankAlert = alerts[tankID];
+        if (t->level <= 2 && !tankAlert->active) { //alert!
+          tankAlert->active = true;
+          tankAlert->dismissed = false;
+          tankAlert->timeStamp = timer;
+        } else if (t->level > 2) 
+          tankAlert->active = false;
+          
 	return 0;
 }
 
@@ -29,12 +35,15 @@ int saveTurbineData(struct turbineStruct *t, struct dataStruct d[]) {
 	strlcpy(t->valves,getDataVal(d,"V"),5);
 	t->psi = atoi(getDataVal(d,"P"));
 	t->timeStamp = timer; // save current time to calculate difference later
-        if (t->psi <=180 && !psiAlert.active) { //alert!
+        
+        if (t->psi < 180 && !psiAlert.active) { //alert!
           psiAlert.active = true;
           psiAlert.dismissed = false;
           psiAlert.timeStamp = timer;
-        } else psiAlert.active = false;
-	return 0;
+        } else if (t->psi >= 180) 
+          psiAlert.active = false;
+	
+        return 0;
 }
 
 // Save data from temporary packet buffer (rx.data) and store in a special
@@ -46,31 +55,14 @@ int saveBatteryData(struct batteryStruct *batt, struct dataStruct d[]) {
 	strlcpy(batt->hourVolts,getDataVal(d,"H"),6);
 	batt->watts = atof(getDataVal(d,"L"));
 	batt->timeStamp = timer; // save current time to calculate difference later
+        
         if (batt->status < 0 && !battAlert.active) { //alert!
           battAlert.active = true;
           battAlert.dismissed = false;
           battAlert.timeStamp = timer;
-        } else battAlert.active = false;
-        // set string for battery status display based on the code stored in batt->status
-        /*switch(batt->status) {
-            case -3:
-                sprintf(batt->statusStr,"-3: Fast Blinking Red");
-                break;
-            case -2:
-                sprintf(batt->statusStr,"-2: Slow Blinking Red");
-                break;
-            case -1:
-                sprintf(batt->statusStr,"-1: Solid Red");
-                break;
-            case 0:
-                sprintf(batt->statusStr,"0: Blue");
-                break;
-            case 1:
-                sprintf(batt->statusStr,"1: Green");
-                break;
-            default:
-                sprintf(batt->statusStr,"Unknown");
-        }       */
+        } else if (batt->status >= 0) 
+          battAlert.active = false;
+  
 	return 0;
 
 }

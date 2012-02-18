@@ -61,9 +61,11 @@ void setup() {
   turbine.psi = -9;
 
   //initalize alerts
-  alerts[0] = &battAlert;
-  alerts[1] = &tankAlert;
-  alerts[2] = &psiAlert;
+  alerts[0] = &twtAlert;
+  alerts[1] = &fwtAlert;
+  alerts[2] = &rdgAlert;
+  alerts[3] = &battAlert;
+  alerts[4] = &psiAlert;
 
   // Start serial port at 9600 bps, used for getting data from XBee
   Serial.begin(9600);
@@ -174,11 +176,9 @@ void loop() {
             }
             else if ((strstr_P(optStr, PSTR("dismiss=")) == optStr))
             {
-              Serial.println("gotit");
               int i = atoi(&optStr[8])-1;
-              Serial.println(i);
               if (i>=0 && i<NUM_ALERTS)
-                alerts[i]->dismissed=true;  
+                alerts[i]->dismissed=true;
             }
 
             if (foundCommand) {
@@ -200,7 +200,7 @@ void loop() {
               PSTR("2") );
             }
             else
-              printMainPage(client);
+              printRedirect(client);
           }
           else if (webState == WEB_CMD_SENT) {
             //check timer - if ok, resend timeout page; if not, send failure info, reset webState
@@ -260,11 +260,11 @@ void loop() {
       // Check for and save any Tank data
       if (strcmp(getDataVal(rx.data,"PT"),"TNK") == 0) {
         if (strcmp(getDataVal(rx.data,"XB"),"TWT") == 0)
-          saveTankData(&tanks[TWT],rx.data);
+          saveTankData(TWT,rx.data);
         if (strcmp(getDataVal(rx.data,"XB"),"FWT") == 0)
-          saveTankData(&tanks[FWT],rx.data);
+          saveTankData(FWT,rx.data);
         if (strcmp(getDataVal(rx.data,"XB"),"RDG") == 0)
-          saveTankData(&tanks[RDG],rx.data);
+          saveTankData(RDG,rx.data);
       }
 
       // Check for and save any Turbine data
@@ -338,9 +338,13 @@ void loop() {
 
   //check alerts and handle LED
   if (timer.justOverflowed) {
-    if ((battAlert.active && !battAlert.dismissed) || 
-      (tankAlert.active && !tankAlert.dismissed) || 
-      (psiAlert.active && !psiAlert.dismissed))
+    boolean alertsActive = false;
+    for (int i=0; i<NUM_ALERTS; i++) {
+      if (alerts[i]->active && !(alerts[i]->dismissed))
+        alertsActive = true;
+    }
+        
+    if (alertsActive)
       if (ledOn) {
         digitalWrite(ALERT_LED, LOW); ledOn = false;
       } else {

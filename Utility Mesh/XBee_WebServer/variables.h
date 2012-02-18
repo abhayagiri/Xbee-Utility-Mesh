@@ -4,7 +4,7 @@ boolean debugMode = false;
 // The IP address will be dependent on your local network:
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192,168,0,230 };
-prog_char myUrl[] PROGMEM = "http://192.168.0.230/";
+prog_char myUrl[] PROGMEM = "http://xbee-mesh/";
 
 // Minutes to wait until data is deemed old enough to warrent a warning
 #define MINUTES_UNTIL_OLD    10
@@ -43,8 +43,10 @@ prog_char valveClosePacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A2=1~";
 prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
+prog_char twtAlertStr[] PROGMEM = "TWT - Water Level Low";
+prog_char fwtAlertStr[] PROGMEM = "FWT - Water Level Low";
+prog_char rdgAlertStr[] PROGMEM = "RDG - Water Level Low";
 prog_char battAlertStr[] PROGMEM = "Battery Bank Voltage Low";
-prog_char tankAlertStr[] PROGMEM = "Tank Water Level Low";
 prog_char psiAlertStr[] PROGMEM = "Turbine PSI Low";
 
 // Turbine Error Limit (if watt reading from Upper Water Shed fall too far
@@ -140,11 +142,15 @@ struct alertStruct {
   prog_char *alertString;
   struct timerStruct timeStamp;
 };
-#define NUM_ALERTS 3
+
+#define NUM_ALERTS TANK_NUM + 2 //one for each tank, plus however many more
 #define ALERT_LED 3
+//tanks at the top, in same order as corresponding structs in tanks[]
 struct alertStruct *alerts[NUM_ALERTS];
+struct alertStruct twtAlert = {false, false, twtAlertStr};
+struct alertStruct fwtAlert = {false, false, fwtAlertStr};
+struct alertStruct rdgAlert = {false, false, rdgAlertStr};
 struct alertStruct battAlert = {false, false, battAlertStr};
-struct alertStruct tankAlert = {false, false, tankAlertStr};
 struct alertStruct psiAlert = {false, false, psiAlertStr};
 boolean ledOn = false;
 
