@@ -269,21 +269,6 @@ void loop() {
                
             if ( pingMode && strcmp(getDataVal(rx.data,"PT"),"PONG") == 0)
               handlePongPacket(rx.data);
-                // If it was and is for Turbine
-//                if (strcmp(getDataVal(rx.data,"XB"),"TRB") == 0) {
-//                    if (strcmp(getDataVal(rx.data,"DST"),XBEE) == 0) {
-//                        char buf[20];
-//                        lcd.clear();
-//                        lcd.setCursor(0,0);
-//                        sprintf(buf,"Msg from: %s",getDataVal(rx.data,"XB"));
-//                        lcd.print(buf);
-//                        lcd.setCursor(0,1);
-//                        lcd.print("Command Received");
-//                        config.pauseCounter = 5;
-//                        valveCommandState = 0; 
-//                    }
-//                }
-//            }
 
             // Check for and save any Tank data
             if (strcmp(getDataVal(rx.data,"PT"),"TNK") == 0) {

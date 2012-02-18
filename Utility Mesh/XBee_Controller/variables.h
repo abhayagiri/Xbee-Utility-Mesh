@@ -3,7 +3,7 @@
 // Number of display modes for LCD
 #define DISPLAY_MODES	3
 //Backlight timer - seconds on
-#define BACKLIGHT_TIME 5
+#define BACKLIGHT_TIME 60
 // Size of array for storing recieved serial data
 #define BUF_SIZE 128
 // Number of entries that can be recieved over serial
@@ -158,7 +158,7 @@ int valveCommandState = 0; // controls valve command display sequence:
                            // 5/6 - received individual valve op info, waiting on more or final AWK
                            // 7/8 - final AWK received
                            // 9/10 - automatic valve operation received
-                           // odd states - no printed to display yet
+                           // odd states - not printed to display yet
                            // even sates - info printed, waiting on state change
                            
 //unsigned long int pkts = 0; //total # packets processed

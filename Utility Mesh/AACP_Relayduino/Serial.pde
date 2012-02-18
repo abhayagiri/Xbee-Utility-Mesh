@@ -63,6 +63,7 @@ int getSerialData(char s[BUF_SIZE]) {
 int sendSerialStatus ()
 {
     char buf[32];
+    valvestate();
     sprintf(buf,"~XB=%s,PT=TRB,V=%s,P=%d~\n",XBEE,vopen,psi);
     Serial.print(buf);
     return 0;

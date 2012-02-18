@@ -23,7 +23,6 @@ void txandtr(){
             closeFunct();
             sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
           }
-          sendSerialStatus();
         }
       }
     }

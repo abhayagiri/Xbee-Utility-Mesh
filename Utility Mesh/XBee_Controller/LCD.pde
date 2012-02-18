@@ -22,11 +22,12 @@ void printDefaultScreen (struct configStruct *cfg, struct timerStruct *t, struct
   switch (cfg->indexDefault) {
     case 0: //turbine/watts data
       //line 1
+      //TODO: use older timestamp after hydro is up and running
       //get older of two timestamps
-      if (timePast(t, &(trbn->timeStamp)) > timePast(t, &(hydro->timeStamp)))
+      //if (timePast(t, &(trbn->timeStamp)) > timePast(t, &(hydro->timeStamp)))
         timePastStr(t, &(trbn->timeStamp), tmpStr);
-      else
-        timePastStr(t, &(hydro->timeStamp), tmpStr);
+      //else
+      //  timePastStr(t, &(hydro->timeStamp), tmpStr);
       sprintf(line1, "V. open:%s", trbn->valves);
       appendToEnd(line1, tmpStr, 16);
       //line 2

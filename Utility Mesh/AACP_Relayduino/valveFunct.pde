@@ -28,6 +28,9 @@ void closeFunct (){      //    CLOSE FUNCTION
   if (currState < 1) {
     currState = 0;
   }
+  //update valve state string and send status update
+  valvestate();
+  sendSerialStatus();
 }
 
 void openFunct (){      //    OPEN FUNCTION
@@ -54,6 +57,9 @@ void openFunct (){      //    OPEN FUNCTION
   if (currState >6) {
     currState = 7;
   }
+  //update valve state string and send status update
+  valvestate();
+  sendSerialStatus();
 }
 
 void adjValve (int valve, int action) {

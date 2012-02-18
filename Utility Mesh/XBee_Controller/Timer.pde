@@ -10,14 +10,14 @@ void resetMillis() {
 }
 
 unsigned long timePast(struct timerStruct *t, struct timerStruct *stmp) {
-    unsigned long tmp =     ((t->day*86400)
-                                     +(t->hour*3600)
-                                     +(t->min*60)
+    unsigned long tmp =     ((t->day*86400ul)
+                                     +(t->hour*3600ul)
+                                     +(t->min*60ul)
                                      +(t->sec)
                             )
-                           -((stmp->day*86400)
-                                     +(stmp->hour*3600)
-                                     +(stmp->min*60)
+                           -((stmp->day*86400ul)
+                                     +(stmp->hour*3600ul)
+                                     +(stmp->min*60ul)
                                      +(stmp->sec)
                             );
     return tmp;
@@ -25,14 +25,14 @@ unsigned long timePast(struct timerStruct *t, struct timerStruct *stmp) {
 
 // Convert time difference to minutes
 void timePastStr(struct timerStruct *t, struct timerStruct *stmp, char *buf) {
-    unsigned long tmp =     ((t->day*86400)
-                                     +(t->hour*3600)
-                                     +(t->min*60)
+    unsigned long tmp =     ((t->day*86400ul)
+                                     +(t->hour*3600ul)
+                                     +(t->min*60ul)
                                      +(t->sec)
                             )
-                           -((stmp->day*86400)
-                                     +(stmp->hour*3600)
-                                     +(stmp->min*60)
+                           -((stmp->day*86400ul)
+                                     +(stmp->hour*3600ul)
+                                     +(stmp->min*60ul)
                                      +(stmp->sec)
                             );
     unsigned int m = tmp/60;
@@ -41,7 +41,7 @@ void timePastStr(struct timerStruct *t, struct timerStruct *stmp, char *buf) {
 
 int updateTimer(struct timerStruct *t) {
 
-	if ((loopMillis = millis()) > nextSecond) {
+	if ((loopMillis = millis()) >= nextSecond) {
 		//resetMillis();
 		nextSecond += 1000;
                 t->sec++;
