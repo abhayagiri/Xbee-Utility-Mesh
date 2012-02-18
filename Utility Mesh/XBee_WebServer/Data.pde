@@ -36,11 +36,11 @@ int saveTurbineData(struct turbineStruct *t, struct dataStruct d[]) {
 	t->psi = atoi(getDataVal(d,"P"));
 	t->timeStamp = timer; // save current time to calculate difference later
         
-        if (t->psi < 180 && !psiAlert.active) { //alert!
+        if (t->psi <= 155 && !psiAlert.active) { //alert!
           psiAlert.active = true;
           psiAlert.dismissed = false;
           psiAlert.timeStamp = timer;
-        } else if (t->psi >= 180) 
+        } else if (t->psi > 155) 
           psiAlert.active = false;
 	
         return 0;
