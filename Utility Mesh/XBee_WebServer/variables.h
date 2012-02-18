@@ -43,6 +43,9 @@ prog_char valveClosePacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A2=1~";
 prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
+prog_char battAlertStr[] PROGMEM = "Battery Bank Voltage Low";
+prog_char tankAlertStr[] PROGMEM = "Tank Water Level Low";
+prog_char psiAlertStr[] PROGMEM = "Turbine PSI Low";
 
 // Turbine Error Limit (if watt reading from Upper Water Shed fall too far
 // there is probably a problem with the turbine)
@@ -55,6 +58,7 @@ int webState = WEB_NORMAL; //set when handling button press on web page
 #define	TWT	0
 #define	FWT	1
 #define RDG	2
+const float numTankLevels = 6.0; //number of levels the tank sensors can report
 
 // Macro to calculate size of array
 #define LENGTH(a,t)	((sizeof(a))/(sizeof(t)))
@@ -79,6 +83,7 @@ struct tankStruct {
 	char id[ID_LENGTH];	// Three bytes for XBee ID,
 				// 4th byte is null termination
 	int level;
+        unsigned int tankCap;   // Tank capacity in gallons
 	struct timerStruct timeStamp; // timestamp to calculate time
 					// since last data came in
         unsigned int dmin;
@@ -128,6 +133,20 @@ struct packetStruct{
 	struct dataStruct data[KEYS_MAX];
 };
 packetStruct rx = { };
+
+struct alertStruct {
+  boolean active;
+  boolean dismissed;
+  prog_char *alertString;
+  struct timerStruct timeStamp;
+};
+#define NUM_ALERTS 3
+#define ALERT_LED 3
+struct alertStruct *alerts[NUM_ALERTS];
+struct alertStruct battAlert = {false, false, battAlertStr};
+struct alertStruct tankAlert = {false, false, tankAlertStr};
+struct alertStruct psiAlert = {false, false, psiAlertStr};
+boolean ledOn = false;
 
 //this keeps track of timeouts for web commands
 struct webCmdTimerStruct {

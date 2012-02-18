@@ -29,7 +29,7 @@ char *timePastStr(char *str, struct timerStruct *t, struct timerStruct *stmp) {
     int h = tmp%24;
     long d = tmp/24;
     
-    sprintf(str,"%02ldd%02dh%02dm%02ds",d,h,m,s);
+    snprintf(str,32,"%02ldd%02dh%02dm%02ds",d,h,m,s);
     return str;
 }
 
@@ -75,7 +75,7 @@ int updateTimer(struct timerStruct *t) {
 	if (millis() > 1000) {
 		resetMillis();
 		t->sec++;
-		t->justOverflowed = true;
+		t->justOverflowed = true;                
 	} else {
 		t->justOverflowed = false;
 	}

@@ -32,6 +32,27 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Send Ping\"/>"));
   printlnEther_p(client, PSTR("</form></td></tr>"));
 
+  for (int i=0; i<NUM_ALERTS; i++) {
+    if (alerts[i]->active && !alerts[i]->dismissed) {
+      char timestr[32] = "";
+      printlnEther_p(client, PSTR("<tr><td>"));
+      printlnEther_p(client, PSTR("<table border=1 bgcolor=\"Red\" width=100%><tr><td><b>ALERT</b></td><td><b>"));
+      client.print(timePastMinutes(&timer,&(alerts[i]->timeStamp)));
+      printlnEther_p(client, (PSTR(" Minutes Old</b></td></tr>")));
+      printlnEther_p(client, PSTR("<tr><td colspan=\"2\"><b>"));
+      printlnEther_p(client, alerts[i]->alertString);
+      printlnEther_p(client, PSTR("</b></td></tr>"));
+      printlnEther_p(client, PSTR("</table></td>"));
+      printEther_p(client, PSTR("<td align=\"center\" valign=\"middle\"><form name=\"dismissForm\""));
+      printlnEther_p(client, PSTR(" action=\"/\" method=\"get\">"));
+      printEther_p(client, PSTR("<input type=\"hidden\" name=\"dismiss\" value=\""));
+      client.print(i+1); 
+      printlnEther_p(client, PSTR("\"/>"));
+      printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Dismiss\"/>"));
+      printlnEther_p(client, PSTR("</form></td></tr>"));
+    } 
+  }
+
   // Battery Info
   printlnEther_p(client, PSTR("<tr><td>"));
   printlnEther_p(client, PSTR("<table border=1 width=100%><tr><td><b>Battery</b></td><td><b>"));
@@ -105,8 +126,8 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR(" Minutes Old</b></td></tr>"));
   if (gotTwt) {
     printEther_p(client, PSTR("<tr><td>Level</td><td>"));
-    client.print(tanks[TWT].level);
-    printlnEther_p(client, PSTR("</td></tr>"));
+    client.print(tanks[TWT].tankCap / numTankLevels * tanks[TWT].level, 0);
+    printlnEther_p(client, PSTR(" gal.</td></tr>"));
   }  
   else {
     printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
@@ -118,8 +139,8 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR(" Minutes Old</b></td></tr>"));
   if (gotFwt) {
     printEther_p(client, PSTR("<tr><td>Level</td><td>"));
-    client.print(tanks[FWT].level);
-    printlnEther_p(client, PSTR("</td></tr>"));
+    client.print(tanks[FWT].tankCap / numTankLevels * tanks[FWT].level, 0);
+    printlnEther_p(client, PSTR(" gal.</td></tr>"));
   }  
   else {
     printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
@@ -131,8 +152,8 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR(" Minutes Old</b></td></tr>"));
   if (gotRdg) {
     printEther_p(client, PSTR("<tr><td>Level</td><td>"));
-    client.print(tanks[RDG].level);
-    printlnEther_p(client, PSTR("</td></tr>"));
+    client.print(tanks[RDG].tankCap / numTankLevels * tanks[RDG].level, 0);
+    printlnEther_p(client, PSTR(" gal.</td></tr>"));
   }  
   else {
     printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
@@ -148,6 +169,20 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"pumpOp\" value=\"off\"/>"));
   printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Pump Off\"/>"));
   printlnEther_p(client, PSTR("</form></td></tr></table></td></tr>"));
+
+  for (int i=0; i<NUM_ALERTS; i++) {
+    if (alerts[i]->active && alerts[i]->dismissed) {
+      char timestr[32] = "";
+      printlnEther_p(client, PSTR("<tr><td>"));
+      printlnEther_p(client, PSTR("<table border=1 width=100%><tr><td><b>ALERT</b></td><td><b>"));
+      client.print(timePastMinutes(&timer,&(alerts[i]->timeStamp)));
+      printlnEther_p(client, (PSTR(" Minutes Old</b></td></tr>")));
+      printlnEther_p(client, PSTR("<tr><td colspan=\"2\"><b>"));
+      printlnEther_p(client, alerts[i]->alertString);
+      printlnEther_p(client, PSTR("</b></td></tr>"));
+      printlnEther_p(client, PSTR("</table></td></tr>"));
+    } 
+  }
 
   //close main table
   printlnEther_p(client, PSTR("</table>"));
@@ -203,6 +238,8 @@ void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_c
   }
   printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
 }
+
+
 
 
 
