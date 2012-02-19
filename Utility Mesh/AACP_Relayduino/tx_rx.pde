@@ -9,10 +9,10 @@ void txandtr(){
   if (getSerialData(rx.str) == 0) { 
     parseData (rx.data,rx.str);
 
-    //is well formed, has packet type, is for US?
+    //is well formed, has packet type, is for us?
     if ((keyExists(rx.data,"XB") && 
       keyExists(rx.data,"PT") &&
-      keyExists(rx.data,"DST") == true && 
+      keyExists(rx.data,"DST") && 
       strcmp(getDataVal(rx.data,"DST"),XBEE) == 0)) {
 
       //BTN packet type     
@@ -22,14 +22,22 @@ void txandtr(){
           openFunct();
         if (keyExists(rx.data,"A2") && atoi(getDataVal(rx.data,"A2")) == 1)
           closeFunct();
-
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
       }//BTN
 
-      //Explicit valve state change request
-      else if(strcmp(getDataVal(rx.data,"PT"),"VSR") == 0 &&
-        keyExists(rx.data,"VS")) {
+      //set control mode, 0 for auto, 1 for manual
+      else if(strcmp(getDataVal(rx.data,"PT"),"SCM") == 0 &&
+        keyExists(rx.data,"M")) {
+        if (strcmp(getDataVal(rx.data,"M"),"0") == 0)
+          resetAutoMode();
+        else if (strcmp(getDataVal(rx.data,"M"),"1") == 0)
+          controlMode = 1;
+        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
+      }//SCM
 
+      //Set Valve State - explicit valve state change request
+      else if(strcmp(getDataVal(rx.data,"PT"),"SVS") == 0 &&
+        keyExists(rx.data,"VS")) {
         //check for up/down symbols '+' and '-'
         if (strcmp(getDataVal(rx.data,"VS"), "-") == 0) closeFunct();
         else if (strcmp(getDataVal(rx.data,"VS"), "+") == 0) openFunct();
@@ -41,17 +49,42 @@ void txandtr(){
             if (i>0) setValveState(i);
           }
         }
+        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
       }//VSR
-      
+
+      //Set Testing Mode - test mode on or off
+      else if (strcmp(getDataVal(rx.data,"PT"),"STM") == 0 &&
+        keyExists(rx.data,"M")) {
+        if (strcmp(getDataVal(rx.data,"M"),"0") == 0) {
+          testing = false;
+          sprintf(title, "Testing: off");
+          printInfo();
+        }
+        else if (strcmp(getDataVal(rx.data,"M"),"1") == 0) {
+          testing = true;
+          sprintf(title, "Testing: on");
+          printInfo();
+        }
+        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
+      }//STM
+
+      //allow setting the psi remotely in testing mode
+      else if(strcmp(getDataVal(rx.data,"PT"),"PSI") == 0 &&
+        keyExists(rx.data,"PSI")) {
+        if (testing) psi = atoi(getDataVal(rx.data,"PSI"));
+        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
+      }
+
       //PING packet
       else if(strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
         Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
         sendSerialStatus();
       }//PING
-      
+
     }//well formed
   }//got data
 }//txandtr()
+
 
 
 

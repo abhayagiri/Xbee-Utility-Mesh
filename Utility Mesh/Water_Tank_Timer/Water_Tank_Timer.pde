@@ -112,7 +112,7 @@ void loop() {
     {
         
       // Buffer for tx
-      char buf[128];
+      char buf[64];
       // Data buffer
       char d[16];
       
@@ -148,7 +148,7 @@ boolean checkForPing() {
       if (Serial.available())
         buf[i++] = Serial.read();
       else if ( i>1 && buf[i-1] == '~')
-        timeout = millis();
+        timeout = millis(); //done
     }
     
     buf[i] = '\0';

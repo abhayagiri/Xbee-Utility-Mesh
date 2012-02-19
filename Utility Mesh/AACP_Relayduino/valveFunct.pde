@@ -173,7 +173,7 @@ void adjValve (int valve, int action) {
   sendSerialValveOp(XBEE, opPacket);
   printInfo();
 
-  if (r == REAL){
+  if (testing){
     delayTime = (15000);// &&&&& should be 15000 - see also txandtr for more &&&&&
   }
   else {

@@ -54,29 +54,31 @@ void loop ()  {
 
 void menuOpt() {
   if (ba==1) {               //ba was pressed
-
+    if (testing) {
+      testing = false;
+      sprintf(title, "Testing: off");
+      printInfo();
+    } else {
+      testing = true;
+      sprintf(title, "Testing: on");
+      printInfo();
+    }
+      
   }
   if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
     if (controlMode == 0) {
       controlMode = 1;
-      sprintf (title, "Begin Manual Mode");
+      sprintf (title, "Manual Mode");
       printInfo ();
     } 
     else if (controlMode == 1) {
-      //close valves from ratio mode, reset currState
-      sprintf(title, "Opening Valves"); 
-      printInfo();
-      setValveState(7);
-
-      controlMode = 0;
-      sprintf (title, "Begin Auto Mode");
-      printInfo ();
+      resetAutoMode();
     }
   }
 
   if (bc==1) {                 //bc was pressed
     if (controlMode == 0 || controlMode == 1) {
-      sprintf (title, "Stepping Up...");
+      sprintf (title, "Step Up...");
       printInfo ();
       openFunct();
     }
@@ -84,7 +86,7 @@ void menuOpt() {
 
   if (bd==1) {                  //bd was pressed
     if (controlMode == 0 || controlMode == 1) {
-      sprintf (title, "Stepping Down...");
+      sprintf (title, "Step Down...");
       printInfo ();
       closeFunct();
     }
@@ -102,6 +104,17 @@ void valvestate(){
   if (currState==7) sprintf (vopen, "ABC ");
 }
 
+void resetAutoMode() {
+  //close valves from manual mode, reset currState
+  sprintf(title, "Opening Valves"); 
+  printInfo();
+  setValveState(7);
+
+  controlMode = 0;
+  sprintf (title, "Auto Mode");
+  printInfo ();
+}
+
 void updateTime() {
   if (newSecond)
     newSecond = false;
@@ -112,6 +125,7 @@ void updateTime() {
     newSecond = true;
   }  
 }
+
 
 
 

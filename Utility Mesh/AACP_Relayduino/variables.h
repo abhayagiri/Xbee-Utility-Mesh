@@ -1,5 +1,8 @@
+//change some behavior (timeouts, etc) during testing
+bool testing = false;
+
 // Size of array for storing recieved serial data
-#define BUF_SIZE 32
+#define BUF_SIZE 128
 // Number of entries that can be recieved over serial
 #define KEYS_MAX 8
 // Max size of each entry
@@ -21,9 +24,7 @@
 #define OPEN 1
 #define CLOSE 0
 
-#define REAL 1
-#define TEST 0
-// termination of strings
+// common strings
 #define XBEE "TRB"
 
 //number of 1-second samples to average psi reading over
@@ -54,14 +55,13 @@ unsigned long infoDismissTime = 0; //time to dismiss temporary info messages
 
 /*    Define misc. variables      */
 int symbol = 0;
-int r = 1;// (REAL=1) (0=TEST) user will choose between 1 and 0 while operating - 1 for actual running the program, one for test purposes 
 int numPacketsSent = 0; //number packets sent during send period
 unsigned long nextPacketTime = 15ul * 1000ul; //next packet send time in millis; initalize to 15 sec. just for fun...
 unsigned long delayTime;// hold time variables for "true" or "working"
 short currState = 0;
 short controlMode = 0; //0 - Auto, 1 - Manual
 short LCDState = 0; //0 - normal display, 1 - temporary info display
-unsigned short psi = 0;
+unsigned short psi = (testing ? 210 : 0); //initalize to 210 for testing, otherwise 0;
 
 //some timing variables
 unsigned long nextSecond = 1000;
