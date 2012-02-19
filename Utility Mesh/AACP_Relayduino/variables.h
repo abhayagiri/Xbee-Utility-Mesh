@@ -52,19 +52,6 @@ unsigned long lastDataUpdateTime = 0;
 unsigned long nextLCDUpdate = 0;
 unsigned long infoDismissTime = 0; //time to dismiss temporary info messages
 
-//ratio mode variables
-unsigned long ratioConfirmTimer = 0; //used to give user a few seconds before RM kicks in
-unsigned long ratioUnit = 2700000; //45 min. time unit
-unsigned long ratioOpenWaitTime = 270000; //wait 4.5 min. with just vA open when moving to open ratio time
-short ratioClosed = 1; //ratio is 1:1 at first
-short ratioOpen = 1;
-unsigned long ratioClosedTime = 0;
-unsigned long ratioOpenTime = 0;
-unsigned long lastRatioCycleTime = 0;
-short ratioState = 3; //0-closed, 1-wait open, 2-full open, 3-reset
-bool ratioChangeRequested = 0;
-short ratioChangeStep = 0; // 0 - init, 1 - changing closed ratio, 2 - changing open ratio, 3 - waiting for accept
-
 /*    Define misc. variables      */
 int symbol = 0;
 int r = 1;// (REAL=1) (0=TEST) user will choose between 1 and 0 while operating - 1 for actual running the program, one for test purposes 
@@ -72,7 +59,7 @@ int numPacketsSent = 0; //number packets sent during send period
 unsigned long nextPacketTime = 15ul * 1000ul; //next packet send time in millis; initalize to 15 sec. just for fun...
 unsigned long delayTime;// hold time variables for "true" or "working"
 short currState = 0;
-short controlMode = 0; //0 - Auto, 1 - Manual, 2 - Ratio mode
+short controlMode = 0; //0 - Auto, 1 - Manual
 short LCDState = 0; //0 - normal display, 1 - temporary info display
 unsigned short psi = 0;
 
@@ -80,11 +67,10 @@ unsigned short psi = 0;
 unsigned long nextSecond = 1000;
 bool newSecond = false;
 unsigned long currSecond = 0;
-unsigned long nextPSICheckTime = 0;
+unsigned int valveWaitTimer = 0;
 
 //variables for doing running averages of psi value
 int psiValues[NUM_PSI_SAMPLES];
-unsigned char 
 
 short ba; // for reading button a
 short baLast;

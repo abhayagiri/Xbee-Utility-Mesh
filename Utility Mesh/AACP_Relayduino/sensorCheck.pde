@@ -8,38 +8,42 @@ void sensorCheck() {
       psiValues[i] >= 0 ? psi += psiValues[i] : --samplesReceived;
     psi = psi/samplesReceived;
   }
+
+
+  //check if we are in a waiting period
+  if (valveWaitTimer) {
+    if (newSecond) valveWaitTimer--;
+  } 
   
-  //every 30 sec. update 10-min record of total change in PSI
-  if (newSecond % NUM_PSI_SAMPLES == 0) {
-    
-  }
-
-  if (controlMode == 0 && currSecond >= nextPSICheckTime) { //check for auto mode
-    switch (autoControlPhase) {
-    
-    case OPENING:
-    if (psi > 200 && currState < 7) {
-      openFunct(); 
-      nextPSICheckTime = currSecond + 600; //back in 10
-    }
-    else if (psi < 180)
-      autoControlPhase = CLOSING; 
-    else
-      
-    break;
-    
-    case CLOSING:
-    if (currentState > 0 && psi < 180)
-      closeFunct();
-      autoControlPhase
-    break;
+  else if (controlMode == 0) { //handle valve changes in auto mode
    
-    case TRICKLE: 
-    
-    break;
+    //1. back off the 1st few states aggressively
+    if (psi < 200 && currState >= 5) {
+      closeFunct();
+      valveWaitTimer = 300; //back in 5 min.
     }
+    //2. until valve B is left, then wait till 160psi
+    else if (psi < 160 && currState == 4) {
+      closeFunct();
+    }
+    //3. then close everything when we get below 160
+    else if (psi < 160 && currState <= 3) {
+      setValveState(0);
+    }  
+    //4. wait till we get above 205, then prime inverter
+    else if (psi > 205 && currState == 0) {
+      openFunct();
+      valveWaitTimer = 270; //prime inverter for 4.5 sec.
+    }
+    //5. if still above 160 after priming, open AC
+    else if (psi > 160 && currState == 1) {
+      setValveState(3);
+    }
+    //6. back to step 3. We should now be locked in this AC
+    //cycle until we reset auto control mode.
   }
-
 }
+
+
 
 

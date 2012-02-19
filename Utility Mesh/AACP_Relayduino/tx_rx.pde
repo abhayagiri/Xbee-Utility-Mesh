@@ -6,30 +6,53 @@ void txandtr(){
   }
 
   /*	Check for remote commands	*/
-  if (getSerialData(rx.str) == 0) {
+  if (getSerialData(rx.str) == 0) { 
     parseData (rx.data,rx.str);
-    // Packet Type is Button?
-    if (keyExists(rx.data,"PT") == true && strcmp(getDataVal(rx.data,"PT"),"BTN") == 0) {
-      // Destination is this location?
-      if (keyExists(rx.data,"DST") == true && strcmp(getDataVal(rx.data,"DST"),XBEE) == 0) {
-        // Check for the ID of the sending XBee
-        if (keyExists(rx.data,"XB") == true) {
-          // if A1 is toggled open valve
-          if (keyExists(rx.data,"A1") && atoi(getDataVal(rx.data,"A1")) == 1) {
-            openFunct();
-            sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
-          }
-          if (keyExists(rx.data,"A2") && atoi(getDataVal(rx.data,"A2")) == 1) {
-            closeFunct();
-            sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
+
+    //is well formed, has packet type, is for US?
+    if ((keyExists(rx.data,"XB") && 
+      keyExists(rx.data,"PT") &&
+      keyExists(rx.data,"DST") == true && 
+      strcmp(getDataVal(rx.data,"DST"),XBEE) == 0)) {
+
+      //BTN packet type     
+      if (strcmp(getDataVal(rx.data,"PT"),"BTN") == 0) {
+        // if A1 is toggled open valve
+        if (keyExists(rx.data,"A1") && atoi(getDataVal(rx.data,"A1")) == 1)
+          openFunct();
+        if (keyExists(rx.data,"A2") && atoi(getDataVal(rx.data,"A2")) == 1)
+          closeFunct();
+
+        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
+      }//BTN
+
+      //Explicit valve state change request
+      else if(strcmp(getDataVal(rx.data,"PT"),"VSR") == 0 &&
+        keyExists(rx.data,"VS")) {
+
+        //check for up/down symbols '+' and '-'
+        if (strcmp(getDataVal(rx.data,"VS"), "-") == 0) closeFunct();
+        else if (strcmp(getDataVal(rx.data,"VS"), "+") == 0) openFunct();
+
+        else { //else, use atoi, remember returns 0 for junk data
+          if (strcmp(getDataVal(rx.data,"VS"), "0") == 0) setValveState(0);
+          else {
+            int i = atoi(getDataVal(rx.data,"VS"));
+            if (i>0) setValveState(i);
           }
         }
-      }
-    }
-    else if(keyExists(rx.data,"PT") == true && strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
-      Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
-      sendSerialStatus();
-    }
-  }
-}
+      }//VSR
+      
+      //PING packet
+      else if(strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
+        Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
+        sendSerialStatus();
+      }//PING
+      
+    }//well formed
+  }//got data
+}//txandtr()
+
+
+
 

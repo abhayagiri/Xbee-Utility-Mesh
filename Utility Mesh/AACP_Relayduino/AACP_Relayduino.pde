@@ -23,11 +23,16 @@ void setup () {
     psiValues[i] = -1;
 
   //close all valves
-  lcd.clear(); lcd.home(); lcd.blink();
+  lcd.clear(); 
+  lcd.home(); 
+  lcd.blink();
   lcd.print("Reset valves...");
-  adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
-  lcd.clear(); lcd.noBlink();
-  
+  adjValve (va, CLOSE); 
+  adjValve (vb, CLOSE); 
+  adjValve (vc, CLOSE);
+  lcd.clear(); 
+  lcd.noBlink();
+
   // for invoking the code in the Memory tab - 
   // usefull for troubleshooting string literal problems
   //  printMemoryProfile();
@@ -36,22 +41,20 @@ void setup () {
 
 
 void loop ()  {  
-  
+
   ba = bb = bc = bd = 0;   //reset buttons
   updateTime();            //keeps track of seconds
   txandtr();               //get serial data and buttons
-  
+
   valvestate();
   sensorCheck();
-  updateRatioMode();
   menuOpt();
   updateLCD();
 }
 
 void menuOpt() {
   if (ba==1) {               //ba was pressed
-    if (controlMode == 2)    //ratio mode reconfiguration
-    ratioChangeRequested = 1;
+
   }
   if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
     if (controlMode == 0) {
@@ -60,17 +63,11 @@ void menuOpt() {
       printInfo ();
     } 
     else if (controlMode == 1) {
-      controlMode = 2;
-      ratioState = 0; ratioConfirmTimer = millis() + 5000; //wait 5 sec
-      sprintf (title, "Begin Ratio Mode");
-      printInfo ();
-    }
-    else if (controlMode == 2) {
       //close valves from ratio mode, reset currState
-      sprintf(title, "Closing Valves"); printInfo();
-      adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
-      currState = 0;
-      
+      sprintf(title, "Opening Valves"); 
+      printInfo();
+      setValveState(7);
+
       controlMode = 0;
       sprintf (title, "Begin Auto Mode");
       printInfo ();
@@ -105,41 +102,17 @@ void valvestate(){
   if (currState==7) sprintf (vopen, "ABC ");
 }
 
-void updateRatioMode()
-{
-  //check for ratio mode
-  if (controlMode == 2) {
-    unsigned long timePast = millis() - lastRatioCycleTime;
-
-    if (ratioState == 1 && timePast > ratioClosedTime) {
-      ratioState = 1;
-      adjValve(va, OPEN);
-    }
-    else if (ratioState == 2 && timePast > (ratioClosedTime + ratioOpenWaitTime)) {
-      ratioState = 2;
-      adjValve(vc, OPEN);
-    }
-    else if ( (ratioState == 3 && timePast > (ratioClosedTime + ratioOpenTime)) ||
-              ratioState == 4) {
-      adjValve (va, CLOSE); adjValve (vb, CLOSE); adjValve (vc, CLOSE);
-      ratioClosedTime = (ratioClosed * ratioUnit);
-      ratioOpenTime = (ratioOpen * ratioUnit);
-      lastRatioCycleTime = millis();
-      ratioState = 1;
-    }
-  } 
-} 
-
 void updateTime() {
   if (newSecond)
     newSecond = false;
-  
+
   if (millis() >= nextSecond) {
     nextSecond += 1000;
     currSecond++;
     newSecond = true;
   }  
 }
+
 
 
 
