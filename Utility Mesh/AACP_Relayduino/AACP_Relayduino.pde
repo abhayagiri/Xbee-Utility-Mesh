@@ -18,6 +18,10 @@ void setup () {
   pinMode (ledB, OUTPUT);
   pinMode (ledC, OUTPUT);
 
+  //init psi averageing array
+  for(int i=0; i<NUM_PSI_SAMPLES; i++)
+    psiValues[i] = -1;
+
   //close all valves
   lcd.clear(); lcd.home(); lcd.blink();
   lcd.print("Reset valves...");

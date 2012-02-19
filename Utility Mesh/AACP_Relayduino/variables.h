@@ -26,6 +26,8 @@
 // termination of strings
 #define XBEE "TRB"
 
+//number of 1-second samples to average psi reading over
+#define NUM_PSI_SAMPLES 30
 
 // Structure type for holding recently received dat a
 struct dataStruct {
@@ -78,9 +80,11 @@ unsigned short psi = 0;
 unsigned long nextSecond = 1000;
 bool newSecond = false;
 unsigned long currSecond = 0;
+unsigned long nextPSICheckTime = 0;
 
 //variables for doing running averages of psi value
-unsigned short psiValues[30];
+int psiValues[NUM_PSI_SAMPLES];
+unsigned char 
 
 short ba; // for reading button a
 short baLast;

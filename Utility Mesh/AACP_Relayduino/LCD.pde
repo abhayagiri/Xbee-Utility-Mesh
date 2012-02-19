@@ -25,7 +25,7 @@ void printStandardData() {
   lcd.setCursor (0,0);
     
   lcd.print("PSI="); //psi data
-  (currSecond >= 30 ? lcd.print(psi) : lcd.print(30-currSecond));
+  lcd.print(psi);
 
   if (controlMode == 1)  //manual mode
     lcd.print(" *manual*");
