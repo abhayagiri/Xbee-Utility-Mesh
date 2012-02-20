@@ -1,3 +1,23 @@
+//utility functions
+void openRow(Client client) {
+   printEther_p(client, PSTR("<tr>"));
+}
+void openCell(Client client) {
+   printEther_p(client, PSTR("<td>"));
+}
+void openRowCell(Client client) {
+   openRow(client); openCell(client);
+}
+void closeRow(Client client) {
+   printEther_p(client, PSTR("</tr>"));
+}
+void closeCell(Client client) {
+   printEther_p(client, PSTR("</td>"));
+}
+void closeCellRow(Client client) {
+   closeCell(client); closeRow(client);
+}
+
 //Main page - displays data from other XBee units
 void printMainPage(Client client) {
   //see if we received at least one of the various packet types
@@ -31,7 +51,7 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"ping\" value=\"send\" />"));
   printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Send Ping\"/>"));
   printlnEther_p(client, PSTR("</form></td></tr>"));
-
+  
   for (int i=0; i<NUM_ALERTS; i++) {
     if (alerts[i]->active && !alerts[i]->dismissed) {
       char timestr[32] = "";
@@ -85,6 +105,7 @@ void printMainPage(Client client) {
   if (gotTrb) {
     printEther_p(client, PSTR("<tr><td>Valves Open</td><td>"));
     client.print(turbine.valves);
+    (turbine.controlMode == 0 ? client.print(" - auto") : client.print(" - manual"));
     printlnEther_p(client, PSTR("</td></tr>"));
     printEther_p(client, PSTR("<tr><td>PSI</td><td>"));
     client.print(turbine.psi);

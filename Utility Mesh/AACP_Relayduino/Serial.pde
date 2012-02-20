@@ -44,7 +44,7 @@ int getSerialData(char s[BUF_SIZE]) {
         // wait 5 sec then timeout
         if (millis()-startTime > 5000) {
           //Serial.flush();
-          Serial.print("Serial timed out");
+          Serial.print("AACP: Serial timed out");
           return 2;
         }
       }

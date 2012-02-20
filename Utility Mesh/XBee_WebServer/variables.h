@@ -96,7 +96,9 @@ struct turbineStruct {
 	char id[ID_LENGTH];	// Three bytes for XBee ID,
 				// 4th byte is null termination
 	char valves[5];		// holds valve status
-	int psi;		// holds turbine psi
+        int psi;		// holds turbine psi
+        unsigned char controlMode; //0-auto, 1-manual; see AACP-Relayduino
+        unsigned char testing;     //0-normal, 1-testing mode; see AACP-Relayduino     
 	struct timerStruct timeStamp; // timestamp to calculate time
 					// since last data came in
         unsigned int dmin;
