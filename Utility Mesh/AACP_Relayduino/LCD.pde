@@ -13,10 +13,13 @@ void printStandardData() {
   lcd.clear ();
   lcd.setCursor (0,0);
 
-  lcd.print("PSI="); //psi data
+  if (!testing) lcd.print("PSI=");
+  else lcd.print("TST="); //psi data
   lcd.print(psi);
 
-  if (controlMode == 1)  //manual mode
+  if (controlMode == 0)  //auto mode
+    lcd.print(" *auto*");
+  else if (controlMode == 1)  //manual mode
     lcd.print(" *manual*");
 
   lcd.setCursor (0,1); //valve data

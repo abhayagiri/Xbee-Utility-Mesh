@@ -3,16 +3,16 @@ void sensorCheck() {
     //adding 4 to normalize reading from sensor 
     psiValues[currSecond % NUM_PSI_SAMPLES] = 4 + map(analogRead(psisensor), 0, 1024, 0, 250);
     //get average psi, not counting samples not yet received (1st 30 seconds)
-    int samplesReceived = NUM_PSI_SAMPLES;
     for (int i=0; i<NUM_PSI_SAMPLES; i++)
-      psiValues[i] >= 0 ? psi += psiValues[i] : --samplesReceived;
-    psi = psi/samplesReceived;
+      psi += psiValues[i];
+    psi = psi/NUM_PSI_SAMPLES;
   }
 
 
   //check if we are in a waiting period
   if (valveWaitTimer) {
     if (newSecond) valveWaitTimer--;
+    if (testing && valveWaitTimer > 10) valveWaitTimer = 10; 
   } 
   
   else if (controlMode == 0) { //handle valve changes in auto mode
@@ -24,10 +24,11 @@ void sensorCheck() {
     }
     //2. until valve B is left, then wait till 160psi
     else if (psi < 160 && currState == 4) {
-      closeFunct();
+      setValveState(3);
+      valveWaitTimer = 300;
     }
     //3. then close everything when we get below 160
-    else if (psi < 160 && currState <= 3) {
+    else if (psi < 160 && currState <= 3 && currState > 0) {
       setValveState(0);
     }  
     //4. wait till we get above 205, then prime inverter

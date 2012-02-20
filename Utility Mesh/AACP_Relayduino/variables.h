@@ -59,7 +59,7 @@ int numPacketsSent = 0; //number packets sent during send period
 unsigned long nextPacketTime = 15ul * 1000ul; //next packet send time in millis; initalize to 15 sec. just for fun...
 unsigned long delayTime;// hold time variables for "true" or "working"
 short currState = 0;
-short controlMode = 0; //0 - Auto, 1 - Manual
+short controlMode = 1; //0 - Auto, 1 - Manual
 short LCDState = 0; //0 - normal display, 1 - temporary info display
 unsigned short psi = (testing ? 210 : 0); //initalize to 210 for testing, otherwise 0;
 
