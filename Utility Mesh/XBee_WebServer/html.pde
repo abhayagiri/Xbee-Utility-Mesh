@@ -1,23 +1,3 @@
-//utility functions
-void openRow(Client client) {
-   printEther_p(client, PSTR("<tr>"));
-}
-void openCell(Client client) {
-   printEther_p(client, PSTR("<td>"));
-}
-void openRowCell(Client client) {
-   openRow(client); openCell(client);
-}
-void closeRow(Client client) {
-   printEther_p(client, PSTR("</tr>"));
-}
-void closeCell(Client client) {
-   printEther_p(client, PSTR("</td>"));
-}
-void closeCellRow(Client client) {
-   closeCell(client); closeRow(client);
-}
-
 //Main page - displays data from other XBee units
 void printMainPage(Client client) {
   //see if we received at least one of the various packet types
@@ -39,7 +19,7 @@ void printMainPage(Client client) {
   printEther_p(client,PSTR("<meta http-equiv=\"REFRESH\" content=\"30; url="));
   printEther_p(client, myUrl);
   client.print("\"/>\n");
-  printlnEther_p(client, PSTR("<style type=\"text/css\">td {text-align:center;}</style>"));
+  printlnEther_p(client, PSTR("<style type=\"text/css\">body {font-family:Verdana;} td {text-align:center; color:white;}</style>"));
   printlnEther_p(client, PSTR("</head>\n<body bgcolor=\"DarkGoldenRod\"><div align=center valign=middle>"));
 
   //open main table
@@ -103,28 +83,51 @@ void printMainPage(Client client) {
   client.print(turbine.dmin);
   client.println(" Minutes Old</b></td></tr>");
   if (gotTrb) {
-    printEther_p(client, PSTR("<tr><td>Valves Open</td><td>"));
-    client.print(turbine.valves);
-    (turbine.controlMode == 0 ? client.print(" - auto") : client.print(" - manual"));
+    printEther_p(client, PSTR("<tr><td>Valves Open</td>"));
+    printlnEther_p(client, PSTR("<td valign=\"middle\"><form name=\"valveSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"));
+    printlnEther_p(client, PSTR("<select name=\"valveOp\" onChange=\"document.forms['valveSetForm'].submit()\">\n<option>"));
+    client.print(turbine.valves); printlnEther_p(client, PSTR("</option>"));
+    printlnEther_p(client, PSTR("<optgroup label=\"Set Valves\"><option value=0>None</option><option value=1>A</option>"));
+    printlnEther_p(client, PSTR("<option value=2>C</option>\n<option value=3>AC</option>\n<option value=4>B</option>"));
+    printlnEther_p(client, PSTR("<option value=5>AB</option>\n<option value=6>BC</option>\n<option value=7>ABC</option>"));
+    printlnEther_p(client, PSTR("</optgroup></select></form>"));
     printlnEther_p(client, PSTR("</td></tr>"));
     printEther_p(client, PSTR("<tr><td>PSI</td><td>"));
     client.print(turbine.psi);
     printlnEther_p(client, PSTR("</td></tr>"));
+    printEther_p(client, PSTR("<tr><td>Mode</td><td>"));
+    (turbine.controlMode == 0 ? client.print("Auto") : client.print("Manual"));
+    printlnEther_p(client, PSTR("</td></tr>"));    
   } 
   else {
-    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
+    printEther_p(client, PSTR("<tr><td colspan=\"2\">"));
+    printlnEther_p(client, PSTR("<form name=\"valveSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"));
+    printlnEther_p(client, PSTR("<select name=\"valveOp\" onChange=\"document.forms['valveSetForm'].submit()\">"));
+    printlnEther_p(client, PSTR("<option>No Data Received</option>"));
+    printlnEther_p(client, PSTR("<optgroup label=\"Set Valves\"><option value=0>None</option><option value=1>A</option>"));
+    printlnEther_p(client, PSTR("<option value=2>C</option>\n<option value=3>AC</option>\n<option value=4>B</option>"));
+    printlnEther_p(client, PSTR("<option value=5>AB</option>\n<option value=6>BC</option>\n<option value=7>ABC</option>"));
+    printlnEther_p(client, PSTR("</optgroup></select></form>"));
+    printlnEther_p(client, PSTR("</td></tr>"));
   }
   printlnEther_p(client, PSTR("</table></td>"));
   //form for buttons
-  printlnEther_p(client, PSTR("<td><table><tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"valveOpenForm\" action=\"/\" method=\"get\">"));
-  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"valveOp\" value=\"open\"/>"));
-  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Step up\"/>"));
-  printlnEther_p(client, PSTR("</form></td></tr>"));
-
-  printlnEther_p(client, PSTR("<tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"valveCloseForm\" action=\"/\" method=\"get\">"));
-  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"valveOp\" value=\"close\"/>"));
-  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Step Down\"/>"));
-  printlnEther_p(client, PSTR("</form></td></tr></table></td></tr>"));
+//  printlnEther_p(client, PSTR("<td><table><tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"valveOpenForm\" action=\"/\" method=\"get\">"));
+//  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"valveOp\" value=\"open\"/>"));
+//  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Step up\"/>"));
+//  printlnEther_p(client, PSTR("</form></td></tr>"));
+//
+//  printlnEther_p(client, PSTR("<tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"valveCloseForm\" action=\"/\" method=\"get\">"));
+//  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"valveOp\" value=\"close\"/>"));
+//  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Step Down\"/>"));
+//  printlnEther_p(client, PSTR("</form></td></tr>"));
+  
+//  printlnEther_p(client, PSTR("<td><table><tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"valveSetForm\" action=\"/\" method=\"get\">"));
+//  printlnEther_p(client, PSTR("<select name=\"state\">\n<option value=0>None</option>\n<option value=1>A</option>"));
+//  printlnEther_p(client, PSTR("<option value=2>C</option>\n<option value=3>AC</option>\n<option value=4>B</option>"));
+//  printlnEther_p(client, PSTR("<option value=5>AB</option>\n<option value=6>BC</option>\n<option value=7>ABC</option>"));
+//  printlnEther_p(client, PSTR("</select>\n<input type=\"submit\" value=\"Set\"/>"));
+//  printlnEther_p(client, PSTR("</form></td></tr></table></td></tr>"));
 
   // Hydro Inverter Info
   printEther_p(client, PSTR("<tr><td><table border=1 width=100%><tr><td><b>Hydro Inverter</b></td><td><b>"));

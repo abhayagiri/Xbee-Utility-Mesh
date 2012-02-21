@@ -135,7 +135,10 @@ void loop() {
 
         //now serve the request  
         if (gotRequest) { 
-
+          //temp variable for the valve state to set
+          //if we get a valveOp=#
+          unsigned int valveStateReq = 0;
+          
           if (webState == WEB_NORMAL && !gotOpts) //normal request
             printMainPage(client);
 
@@ -153,6 +156,14 @@ void loop() {
               webCmdTimer.msgStr = valveCloseMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveClosePacket;
+              foundCommand = true;
+            }
+            else if ((strstr_P(optStr, PSTR("valveOp=")) == optStr))
+            {
+              webCmdTimer.msgStr = valveSetMsg;
+              webCmdTimer.opStr = valveOpStr;
+              webCmdTimer.packetStr = valveSetPacket;
+              valveStateReq = atoi(&optStr[8]);
               foundCommand = true;
             }
             else if (strcmp_P(optStr, PSTR("pumpOp=on")) == 0) {
@@ -188,9 +199,15 @@ void loop() {
 
               //send command
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
-              while (pgm_read_byte(strPtr) != 0x00)
-                Serial.print(pgm_read_byte(strPtr++));
-
+              while (pgm_read_byte(strPtr) != 0x00) {
+                if (pgm_read_byte(strPtr) == '%') {
+                  Serial.print(valveStateReq); 
+                  strPtr++;
+                } 
+                else
+                  Serial.print(pgm_read_byte(strPtr++));
+              }
+              
               webState = WEB_CMD_SENT; //set webState to command sent state
               //send refresh page                                
               printRedirect_p( client,

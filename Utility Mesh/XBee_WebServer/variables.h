@@ -35,11 +35,14 @@ prog_char pumpOpStr[] PROGMEM = "Pump Operation";
 prog_char pingOpStr[] PROGMEM = "Ping Operation";
 prog_char valveOpenMsg[] PROGMEM = "<p>Sent valve open command, waiting for response...</p>";
 prog_char valveCloseMsg[] PROGMEM = "<p>Sent valve close command, waiting for response...</p>";
+prog_char valveSetMsg[] PROGMEM = "<p>Sent valve set command, waiting for response...</p>";
 prog_char pumpStartMsg[] PROGMEM = "<p>Sent pump start command, waiting for response...</p>";
 prog_char pumpStopMsg[] PROGMEM = "<p>Sent pump stop command, waiting for response...</p>";
 prog_char pingMsg[] PROGMEM = "<p>Sent ping command, waiting for responses...</p>";
 prog_char valveOpenPacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A1=1~";
 prog_char valveClosePacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A2=1~";
+//total hack; % replaced w/requested state when parsed out to turbine
+prog_char valveSetPacket[] PROGMEM = "~XB=VST,PT=SVS,DST=TRB,VS=%~";
 prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
