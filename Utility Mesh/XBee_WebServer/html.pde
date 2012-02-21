@@ -10,17 +10,17 @@ void printMainPage(Client client) {
   gotRdg = !timeStampIsZero(tanks[RDG].timeStamp);
 
   // send a standard http response header
-  printlnEther_p(client, PSTR("HTTP/1.1 200 OK"));
-  printlnEther_p(client, PSTR("Content-Type: text/html"));
-  client.println();
-  // Page HTML goes here
+  printlnEther_p(client, httpResponse200);
 
-  printlnEther_p(client, PSTR("<html><head><title>Abhayagiri XBee Utility Mesh</title>\n"));
+  // Page HTML goes here
+  printEther_p(client, openDocument);
+  printlnEther_p(client, PSTR("Abhayagiri XBee Utility Mesh</title>\n"));
   printEther_p(client,PSTR("<meta http-equiv=\"REFRESH\" content=\"30; url="));
   printEther_p(client, myUrl);
   client.print("\"/>\n");
-  printlnEther_p(client, PSTR("<style type=\"text/css\">body {font-family:Verdana;} td {text-align:center; color:white;}</style>"));
-  printlnEther_p(client, PSTR("</head>\n<body bgcolor=\"DarkGoldenRod\"><div align=center valign=middle>"));
+  printlnEther_p(client, PSTR("<style type=\"text/css\">body {font-family:Verdana;} td {text-align:center; color:white;}</style></head>"));
+  printlnEther_p(client, openBody);
+  printlnEther_p(client, PSTR("<div align=center valign=middle>"));
 
   //open main table
   printlnEther_p(client, PSTR("<table cellspacing=15>"));
@@ -84,7 +84,7 @@ void printMainPage(Client client) {
   client.println(" Minutes Old</b></td></tr>");
   if (gotTrb) {
     printEther_p(client, PSTR("<tr><td>Valves Open</td>"));
-    printlnEther_p(client, PSTR("<td valign=\"middle\"><form name=\"valveSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"));
+    printlnEther_p(client, PSTR("<td><form name=\"valveSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"));
     printlnEther_p(client, PSTR("<select name=\"valveOp\" onChange=\"document.forms['valveSetForm'].submit()\">\n<option>"));
     client.print(turbine.valves); printlnEther_p(client, PSTR("</option>"));
     printlnEther_p(client, PSTR("<optgroup label=\"Set Valves\"><option value=0>None</option><option value=1>A</option>"));
@@ -95,9 +95,13 @@ void printMainPage(Client client) {
     printEther_p(client, PSTR("<tr><td>PSI</td><td>"));
     client.print(turbine.psi);
     printlnEther_p(client, PSTR("</td></tr>"));
-    printEther_p(client, PSTR("<tr><td>Mode</td><td>"));
-    (turbine.controlMode == 0 ? client.print("Auto") : client.print("Manual"));
-    printlnEther_p(client, PSTR("</td></tr>"));    
+    printEther_p(client, PSTR("<tr><td>Mode</td>"));
+    printlnEther_p(client, PSTR("<td><form name=\"modeSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"));
+    printlnEther_p(client, PSTR("<select name=\"valveOp\" onChange=\"document.forms['modeSetForm'].submit()\">\n<option>"));
+    (turbine.controlMode == 0 ? client.print("Auto") : client.print("Manual")); printlnEther_p(client, PSTR("</option>"));
+    printlnEther_p(client, PSTR("<optgroup label=\"Set Mode\"><option value=0>Auto</option><option value=1>Manual</option>"));
+    printlnEther_p(client, PSTR("</optgroup></select></form>"));
+    printlnEther_p(client, PSTR("</td></tr>"));   
   } 
   else {
     printEther_p(client, PSTR("<tr><td colspan=\"2\">"));
@@ -216,23 +220,26 @@ void printMainPage(Client client) {
 }
 
 //all strings should be PROGMEM strings
-void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char *targetUrl, prog_char *timeout) {
+void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char *targetUrl, prog_char *timeout, bool wrap) {
 
   //print header
-  printlnEther_p(client, PSTR("HTTP/1.1 200 OK"));
-  printlnEther_p(client, PSTR("Content-Type: text/html"));
-  client.println();
-  printEther_p(client, PSTR("<html>\n<head>\n<title>"));
-  printEther_p(client, title);
-  printEther_p(client, PSTR("</title>\n<meta http-equiv=\"REFRESH\" content=\""));
-  printEther_p(client, timeout);
-  printEther_p(client, PSTR("; url="));
-  printEther_p(client, targetUrl);
-  printlnEther_p(client,PSTR("\"></HEAD>"));
+ printRedirectHeader_p(client, title, targetUrl, timeout);
 
   //print body
-  printlnEther_p(client, PSTR("<BODY bgcolor=\"DarkGoldenRod\">"));
+  printlnEther_p(client, openBody);
+  printlnEther_p(client, openContainer);
+  printEther_p(client, openStyledP);
+  
+  if (wrap)
+    printEther_p(client, PSTR("Sent <b>"));  
+  
   printlnEther_p(client, msg);
+  
+  if (wrap)
+    printlnEther_p(client, PSTR(" </b>command, waiting for response..."));  
+  
+  printEther_p(client, PSTR("</p>"));
+  printEther_p(client, closeContainer);
   printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
 }
 
@@ -240,27 +247,35 @@ void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char 
 void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_char *targetUrl, prog_char *timeout) {
 
   //print header
-  printlnEther_p(client, PSTR("HTTP/1.1 200 OK"));
-  printlnEther_p(client, PSTR("Content-Type: text/html"));
-  client.println();
-  printEther_p(client, PSTR("<html>\n<head>\n<title>"));
+ printRedirectHeader_p(client, title, targetUrl, timeout);
+
+  //print body
+  printlnEther_p(client, openBody);
+  if (strlen(pongList) == 0) {
+      printlnEther_p(client, openContainer);
+      printEther_p(client, openStyledP);
+    printlnEther_p(client, PSTR("Waiting for responses... </p>"));
+  } else {
+    printEther_p(client, openStyledP);
+    printEther_p(client, PSTR("Responses:</p>\n"));     
+    printEther_p(client, openStyledP);
+    client.print(pongList);
+    printlnEther_p(client, PSTR("</p>"));
+  }
+  printlnEther_p(client, closeContainer);
+  printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
+}
+
+void printRedirectHeader_p(Client client, prog_char *title, prog_char *targetUrl, prog_char *timeout)
+{
+  printlnEther_p(client, httpResponse200);
+  printEther_p(client, openDocument);
   printEther_p(client, title);
   printEther_p(client, PSTR("</title>\n<meta http-equiv=\"REFRESH\" content=\""));
   printEther_p(client, timeout);
   printEther_p(client, PSTR("; url="));
   printEther_p(client, targetUrl);
   printlnEther_p(client,PSTR("\"></HEAD>"));
-
-  //print body
-  printlnEther_p(client, PSTR("<BODY bgcolor=\"DarkGoldenRod\">"));
-  if (strlen(pongList) == 0)
-    printlnEther_p(client, PSTR("<p>Waiting for responses... </p>"));
-  else {
-    printEther_p(client, PSTR("<p>Responses:</p>\n<p>"));     
-    client.print(pongList);
-    printlnEther_p(client, PSTR("</p>"));
-  }
-  printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
 }
 
 void printRedirect(Client client) {

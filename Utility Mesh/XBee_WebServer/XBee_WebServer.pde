@@ -150,12 +150,14 @@ void loop() {
               webCmdTimer.msgStr = valveOpenMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveOpenPacket;
+              webCmdTimer.wrap = true;
               foundCommand = true;
             }
             else if (strcmp_P(optStr, PSTR("valveOp=close")) == 0) {
               webCmdTimer.msgStr = valveCloseMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveClosePacket;
+              webCmdTimer.wrap = true;
               foundCommand = true;
             }
             else if ((strstr_P(optStr, PSTR("valveOp=")) == optStr))
@@ -164,18 +166,21 @@ void loop() {
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveSetPacket;
               valveStateReq = atoi(&optStr[8]);
+              webCmdTimer.wrap = true;
               foundCommand = true;
             }
             else if (strcmp_P(optStr, PSTR("pumpOp=on")) == 0) {
               webCmdTimer.msgStr = pumpStartMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStartPacket;
+              webCmdTimer.wrap = true;
               foundCommand = true;
             }
             else if (strcmp_P(optStr, PSTR("pumpOp=off")) == 0) {
               webCmdTimer.msgStr = pumpStopMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStopPacket;
+              webCmdTimer.wrap = true;
               foundCommand = true;
             }
             else if (strcmp_P(optStr, PSTR("ping=send")) == 0) {
@@ -183,6 +188,7 @@ void loop() {
               webCmdTimer.opStr = pingOpStr;
               webCmdTimer.packetStr = pingPacket;
               webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.wrap = false;
               foundCommand = true;
             }
             else if ((strstr_P(optStr, PSTR("dismiss=")) == optStr))
@@ -214,7 +220,8 @@ void loop() {
               webCmdTimer.opStr,
               webCmdTimer.msgStr,
               myUrl,
-              PSTR("2") );
+              PSTR("2"),
+              webCmdTimer.wrap);
             }
             else
               printRedirect(client);
@@ -227,7 +234,7 @@ void loop() {
               (ping ? PSTR("Ping Complete") : PSTR("Command Timed Out")),
               (ping ? PSTR("Ping Complete") : PSTR("Command timed out: no response")),
               myUrl,
-              PSTR("5") );
+              PSTR("5"), false);
               webState = WEB_NORMAL;
             }
             else if (webCmdTimer.opStr == pingOpStr) { //handling a ping
@@ -246,7 +253,8 @@ void loop() {
               webCmdTimer.opStr,
               webCmdTimer.msgStr,
               myUrl,
-              PSTR("2") );
+              PSTR("2"), 
+              webCmdTimer.wrap );
           }
           else if (webState == WEB_CMD_ACKNOWLEDGED) {
             //send ACK page, reset webState;
@@ -254,7 +262,8 @@ void loop() {
             PSTR("Command finished"),
             PSTR("Acknowlement received - command finished."),
             myUrl,
-            PSTR("5") );
+            PSTR("5"),
+            false );
             webState = WEB_NORMAL;              
           }
 
@@ -320,6 +329,7 @@ void loop() {
               webCmdTimer.timeStamp = timer;
               webCmdTimer.msgStr = 
                 PSTR("Received packet: valve operations in progress");
+              webCmdTimer.wrap = false;
             }
             else if (strcmp(getDataVal(rx.data,"PT"),"AWK") == 0)
               webState = WEB_CMD_ACKNOWLEDGED;

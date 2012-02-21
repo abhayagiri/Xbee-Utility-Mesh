@@ -30,15 +30,21 @@ prog_char myUrl[] PROGMEM = "http://xbee-mesh/";
 #define WEB_CMD_ACKNOWLEDGED 2
 
 //Some strings for web commands
+prog_char httpResponse200[] PROGMEM = "HTTP/1.1 200 OK\nContent-Type: text/html\n";
+prog_char openDocument[] PROGMEM = "<html><head><title>";
+prog_char openBody[] PROGMEM = "<body bgcolor=\"DarkGoldenRod\">";
+prog_char openContainer[] PROGMEM = "<table width=100%, height=100% border=10><tr><td align=center, valign=middle>";
+prog_char closeContainer[] PROGMEM = "</td></tr></table>";
+prog_char openStyledP[] PROGMEM = "<p style=\"text-align:center; font-size:24pt;\">";
 prog_char valveOpStr[] PROGMEM = "Valve Operation";
 prog_char pumpOpStr[] PROGMEM = "Pump Operation";
 prog_char pingOpStr[] PROGMEM = "Ping Operation";
-prog_char valveOpenMsg[] PROGMEM = "<p>Sent valve open command, waiting for response...</p>";
-prog_char valveCloseMsg[] PROGMEM = "<p>Sent valve close command, waiting for response...</p>";
-prog_char valveSetMsg[] PROGMEM = "<p>Sent valve set command, waiting for response...</p>";
-prog_char pumpStartMsg[] PROGMEM = "<p>Sent pump start command, waiting for response...</p>";
-prog_char pumpStopMsg[] PROGMEM = "<p>Sent pump stop command, waiting for response...</p>";
-prog_char pingMsg[] PROGMEM = "<p>Sent ping command, waiting for responses...</p>";
+prog_char valveOpenMsg[] PROGMEM = "valve open";
+prog_char valveCloseMsg[] PROGMEM = "valve close";
+prog_char valveSetMsg[] PROGMEM = "valve set";
+prog_char pumpStartMsg[] PROGMEM = "pump start";
+prog_char pumpStopMsg[] PROGMEM = "pump stop";
+prog_char pingMsg[] PROGMEM = "<p style=\"text-align:center; font-size:24pt;\">Sent ping command, waiting for responses...<p>";
 prog_char valveOpenPacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A1=1~";
 prog_char valveClosePacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A2=1~";
 //total hack; % replaced w/requested state when parsed out to turbine
@@ -167,5 +173,6 @@ struct webCmdTimerStruct {
         prog_char *msgStr;
         prog_char *packetStr;
         char pongList[32];
+        bool wrap;
 } webCmdTimer;
         
