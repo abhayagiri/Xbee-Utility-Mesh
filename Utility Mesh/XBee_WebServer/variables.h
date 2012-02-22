@@ -37,18 +37,21 @@ prog_char openContainer[] PROGMEM = "<table width=100%, height=100% border=10><t
 prog_char closeContainer[] PROGMEM = "</td></tr></table>";
 prog_char openStyledP[] PROGMEM = "<p style=\"text-align:center; font-size:24pt;\">";
 prog_char valveOpStr[] PROGMEM = "Valve Operation";
+prog_char modeOpStr[] PROGMEM = "Change Mode";
 prog_char pumpOpStr[] PROGMEM = "Pump Operation";
 prog_char pingOpStr[] PROGMEM = "Ping Operation";
 prog_char valveOpenMsg[] PROGMEM = "valve open";
 prog_char valveCloseMsg[] PROGMEM = "valve close";
 prog_char valveSetMsg[] PROGMEM = "valve set";
+prog_char modeSetMsg[] PROGMEM = "change mode";
 prog_char pumpStartMsg[] PROGMEM = "pump start";
 prog_char pumpStopMsg[] PROGMEM = "pump stop";
 prog_char pingMsg[] PROGMEM = "<p style=\"text-align:center; font-size:24pt;\">Sent ping command, waiting for responses...<p>";
 prog_char valveOpenPacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A1=1~";
 prog_char valveClosePacket[] PROGMEM = "~XB=VST,PT=BTN,DST=TRB,A2=1~";
-//total hack; % replaced w/requested state when parsed out to turbine
+//total hack; % and $ replaced w/requested state when parsed out to turbine
 prog_char valveSetPacket[] PROGMEM = "~XB=VST,PT=SVS,DST=TRB,VS=%~";
+prog_char modeSetPacket[] PROGMEM = "~XB=VST,DST=TRB,PT=SCM,M=$~";
 prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
