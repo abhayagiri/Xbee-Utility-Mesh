@@ -135,9 +135,9 @@ void loop() {
 
         //now serve the request  
         if (gotRequest) { 
-          //temp variable for the valve state to set
-          //if we get a valveOp=#
-          unsigned int valveStateReq = 0;
+          //temp variable for the requested state to set
+          //if we get a valveOp=# or modeOp=#
+          unsigned int stateReq = 0;
           
           if (webState == WEB_NORMAL && !gotOpts) //normal request
             printMainPage(client);
@@ -160,12 +160,23 @@ void loop() {
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
-            else if ((strstr_P(optStr, PSTR("valveOp=")) == optStr))
+            else if ((strstr_P(optStr, PSTR("valveOp=")) == optStr)
+                     && optStr[8]>='0' && optStr[8]<='7' && optStr[9]=='\0')
             {
               webCmdTimer.msgStr = valveSetMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveSetPacket;
-              valveStateReq = atoi(&optStr[8]);
+              stateReq = atoi(&optStr[8]);
+              webCmdTimer.wrap = true;
+              foundCommand = true;
+            }
+            else if ((strstr_P(optStr, PSTR("modeOp=")) == optStr)
+                      && (optStr[7]=='0' || optStr[7]=='1') && optStr[8]=='\0')
+            {
+              webCmdTimer.msgStr = modeSetMsg;
+              webCmdTimer.opStr = modeOpStr;
+              webCmdTimer.packetStr = modeSetPacket;
+              stateReq = atoi(&optStr[7]);
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -207,7 +218,7 @@ void loop() {
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
               while (pgm_read_byte(strPtr) != 0x00) {
                 if (pgm_read_byte(strPtr) == '%') {
-                  Serial.print(valveStateReq); 
+                  Serial.print(stateReq); 
                   strPtr++;
                 } 
                 else
