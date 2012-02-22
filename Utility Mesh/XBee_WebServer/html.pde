@@ -256,6 +256,7 @@ void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_c
       printEther_p(client, openStyledP);
     printlnEther_p(client, PSTR("Waiting for responses... </p>"));
   } else {
+    printlnEther_p(client, openContainer);
     printEther_p(client, openStyledP);
     printEther_p(client, PSTR("Responses:</p>\n"));     
     printEther_p(client, openStyledP);
