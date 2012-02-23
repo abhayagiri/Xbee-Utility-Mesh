@@ -18,7 +18,7 @@ void printMainPage(Client client) {
   printEther_p(client,PSTR("<meta http-equiv=\"REFRESH\" content=\"30; url="));
   printEther_p(client, myUrl);
   client.print("\"/>\n");
-  printlnEther_p(client, PSTR("<style type=\"text/css\">body {font-family:Verdana;} td {text-align:center; color:white;}</style></head>"));
+  printlnEther_p(client, PSTR("<style type=\"text/css\">body {font-family:Verdana;} td {text-align:center; vertical-align:middle;}</style></head>"));
   printlnEther_p(client, openBody);
   printlnEther_p(client, PSTR("<div align=center valign=middle>"));
 
@@ -26,30 +26,23 @@ void printMainPage(Client client) {
   printlnEther_p(client, PSTR("<table cellspacing=15>"));
 
   //ping button
-  printEther_p(client, PSTR("<tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"pingForm\""));
-  printlnEther_p(client, PSTR(" action=\"/\" method=\"get\">"));
-  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"ping\" value=\"send\" />"));
-  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Send Ping\"/>"));
-  printlnEther_p(client, PSTR("</form></td></tr>"));
+  printEther_p(client, PSTR("<tr><td><input type=\"button\" value=\"Send Ping\" onClick=\"window.location.replace(\'"));
+  printEther_p(client, myUrl); printlnEther_p(client, PSTR("?ping=send\')\"/></td></tr>"));
   
   for (int i=0; i<NUM_ALERTS; i++) {
     if (alerts[i]->active && !alerts[i]->dismissed) {
       char timestr[32] = "";
-      printlnEther_p(client, PSTR("<tr><td>"));
-      printlnEther_p(client, PSTR("<table border=1 bgcolor=\"Red\" width=100%><tr><td><b>ALERT</b></td><td><b>"));
+      printlnEther_p(client, PSTR("<tr><td><table border=1 bgcolor=\"Red\" width=100%><tr><td><b>ALERT</b></td><td><b>"));
       client.print(timePastMinutes(&timer,&(alerts[i]->timeStamp)));
       printlnEther_p(client, (PSTR(" Minutes Old</b></td></tr>")));
       printlnEther_p(client, PSTR("<tr><td colspan=\"2\"><b>"));
       printlnEther_p(client, alerts[i]->alertString);
       printlnEther_p(client, PSTR("</b></td></tr>"));
       printlnEther_p(client, PSTR("</table></td>"));
-      printEther_p(client, PSTR("<td align=\"center\" valign=\"middle\"><form name=\"dismissForm\""));
-      printlnEther_p(client, PSTR(" action=\"/\" method=\"get\">"));
-      printEther_p(client, PSTR("<input type=\"hidden\" name=\"dismiss\" value=\""));
-      client.print(i+1); 
-      printlnEther_p(client, PSTR("\"/>"));
-      printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Dismiss\"/>"));
-      printlnEther_p(client, PSTR("</form></td></tr>"));
+      printEther_p(client, PSTR("<td><input type=\"button\" value=\"Dismiss\" onClick=\"window.location.replace(\'"));
+      printEther_p(client, myUrl); printEther_p(client, PSTR("?dismiss=")); 
+      client.print(i+1); printlnEther_p(client, PSTR("\')\"/>"));
+      printlnEther_p(client, PSTR("</td></tr>"));
     } 
   }
 
@@ -73,7 +66,7 @@ void printMainPage(Client client) {
     printlnEther_p(client, PSTR("</td></tr>"));
   } 
   else {
-    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
+    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Received</td></tr>"));
   }
   printlnEther_p(client, PSTR("</table></td></tr>"));
 
@@ -126,7 +119,7 @@ void printMainPage(Client client) {
     printlnEther_p(client, PSTR("</td></tr>"));
   }  
   else {
-    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
+    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Received</td></tr>"));
   }
   printlnEther_p(client, PSTR("</table></td></tr>"));
 
@@ -141,7 +134,7 @@ void printMainPage(Client client) {
     printlnEther_p(client, PSTR(" gal.</td></tr>"));
   }  
   else {
-    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
+    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Received</td></tr>"));
   }
   printlnEther_p(client, PSTR("</table></td></tr>"));
   // Four Water Tanks
@@ -154,7 +147,7 @@ void printMainPage(Client client) {
     printlnEther_p(client, PSTR(" gal.</td></tr>"));
   }  
   else {
-    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
+    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Received</td></tr>"));
   }
   printlnEther_p(client, PSTR("</table></td></tr>"));
   // Ridge
@@ -167,19 +160,18 @@ void printMainPage(Client client) {
     printlnEther_p(client, PSTR(" gal.</td></tr>"));
   }  
   else {
-    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Recieved</td></tr>"));
+    printlnEther_p(client, PSTR("<tr><td colspan=\"2\">No Data Received</td></tr>"));
   }
   printlnEther_p(client, PSTR("</table></td>"));
-  //form for button
-  printlnEther_p(client, PSTR("<td><table><tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"pumpOnForm\" action=\"/\" method=\"get\">"));
-  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"pumpOp\" value=\"on\"/>"));
-  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Pump On\"/>"));
-  printlnEther_p(client, PSTR("</form></td></tr>"));
+  
+  //pump operation buttons
+  printEther_p(client, PSTR("<td><table><tr><td><input type=\"button\" value=\"Pump On\" onClick=\"window.location.replace(\'"));
+  printEther_p(client, myUrl); printEther_p(client, PSTR("?pumpOp=on\')\"/>"));
+  printlnEther_p(client, PSTR("</td></tr>"));
 
-  printlnEther_p(client, PSTR("<tr valign=\"middle\"><td align=\"center\" valign=\"middle\"><form name=\"pumpOffForm\" action=\"/\" method=\"get\">"));
-  printlnEther_p(client, PSTR("<input type=\"hidden\" name=\"pumpOp\" value=\"off\"/>"));
-  printlnEther_p(client, PSTR("<input type=\"submit\" value=\"Pump Off\"/>"));
-  printlnEther_p(client, PSTR("</form></td></tr></table></td></tr>"));
+  printEther_p(client, PSTR("<tr><td><input type=\"button\" value=\"Pump Off\" onClick=\"window.location.replace(\'"));
+  printEther_p(client, myUrl); printEther_p(client, PSTR("?pumpOp=off\')\"/>"));
+  printlnEther_p(client, PSTR("</td></tr></table></td></tr>"));
 
   for (int i=0; i<NUM_ALERTS; i++) {
     if (alerts[i]->active && alerts[i]->dismissed) {
@@ -214,12 +206,12 @@ void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char 
   printEther_p(client, openStyledP);
   
   if (wrap)
-    printEther_p(client, PSTR("Sent <b>"));  
+    printEther_p(client, PSTR("Sent <i>"));  
   
   printlnEther_p(client, msg);
   
   if (wrap)
-    printlnEther_p(client, PSTR(" </b>command, waiting for response..."));  
+    printlnEther_p(client, PSTR(" </i>command, waiting for response..."));  
   
   printEther_p(client, PSTR("</p>"));
   printEther_p(client, closeContainer);

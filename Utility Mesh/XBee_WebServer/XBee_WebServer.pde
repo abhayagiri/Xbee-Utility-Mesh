@@ -212,7 +212,7 @@ void loop() {
             if (foundCommand) {
               //set timeout
               webCmdTimer.timeStamp = timer;
-              webCmdTimer.timeout = 25;
+              webCmdTimer.timeout = 20;
 
               //send command
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
