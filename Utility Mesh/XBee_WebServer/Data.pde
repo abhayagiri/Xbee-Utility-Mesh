@@ -34,6 +34,15 @@ int saveTurbineData(struct turbineStruct *t, struct dataStruct d[]) {
 	strlcpy(t->id,getDataVal(d,"XB"),4);
 	strlcpy(t->valves,getDataVal(d,"V"),5);
 	t->psi = atoi(getDataVal(d,"P"));
+        
+        //get controlmode and 'testing' flag
+        char *modeStr = getDataVal(d,"M");
+        if ( (modeStr[0] == '0' || modeStr[0] == '1') &&
+             (modeStr[1] == '0' || modeStr[1] == '1')) {
+          t->controlMode = modeStr[0] - '0';
+          t->testing = modeStr[1] - '0';
+        }
+        
 	t->timeStamp = timer; // save current time to calculate difference later
         
         if (t->psi <= 155 && !psiAlert.active) { //alert!
