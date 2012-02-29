@@ -31,8 +31,9 @@ void txandtr(){
                 if (strcmp(getDataVal(rx.data,"M"),"0") == 0) {
                     resetAutoMode();
                 }
-                else if (strcmp(getDataVal(rx.data,"M"),"1") == 0)
+                else if (strcmp(getDataVal(rx.data,"M"),"1") == 0) {
                     controlMode = 1;
+                }
                 sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
             }//SCM
 
