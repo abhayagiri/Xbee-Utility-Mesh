@@ -150,6 +150,7 @@ void loop() {
               webCmdTimer.msgStr = valveOpenMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveOpenPacket;
+              webCmdTimer.timeout = 20;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -157,6 +158,7 @@ void loop() {
               webCmdTimer.msgStr = valveCloseMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveClosePacket;
+              webCmdTimer.timeout = 20;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -167,6 +169,7 @@ void loop() {
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveSetPacket;
               stateReq = atoi(&optStr[8]);
+              webCmdTimer.timeout = 20;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -177,6 +180,7 @@ void loop() {
               webCmdTimer.opStr = modeOpStr;
               webCmdTimer.packetStr = modeSetPacket;
               stateReq = atoi(&optStr[7]);
+              webCmdTimer.timeout = 20;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -184,6 +188,7 @@ void loop() {
               webCmdTimer.msgStr = pumpStartMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStartPacket;
+              webCmdTimer.timeout = 20;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -191,6 +196,7 @@ void loop() {
               webCmdTimer.msgStr = pumpStopMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStopPacket;
+              webCmdTimer.timeout = 20;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -199,20 +205,20 @@ void loop() {
               webCmdTimer.opStr = pingOpStr;
               webCmdTimer.packetStr = pingPacket;
               webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 10;
               webCmdTimer.wrap = false;
               foundCommand = true;
             }
-            else if ((strstr_P(optStr, PSTR("dismiss=")) == optStr))
-            {
+            else if ((strstr_P(optStr, PSTR("dismiss=")) == optStr)) {
+              //foundCommand=false here, no timeout required
               int i = atoi(&optStr[8])-1;
               if (i>=0 && i<NUM_ALERTS)
                 alerts[i]->dismissed=true;
             }
 
             if (foundCommand) {
-              //set timeout
+              //set timestamp
               webCmdTimer.timeStamp = timer;
-              webCmdTimer.timeout = 20;
 
               //send command
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
@@ -245,7 +251,7 @@ void loop() {
               (ping ? PSTR("Ping Complete") : PSTR("Command Timed Out")),
               (ping ? PSTR("Ping Complete") : PSTR("Command timed out: no response")),
               myUrl,
-              PSTR("5"), false);
+              PSTR("3"), false);
               webState = WEB_NORMAL;
             }
             else if (webCmdTimer.opStr == pingOpStr) { //handling a ping
@@ -253,7 +259,7 @@ void loop() {
               webCmdTimer.opStr,
               webCmdTimer.pongList,
               myUrl,
-              PSTR("2") );
+              PSTR("1") );
 
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
               while (pgm_read_byte(strPtr) != 0x00)
