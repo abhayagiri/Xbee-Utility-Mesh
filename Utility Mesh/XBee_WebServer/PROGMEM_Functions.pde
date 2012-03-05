@@ -7,14 +7,10 @@ void printEther_p (Client client, const char *str) {
 }
 
 void printlnEther_p (Client client, const char *str) {
-  while (pgm_read_byte(str) != 0x00) {
-     if (debugMode)
-       Serial.print(pgm_read_byte(str)); 
-     client.print(pgm_read_byte(str++)); 
-  }
+  printEther_p (client, str);
   if (debugMode)
-    Serial.println("");
-  client.println("");
+    Serial.print('\n');
+  client.print('\n');
 }
 
 void debugPrint_p(char *msg) {

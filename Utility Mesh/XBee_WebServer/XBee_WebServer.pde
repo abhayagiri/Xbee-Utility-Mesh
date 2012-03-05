@@ -139,7 +139,29 @@ void loop() {
           //if we get a valveOp=# or modeOp=#
           unsigned int stateReq = 0;
           
-          if (webState == WEB_NORMAL && !gotOpts) //normal request
+          if (!timeSet) {
+            
+            if (!gotOpts) //request time from user
+              printTimeSetPage(client);
+            
+            else if (strstr_P(optStr, PSTR("setTime=")) == optStr) { //process time string
+              int hour=0, minute=0;
+              char *dashLoc = strchr(optStr, '-');
+              
+              if (dashLoc != NULL) {
+                *dashLoc = '\0'; //set the dash to null, send substrings to atoi()
+                 hour = atoi(optStr+8);
+                 minute = atoi(dashLoc+1);
+                if (minute < 60 && hour < 24) {
+                  timer.hour = hour; timer.min = minute;
+                  timeSet = true;
+                  printRedirect(client);
+                }
+              }
+            }
+          }
+            
+          else if (webState == WEB_NORMAL && !gotOpts) //normal request
             printMainPage(client);
 
           else if (webState == WEB_NORMAL && gotOpts) {//handle html buttons            
@@ -327,7 +349,7 @@ void loop() {
 
       // Check for and save any Hydro data
       if (strcmp(getDataVal(rx.data,"PT"),"WTT") == 0) {
-        if (strcmp(getDataVal(rx.data,"XB"),"UWS") == 0)
+        if (strcmp(getDataVal(rx.data,"XB"),"GTS") == 0)
           saveHydroWattsData(&hydroWatts,rx.data);
       }
 

@@ -1,4 +1,5 @@
 boolean debugMode = false;
+boolean timeSet = false;
 
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
@@ -37,6 +38,9 @@ prog_char openContainer[] PROGMEM = "<table height=100% width=100% border=0><tr>
 prog_char closeContainer[] PROGMEM = "</td></tr></table>";
 prog_char openData[] PROGMEM = "<td align=\"center\" valign=\"middle\">";
 prog_char openStyledP[] PROGMEM = "<p style=\"text-align:center; font-size:24pt;\">";
+prog_char strMins[] PROGMEM = " Minutes";
+prog_char strHours[] PROGMEM = " Hours";
+prog_char strAgo[] PROGMEM = " Ago</b></td></tr>";
 prog_char valveOpStr[] PROGMEM = "Valve Operation";
 prog_char modeOpStr[] PROGMEM = "Change Mode";
 prog_char pumpOpStr[] PROGMEM = "Pump Operation";
