@@ -28,6 +28,8 @@ void setup() {
   }
   
   //calibrate
+  timer0_millis=0;
+  
   lcd.clear(); lcd.print("Calibrating"); lcd.blink();
   unsigned long long int tmpAvg = 0;
   unsigned long int numSamps = 0;
@@ -58,7 +60,7 @@ void loop() {
     
   current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0);
   if (current < 0.25) current = 0;
-  watts = current * 120.0; 
+  watts = current * 330.0; //330v coming from turbine 
   wattSecondsToday += (watts); //watt-seconds / 3600 seconds per hour
   
   lcd.clear();
@@ -81,7 +83,7 @@ void loop() {
   }
   
   //send packet every 5 min.
-  if (todInSeconds % 10 == 0)
+  if (todInSeconds % 120 == 0)
   {
     Serial.print("~XB=GTS,PT=WTT,W="); Serial.print(watts);
     Serial.print(",T="); Serial.print(wattSecondsToday / (3600000.0));
