@@ -1,7 +1,11 @@
 // Selects which feilduino to program
 //#define TWT
 //#define FWT
-//#define RDG
+#define RDG
+
+#include <avr/interrupt.h>
+#include <avr/power.h>
+#include <avr/sleep.h>
 
 #ifdef TWT
 #define PIN_OFFSET	2
@@ -28,6 +32,9 @@
 #define PACKET_INTERVAL  1ul //pause 1 sec between each packet
 #define PACKETS_PER_SEND 10ul //send 60 packets each time
 
+//keep track of time of day
+unsigned long int todInMillis = 0;
+
 struct {
   int old;
   int crnt;
@@ -38,7 +45,9 @@ lvl = {
 // Reset timer
 extern volatile unsigned long timer0_millis;  
 void resetMillis() {
-  timer0_millis = 0; 
+  //add accumulated time to time-of-day    //86400000 millis in a day
+  todInMillis = (todInMillis + millis()) % (86400000); 
+  timer0_millis = 0; //now we can reset millis
   return;
 }
 
@@ -62,13 +71,13 @@ void setup() {
 
   int i=0;
   while(i++<3) {
-    makePacket();
+    sendTankPacket();
     delay(1000);
   }
 }
 
 void loop() {
-  checkForPing();
+  checkForPacket();
 
   for (int i = PIN_TOTAL-1; i >=0; i--) {
     pinState.last[i] = pinState.current[i];
@@ -100,13 +109,12 @@ void loop() {
     sending = true;
     packetsSent = 0;
     resetMillis();
-    //Serial.println("cought sending condition");
   }
 
   if (sending)
   { 
     if (millis() > PACKET_INTERVAL * 1000ul * packetsSent ) {
-      makePacket();
+      sendTankPacket();
       packetsSent++;
     }
 
@@ -115,26 +123,38 @@ void loop() {
       sending = false;
       packetsSent = 0;
       resetMillis();
+      sendTimeReportPacket();
     }
   }
 }
 
-int makePacket() {
+void sendTankPacket() {
   Serial.print("~XB="); 
   Serial.print(LOCATION_NAME);
   Serial.print(",PT=TNK,LVL="); 
   Serial.print(lvl.crnt);
   Serial.println('~');
-  return 0;
 }
 
-boolean checkForPing() {
+//just tell the world what time we think it is
+void sendTimeReportPacket() {
+  Serial.print("~XB="); 
+  Serial.print(LOCATION_NAME);
+  Serial.print(",PT=LTR,H="); //LTR = local time report
+  Serial.print(todInMillis / 3600000);
+  Serial.print(",M=");
+  Serial.print((todInMillis % 3600000) / 60000);
+  Serial.println('~');
+}
+
+void checkForPacket() {
   if (Serial.available()) {
-    char buf[64] = "";
+    char buf[128] = "";
     int i = 0;
     unsigned long timeout = 1000;
     timeout += millis();
 
+    Serial.read();
     while ((Serial.available() || millis() < timeout) && i < 63) {
       if (Serial.available())
         buf[i++] = Serial.read();
@@ -159,10 +179,32 @@ boolean checkForPing() {
 
       //a little space between packets
       delay(100);
-      return true;
-    } 
+    }
+   
+    //got time-of-day packet?
+    else if (strstr(buf, "PT=TOD") != NULL) {
+      char *hourLoc = strstr(buf, "H=");
+      char *minLoc = strstr(buf, "M=");
+      
+      if ( hourLoc && minLoc ) { //if neither are NULL
+        unsigned short hours = 0;
+        unsigned short mins = 0;
+        hourLoc += 2; minLoc += 2;
+        
+        while (*hourLoc >= '0' && *hourLoc <= '9') {
+          hours = (10*hours + *hourLoc-'0');
+          hourLoc++;
+        }
+        while (*minLoc >= '0' && *minLoc <= '9') {
+          mins = (10*mins + *minLoc-'0');
+          minLoc++;
+        }
+        
+        resetMillis();
+        todInMillis = (hours*3600000) + (mins * 60000);
+      } 
+    }
   }
-
 }
 
 

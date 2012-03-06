@@ -72,6 +72,8 @@ void setup() {
     battery.watts = -9;	// -9 is an impossible value so use it as default
     // and make sure hydro wattage starts at an impossible level
     hydroWatts.watts = -1;
+    hydroWatts.kwhToday = -1;
+    hydroWatts.kwhYesterday = -1;
     // set valves open string to "????")
     sprintf(turbine.valves,"????");
     // and psi to impossible number
@@ -295,7 +297,7 @@ void loop() {
 
             // Check for and save any Hydro data
             if (strcmp(getDataVal(rx.data,"PT"),"WTT") == 0) {
-                if (strcmp(getDataVal(rx.data,"XB"),"UWS") == 0)
+                if (strcmp(getDataVal(rx.data,"XB"),"GTS") == 0)
                     saveHydroWattsData(&hydroWatts,rx.data);
           }
             

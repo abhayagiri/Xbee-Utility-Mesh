@@ -126,6 +126,8 @@ struct hydroWattsStruct {
 	char id[ID_LENGTH];	// Three bytes for XBee ID,
 				// 4th byte is null termination
 	int watts;		// holds watts produced by hydro
+        float kwhToday;
+        float kwhYesterday;
 	struct timerStruct timeStamp; // timestamp to calculate time
 					// since last data came in
         unsigned int dmin;

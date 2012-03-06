@@ -3,6 +3,8 @@
 int saveHydroWattsData(struct hydroWattsStruct *hW, struct dataStruct d[]) {
 	strlcpy(hW->id,getDataVal(d,"XB"),4);
 	hW->watts = atoi(getDataVal(d,"W"));
+        hW->kwhToday = atof(getDataVal(d,"T"));
+        hW->kwhYesterday = atof(getDataVal(d,"Y"));
 	hW->timeStamp = timer; // save current time to calculate difference later
 	return 0;
 }

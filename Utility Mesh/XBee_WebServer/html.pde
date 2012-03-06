@@ -22,14 +22,14 @@ void printMainPage(Client client) {
   printEther_p(client, myUrl); client.println("\"/>");
   
   printEther_p(client, PSTR("<style type=\"text/css\"> "
-                              "body {font-family:Verdana;} td {text-align:center; vertical-align:middle;}"
+                              "body {font-family:Verdana; height:100%;} td {text-align:center; vertical-align:middle;}"
                               "</style></head>"
                               "<body bgcolor=\"DarkGoldenRod\">"
                               "<div align=center valign=middle>"
 
                               "<table cellspacing=15>"
 
-                              "<tr><td><input type=\"button\" value=\"Send Ping\" "
+                              "<tr><td><input type=\"button\" value=\"Ping\" "
                               "onClick=\"window.location.replace(\'"));
   printEther_p(client, myUrl); 
   printEther_p(client, PSTR("?ping=send\')\"/></td></tr>"));
@@ -189,7 +189,7 @@ void printMainPage(Client client) {
   }
   printlnEther_p(client, PSTR("</table></td></tr>"));
   
-  //turbine/////////////////////////////////////////////////////////
+  //Grid tie inverter/////////////////////////////////////////////////////////
   printEther_p(client, PSTR("<tr><td>"
                             
                             "<table border=1 width=100%>"
@@ -201,9 +201,21 @@ void printMainPage(Client client) {
     printEther_p(client, PSTR("<td><b>"));
                               printTime(client, hydroWatts.dmin);
     printEther_p(client, PSTR("<tr>"
-                              "<td>Watts Produced</td><td>"));
+                              "<td>Curr. Output</td><td>"));
                               client.print(hydroWatts.watts);
-    printEther_p(client, PSTR("</td>"
+    printEther_p(client, PSTR(" Watts</td>"
+                              "</tr>"
+                              
+                              "<tr>"
+                              "<td>Produced Today</td><td>"));
+                              client.print(hydroWatts.kwhToday, 2);
+    printEther_p(client, PSTR(" kWh</td>"
+                              "</tr>"
+                              
+                              "<tr>"
+                              "<td>Produced Yesterday</td><td>"));
+                              client.print(hydroWatts.kwhYesterday, 2);
+    printEther_p(client, PSTR(" kWh</td>"
                               "</tr>"));
   }  
   else {
@@ -258,13 +270,12 @@ void printMainPage(Client client) {
                               "<td colspan=\"2\">No Data Received</td>"
                               "</tr>"));
   }
-  
   printEther_p(client, PSTR("</table></td></tr>"
+                           
                             "<tr><td>"
                             "<table border=1 width=100%>"
                             "<tr>"
                             "<td><b>Ridge Water Tanks</b></td>"));
-
   if (gotRdg) {
     printEther_p(client, PSTR("<td><b>"));
                               printTime(client, tanks[RDG].dmin); 
@@ -281,15 +292,17 @@ void printMainPage(Client client) {
                               "<td colspan=\"2\">No Data Received</td>"
                               "</tr>"));
   }
-  printEther_p(client, PSTR("</table></td>"
+  printEther_p(client, PSTR(//"</table></td>"
                               
-                            "<td>"
-                            "<table>"
-                            "<tr><td><input type=\"button\" value=\"Pump On\" onClick=\"window.location.replace(\'"));
+                            //"<td>"
+                            //"<table>"
+                            "<tr>"
+                            "<td colspan=\"2\"><input type=\"button\" value=\"Pump On\" onClick=\"window.location.replace(\'"));
                             printEther_p(client, myUrl);
-  printEther_p(client, PSTR("?pumpOp=on\')\"/></td></tr>"
+  printEther_p(client, PSTR("?pumpOp=on\')\"/>"//</tr>"
                             
-                            "<tr><td><input type=\"button\" value=\"Pump Off\" onClick=\"window.location.replace(\'"));
+                            //"<tr><td>
+                            "<nbsp><input type=\"button\" value=\"Pump Off\" onClick=\"window.location.replace(\'"));
                             printEther_p(client, myUrl); 
   printEther_p(client, PSTR("?pumpOp=off\')\"/>"
                             "</td></tr>"
@@ -324,9 +337,20 @@ void printMainPage(Client client) {
   }
 
   //close main table
-  printlnEther_p(client, PSTR("</table>"
-                              
-                              "</div></body></html>"));
+  printEther_p(client, PSTR("</table>"
+                            "</div>"
+                            
+                            "<div align=\"center\"  style=\"visibility: hidden;\">"
+                            "<p>"));
+                            client.print((timer.hour > 12 ? timer.hour-12 : timer.hour));
+                            client.print(':');
+                            if (timer.min < 10) client.print('0');
+                            client.print(timer.min);
+                            client.print((timer.hour > 11 ? " PM" : " AM"));
+  printEther_p(client, PSTR("</p>"
+                            "</div>"
+                            
+                            "</body></html>"));
   // HTML Ends Here
 }
 
@@ -342,7 +366,7 @@ void printTimeSetPage(Client client) {
                             "<form name=\"timeSetForm\" action=\"/\" method=\"get\">"
                             "Hour: "
                             "<select name=\"hour\">"));
-                            for (int i=0; i<25; i++) {
+                            for (int i=0; i<24; i++) {
                               printEther_p(client, PSTR("<option>"));
                               client.print(i);
                               printEther_p(client, PSTR("</option>"));

@@ -55,6 +55,8 @@ void setup() {
   battery.watts = -9;	// -9 is an impossible value so use it as default
   // and make sure hydro wattage starts at an impossible level
   hydroWatts.watts = -1;
+  hydroWatts.kwhToday = -1;
+  hydroWatts.kwhYesterday = -1;
   // set valves open string to "????")
   sprintf(turbine.valves,"????");
   // and psi to impossible number
@@ -153,7 +155,8 @@ void loop() {
                  hour = atoi(optStr+8);
                  minute = atoi(dashLoc+1);
                 if (minute < 60 && hour < 24) {
-                  timer.hour = hour; timer.min = minute;
+                  timer.hour = hour; timer.min = minute; timer.sec = 0;
+                  timer.justOverflowed = true;
                   timeSet = true;
                   printRedirect(client);
                 }
@@ -418,6 +421,17 @@ void loop() {
       }
     else 
       digitalWrite(ALERT_LED, LOW);
+  }
+  
+  //send TOD packet once every 10 min. on the +9 minute minute
+  if (timer.justOverflowed && 
+      timer.min % 10 == 9 && 
+      timer.sec == 0 &&
+      timeSet) {
+    Serial.print("~XB="); Serial.print(XBEE);
+    Serial.print(",PT=TOD,H="); Serial.print(timer.hour);
+    Serial.print(",M="); Serial.print(timer.min);
+    Serial.print("~");
   }
 }
 
