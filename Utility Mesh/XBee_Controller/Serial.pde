@@ -52,6 +52,14 @@ int sendButtons ( struct configStruct *cfg, const struct buttonStruct *b, const 
 
         char buf[48];
 
+        //total hack - ask for manual mode when stepping down from AC,
+        //and auto mode when up from B; did this as we have run out
+        //of convenient was to use the buttons;
+        if ( b->a2 || strstr(turbine.valves, "AC ") == turbine.valves)
+          sprintf(buf, "~XB=%s,DST=%s,PT=SCM,M=%d~", id, dest, 1);//
+        else if ( b->a1 || strstr(turbine.valves, "B ") == turbine.valves)
+          sprintf(buf, "~XB=%s,DST=%s,PT=SCM,M=%d~", id, dest, 0);//
+          
 	// Construct transmission
 	sprintf(buf,"~XB=%s,DST=%s,PT=BTN,A1=%d,A2=%d,B1=%d,B2=%d~",
 						id,	// XBee ID

@@ -78,6 +78,7 @@ void setup() {
     sprintf(turbine.valves,"????");
     // and psi to impossible number
     turbine.psi = -9;
+    turbine.mode = -9;
     //initalize valveOp data
     memset(valveOp.id,'\0',ID_LENGTH);
     memset(valveOp.op,'\0',6);
@@ -112,7 +113,7 @@ void loop() {
       button.a1 ? valveCommandState=1 : valveCommandState=3; //set valve command state
     }
     
-    //reset the rocker switch counter, used for ping mode
+    //handle the rocker switch counter, used for ping mode
     if ( config.displayMode == 0 && valveCommandState == 0 && ((buttonLast.a1 && button.a1) || (buttonLast.a2 && button.a2)))
       pingThreshold += 1;
     else

@@ -81,6 +81,7 @@ struct turbineStruct {
 				// 4th byte is null termination
 	char valves[5];		// holds valve status
 	int psi;		// holds turbine psi
+        char mode;
 	struct timerStruct timeStamp; // timestamp to calculate time
 					// since last data came in
 } turbine;
