@@ -25,7 +25,12 @@ int saveTurbineData(struct turbineStruct *t, struct dataStruct d[]) {
 	strlcpy(t->id,getDataVal(d,"XB"),4);
 	strlcpy(t->valves,getDataVal(d,"V"),5);
 	t->psi = atoi(getDataVal(d,"P"));
-	t->timeStamp = timer; // save current time to calculate difference later
+        
+        char *modeTmp = getDataVal(d,"M"); //sends 2 bits, one for auto/manual and one for testing state
+        if (modeTmp[0] == '0' || modeTmp[0] == '1') //we just need the 1st bit for now
+          t->mode = modeTmp[0] - '0';
+	
+        t->timeStamp = timer; // save current time to calculate difference later
 	return 0;
 }
 

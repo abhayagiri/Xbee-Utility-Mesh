@@ -28,7 +28,10 @@ void printDefaultScreen (struct configStruct *cfg, struct timerStruct *t, struct
         timePastStr(t, &(trbn->timeStamp), tmpStr);
       //else
       //  timePastStr(t, &(hydro->timeStamp), tmpStr);
-      sprintf(line1, "V. open:%s", trbn->valves);
+      if (trbn->mode == 0) sprintf("auto", tmpStr);
+      else if (trbn->mode == 1) sprintf("man", tmpStr);
+      else sprintf("?", tmpStr);
+      sprintf(line1, "Vs:%s%s", trbn->valves, tmpStr);
       appendToEnd(line1, tmpStr, 16);
       //line 2
       sprintf(line2, "PSI:%03d", trbn->psi);
