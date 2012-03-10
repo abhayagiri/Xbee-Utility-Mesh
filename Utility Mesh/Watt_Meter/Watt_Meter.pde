@@ -3,7 +3,13 @@
 
 #define	LOCATION_NAME	"GTS"
 #define AVG_SECS        10 //10sec running avg. for display, etc.
-#define INVERTER_INEFFECIENCY 
+
+//had to abandon [watts = amps * volts] to get
+//numbers close to inverter display. sampling
+//showed a linear relationship:
+//inverter displayed watts = constant + (coeffecient * sensed amps)
+#define INVERTER_COEFFECIENT = 274
+#define INVERTER_CONSTANT = -170
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 int calibratedNull = 0;
@@ -64,7 +70,7 @@ void setup() {
 }
 
 void loop() {
-  long int accumulator = 0;
+  unsigned long int accumulator = 0;
   unsigned int numSamples = 0;
   float current = 0;
   int watts = 0;
@@ -73,14 +79,14 @@ void loop() {
   int sample; //sample for 1 sec.
   while(millis() < averagingTime) {
     sample = analogRead(A0) - calibratedNull;
-    accumulator += sample; // * sample;
+    accumulator += (sample>0 ? sample : 0); //expecting dc, ignoring negative components the rectifier output
     numSamples++;
   }
     
-  //current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0);
-  current = (accumulator/(float)numSamples) * ampsPerUnitFromNull;
-  if (current < 0.25 && current > -0.25) current = 0;
-  watts = current * 330.0; //~330v coming from turbine 
+  //current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0); //for AC
+  current = (accumulator/(float)numSamples) * ampsPerUnitFromNull; //for DC
+  if (current < 0.5) current = 0;
+  watts = (current * INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
   wattSecondsToday += watts;
   
   //handle timing
