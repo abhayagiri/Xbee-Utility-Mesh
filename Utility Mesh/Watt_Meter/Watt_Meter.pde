@@ -8,8 +8,8 @@
 //numbers close to inverter display. sampling
 //showed a linear relationship:
 //inverter displayed watts = constant + (coeffecient * sensed amps)
-#define INVERTER_COEFFECIENT = 274
-#define INVERTER_CONSTANT = -170
+#define INVERTER_COEFFECIENT 274
+#define INVERTER_CONSTANT -170
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 int calibratedNull = 0;
@@ -40,14 +40,14 @@ void setup() {
   
   //check if sensor is plugged in:
   while (analogRead(A0) < 30) {
-    lcd.home(); lcd.print("Sensor");
+    lcd.home(); lcd.print("Connect Sensor");
     delay(500);
   }
   
   //calibrate
   timer0_millis=0;
   
-  lcd.clear(); lcd.print("Calib"); lcd.blink();
+  lcd.clear(); lcd.print("Calibrating"); lcd.blink();
   unsigned long int avg = 0;
   int sample = 0, high = -1, low = 1025;
   unsigned long int numSamps = 0;
@@ -86,7 +86,7 @@ void loop() {
   //current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0); //for AC
   current = (accumulator/(float)numSamples) * ampsPerUnitFromNull; //for DC
   if (current < 0.5) current = 0;
-  watts = (current * INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
+  if (current > 0) watts = (current * INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
   wattSecondsToday += watts;
   
   //handle timing
@@ -108,12 +108,7 @@ void loop() {
   
   //send packet every 5 min.
   if (todInSeconds % 120 == 0)
-  {
-    Serial.print("~XB=GTS,PT=WTT,W="); Serial.print(avgWatts);
-    Serial.print(",T="); Serial.print(wattSecondsToday / (3600000.0));
-    Serial.print(",Y="); Serial.print(wattSecondsYesterday / (3600000.0));
-    Serial.print('~');
-  }
+     sendPacket();
   
   //update LCD
   lcd.clear();

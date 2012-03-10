@@ -1,7 +1,7 @@
 void sensorCheck() {
   if (newSecond && !testing) { //once a second, sample the psi sensor
-    //adding 4 to normalize reading from sensor 
-    psiValues[currSecond % NUM_PSI_SAMPLES] = 4 + map(analogRead(psisensor), 0, 1024, 0, 250);
+    //subtracting 4 to normalize reading from sensor 
+    psiValues[currSecond % NUM_PSI_SAMPLES] = (-4) + map(analogRead(psisensor), 0, 1024, 0, 250);
     //get average psi, not counting samples not yet received (1st 30 seconds)
     for (int i=0; i<NUM_PSI_SAMPLES; i++)
       psi += psiValues[i];
