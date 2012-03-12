@@ -32,7 +32,7 @@ void sensorCheck() {
       setValveState(0);
     }  
     //4. wait till we get above 205, then prime inverter
-    else if (psi > 205 && currState == 0) {
+    else if (psi > 200 && currState == 0) {
       openFunct();
       valveWaitTimer = 270; //prime inverter for 4.5 sec.
     }
