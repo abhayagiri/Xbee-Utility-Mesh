@@ -404,21 +404,21 @@ void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char 
  printRedirectHeader_p(client, title, targetUrl, timeout);
 
   //print body
-  printlnEther_p(client, openBody);
-  printlnEther_p(client, openContainer);
-  printEther_p(client, openStyledP);
+  printEther_p(client, openBody);
+  printEther_p(client, openContainer);
+  printEther_p(client, PSTR("<p>"));
   
   if (wrap)
-    printEther_p(client, PSTR("Sent <i>"));  
+    printEther_p(client, PSTR("Sending <i>"));  
   
-  printlnEther_p(client, msg);
+  printEther_p(client, msg);
   
   if (wrap)
-    printlnEther_p(client, PSTR(" </i>command, waiting for response..."));  
+    printEther_p(client, PSTR(" </i>command, waiting for response..."));  
   
-  printEther_p(client, PSTR("</p>"));
+  printEther_p(client, PSTR("</p><p><a style=\"font-size:12pt;\" href=\"http://xbee-mesh/?\">Cancel</a></p>"));
   printEther_p(client, closeContainer);
-  printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
+  printEther_p(client, PSTR("</body>\n</html>"));
 }
 
 //for dealing with ping packets
@@ -428,21 +428,18 @@ void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_c
  printRedirectHeader_p(client, title, targetUrl, timeout);
 
   //print body
-  printlnEther_p(client, openBody);
+  printEther_p(client, openBody);
+  printEther_p(client, openContainer);
   if (strlen(pongList) == 0) {
-      printlnEther_p(client, openContainer);
-      printEther_p(client, openStyledP);
-    printlnEther_p(client, PSTR("Waiting for responses... </p>"));
+      printEther_p(client, PSTR("<p>Waiting for responses... </p>"));
   } else {
-    printlnEther_p(client, openContainer);
-    printEther_p(client, openStyledP);
-    printEther_p(client, PSTR("Responses:</p>\n"));     
-    printEther_p(client, openStyledP);
+    printEther_p(client, PSTR("Responses:</p><p>\n"));     
     client.print(pongList);
-    printlnEther_p(client, PSTR("</p>"));
+    printEther_p(client, PSTR("</p>"));
   }
-  printlnEther_p(client, closeContainer);
-  printlnEther_p(client, PSTR("</BODY>\n</HTML>"));
+  printEther_p(client, PSTR("<p><a style=\"font-size:12pt;\" href=\"http://xbee-mesh/?\">Finished</a></p>"));
+  printEther_p(client, closeContainer);
+  printEther_p(client, PSTR("</body>\n</html>"));
 }
 
 void printRedirectHeader_p(Client client, prog_char *title, prog_char *targetUrl, prog_char *timeout)
@@ -454,7 +451,7 @@ void printRedirectHeader_p(Client client, prog_char *title, prog_char *targetUrl
   printEther_p(client, timeout);
   printEther_p(client, PSTR("; url="));
   printEther_p(client, targetUrl);
-  printlnEther_p(client,PSTR("\"></HEAD>"));
+  printEther_p(client,PSTR("\"></head>"));
 }
 
 void printRedirect(Client client) {

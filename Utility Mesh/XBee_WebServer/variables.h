@@ -34,10 +34,10 @@ prog_char myUrl[] PROGMEM = "http://xbee-mesh/";
 prog_char httpResponse200[] PROGMEM = "HTTP/1.1 200 OK\nContent-Type: text/html\n";
 prog_char openDocument[] PROGMEM = "<html><head><title>";
 prog_char openBody[] PROGMEM = "<body bgcolor=\"DarkGoldenRod\">";
-prog_char openContainer[] PROGMEM = "<table height=100% width=100% border=0><tr><td align=center, valign=middle>";
+prog_char openContainer[] PROGMEM = "<table height=100% width=100% border=0 style=\"text-align:center; font-size:24pt;\">"
+                                    "<tr><td align=center, valign=middle>";
 prog_char closeContainer[] PROGMEM = "</td></tr></table>";
 prog_char openData[] PROGMEM = "<td align=\"center\" valign=\"middle\">";
-prog_char openStyledP[] PROGMEM = "<p style=\"text-align:center; font-size:24pt;\">";
 prog_char strMins[] PROGMEM = " Minutes";
 prog_char strHours[] PROGMEM = " Hours";
 prog_char strAgo[] PROGMEM = " Ago</b></td></tr>";
@@ -178,10 +178,11 @@ boolean ledOn = false;
 //this keeps track of timeouts for web commands
 struct webCmdTimerStruct {
         struct timerStruct timeStamp;
-        int timeout;
+        unsigned int timeout;
         prog_char *opStr;
         prog_char *msgStr;
         prog_char *packetStr;
+        unsigned short stateReq; //temp variable for the requested state to set if we get a valveOp=# or modeOp=#
         char pongList[32];
         bool wrap;
 } webCmdTimer;

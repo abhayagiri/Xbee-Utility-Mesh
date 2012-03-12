@@ -137,25 +137,24 @@ void loop() {
 
         //now serve the request  
         if (gotRequest) { 
-          //temp variable for the requested state to set
-          //if we get a valveOp=# or modeOp=#
-          unsigned int stateReq = 0;
-          
+
           if (!timeSet) {
-            
+
             if (!gotOpts) //request time from user
               printTimeSetPage(client);
-            
+
             else if (strstr_P(optStr, PSTR("setTime=")) == optStr) { //process time string
               int hour=0, minute=0;
               char *dashLoc = strchr(optStr, '-');
-              
+
               if (dashLoc != NULL) {
                 *dashLoc = '\0'; //set the dash to null, send substrings to atoi()
-                 hour = atoi(optStr+8);
-                 minute = atoi(dashLoc+1);
+                hour = atoi(optStr+8);
+                minute = atoi(dashLoc+1);
                 if (minute < 60 && hour < 24) {
-                  timer.hour = hour; timer.min = minute; timer.sec = 0;
+                  timer.hour = hour; 
+                  timer.min = minute; 
+                  timer.sec = 0;
                   timer.justOverflowed = true;
                   timeSet = true;
                   printRedirect(client);
@@ -163,49 +162,49 @@ void loop() {
               }
             }
           }
-            
+
           else if (webState == WEB_NORMAL && !gotOpts) //normal request
             printMainPage(client);
 
           else if (webState == WEB_NORMAL && gotOpts) {//handle html buttons            
 
-            boolean foundCommand = false;
+              boolean foundCommand = false;
             //check for valid option string
-            if (strcmp_P(optStr, PSTR("valveOp=open")) == 0) {
-              webCmdTimer.msgStr = valveOpenMsg;
-              webCmdTimer.opStr = valveOpStr;
-              webCmdTimer.packetStr = valveOpenPacket;
-              webCmdTimer.timeout = 20;
-              webCmdTimer.wrap = true;
-              foundCommand = true;
-            }
-            else if (strcmp_P(optStr, PSTR("valveOp=close")) == 0) {
-              webCmdTimer.msgStr = valveCloseMsg;
-              webCmdTimer.opStr = valveOpStr;
-              webCmdTimer.packetStr = valveClosePacket;
-              webCmdTimer.timeout = 20;
-              webCmdTimer.wrap = true;
-              foundCommand = true;
-            }
-            else if ((strstr_P(optStr, PSTR("valveOp=")) == optStr)
-                     && optStr[8]>='0' && optStr[8]<='7' && optStr[9]=='\0')
+//            if (strcmp_P(optStr, PSTR("valveOp=open")) == 0) {
+//              webCmdTimer.msgStr = valveOpenMsg;
+//              webCmdTimer.opStr = valveOpStr;
+//              webCmdTimer.packetStr = valveOpenPacket;
+//              webCmdTimer.timeout = 20;
+//              webCmdTimer.wrap = true;
+//              foundCommand = true;
+//            }
+//            else if (strcmp_P(optStr, PSTR("valveOp=close")) == 0) {
+//              webCmdTimer.msgStr = valveCloseMsg;
+//              webCmdTimer.opStr = valveOpStr;
+//              webCmdTimer.packetStr = valveClosePacket;
+//              webCmdTimer.timeout = 20;
+//              webCmdTimer.wrap = true;
+//              foundCommand = true;
+//            }
+            if ((strstr_P(optStr, PSTR("valveOp=")) == optStr)
+              && optStr[8]>='0' && optStr[8]<='7' && optStr[9]=='\0')
             {
               webCmdTimer.msgStr = valveSetMsg;
               webCmdTimer.opStr = valveOpStr;
               webCmdTimer.packetStr = valveSetPacket;
-              stateReq = atoi(&optStr[8]);
-              webCmdTimer.timeout = 20;
+              webCmdTimer.stateReq = atoi(&optStr[8]);
+              webCmdTimer.timeout = 60;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
             else if ((strstr_P(optStr, PSTR("modeOp=")) == optStr)
-                      && (optStr[7]=='0' || optStr[7]=='1') && optStr[8]=='\0')
+              && (optStr[7]=='0' || optStr[7]=='1') && optStr[8]=='\0')
             {
               webCmdTimer.msgStr = modeSetMsg;
               webCmdTimer.opStr = modeOpStr;
               webCmdTimer.packetStr = modeSetPacket;
-              stateReq = atoi(&optStr[7]);
-              webCmdTimer.timeout = 20;
+              webCmdTimer.stateReq = atoi(&optStr[7]);
+              webCmdTimer.timeout = 60;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -213,7 +212,7 @@ void loop() {
               webCmdTimer.msgStr = pumpStartMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStartPacket;
-              webCmdTimer.timeout = 20;
+              webCmdTimer.timeout = 60;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -221,7 +220,7 @@ void loop() {
               webCmdTimer.msgStr = pumpStopMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStopPacket;
-              webCmdTimer.timeout = 20;
+              webCmdTimer.timeout = 60;
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
@@ -230,7 +229,7 @@ void loop() {
               webCmdTimer.opStr = pingOpStr;
               webCmdTimer.packetStr = pingPacket;
               webCmdTimer.pongList[0] = '\0';
-              webCmdTimer.timeout = 10;
+              webCmdTimer.timeout = 300;
               webCmdTimer.wrap = false;
               foundCommand = true;
             }
@@ -249,26 +248,29 @@ void loop() {
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
               while (pgm_read_byte(strPtr) != 0x00) {
                 if (pgm_read_byte(strPtr) == '%') {
-                  Serial.print(stateReq); 
+                  Serial.print(webCmdTimer.stateReq); 
                   strPtr++;
-                } 
-                else
+                } else
                   Serial.print(pgm_read_byte(strPtr++));
               }
-              
+
               webState = WEB_CMD_SENT; //set webState to command sent state
               //send refresh page                                
               printRedirect_p( client,
               webCmdTimer.opStr,
               webCmdTimer.msgStr,
               myUrl,
-              PSTR("2"),
+              PSTR("3"),
               webCmdTimer.wrap);
             }
             else
               printRedirect(client);
           }
+          //got options during a webcommand - means abandon ping for now
+
           else if (webState == WEB_CMD_SENT) {
+            if (gotOpts) //kill web command on any request but the main page
+              webCmdTimer.timeout = 0;
             //check timer - if ok, resend timeout page; if not, send failure info, reset webState
             if (timePastSeconds(&timer, &(webCmdTimer.timeStamp)) > webCmdTimer.timeout) {
               boolean ping = (webCmdTimer.opStr == pingOpStr ? true : false);
@@ -290,13 +292,25 @@ void loop() {
               while (pgm_read_byte(strPtr) != 0x00)
                 Serial.print(pgm_read_byte(strPtr++));
             }
-            else
+            else {
               printRedirect_p( client,
               webCmdTimer.opStr,
               webCmdTimer.msgStr,
               myUrl,
               PSTR("2"), 
               webCmdTimer.wrap );
+              
+              if (webCmdTimer.wrap == true) {//we have not heard from the turbine yes
+                prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
+                while (pgm_read_byte(strPtr) != 0x00) {
+                  if (pgm_read_byte(strPtr) == '%') {
+                    Serial.print(webCmdTimer.stateReq); 
+                    strPtr++;
+                  } else
+                    Serial.print(pgm_read_byte(strPtr++));
+                }
+              }
+            }
           }
           else if (webState == WEB_CMD_ACKNOWLEDGED) {
             //send ACK page, reset webState;
@@ -364,7 +378,8 @@ void loop() {
       // Check for web command awk packets
       if (webState == WEB_CMD_SENT) {
 
-        if (webCmdTimer.opStr == valveOpStr) {//waiting on valve op?
+        if (webCmdTimer.opStr == valveOpStr ||
+            webCmdTimer.opStr == modeOpStr) {//waiting on valve op?
           if (strcmp(getDataVal(rx.data,"XB"),"TRB") == 0 ) {
             if (strcmp(getDataVal(rx.data,"PT"),"VOP") == 0) {
               webCmdTimer.timeout = 25;
@@ -412,28 +427,35 @@ void loop() {
       if (alerts[i]->active && !(alerts[i]->dismissed))
         alertsActive = true;
     }
-        
+
     if (alertsActive)
       if (ledOn) {
-        digitalWrite(ALERT_LED, LOW); ledOn = false;
-      } else {
-        digitalWrite(ALERT_LED, HIGH); ledOn = true;
+        digitalWrite(ALERT_LED, LOW); 
+        ledOn = false;
+      } 
+      else {
+        digitalWrite(ALERT_LED, HIGH); 
+        ledOn = true;
       }
     else 
       digitalWrite(ALERT_LED, LOW);
   }
-  
+
   //send TOD packet once every 10 min. on the +9 minute minute
   if (timer.justOverflowed && 
-      timer.min % 10 == 9 && 
-      timer.sec == 0 &&
-      timeSet) {
-    Serial.print("~XB="); Serial.print(XBEE);
-    Serial.print(",PT=TOD,H="); Serial.print(timer.hour);
-    Serial.print(",M="); Serial.print(timer.min);
+    timer.min % 10 == 9 && 
+    timer.sec == 0 &&
+    timeSet) {
+    Serial.print("~XB="); 
+    Serial.print(XBEE);
+    Serial.print(",PT=TOD,H="); 
+    Serial.print(timer.hour);
+    Serial.print(",M="); 
+    Serial.print(timer.min);
     Serial.print("~");
   }
 }
+
 
 
 
