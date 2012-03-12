@@ -1,3 +1,11 @@
+/****************************************************************
+We ran out of pins on the relayduino board, and decided to use
+a spare lillypad for handling buttons and the xBee. Standard 
+Serial sends button press messages to the relayduino, and listens 
+for messages meant to go out to the xBee; a NewSoftSerial instance
+talks to the xBee.
+****************************************************************/
+
 #include <NewSoftSerial.h>
 
 NewSoftSerial sSerial(8,9);
@@ -35,6 +43,8 @@ void loop() {
   lastC = stateC;  
   lastD = stateD;  
   
+  
+  //these delays debounce the button presses
   if (digitalRead(buttonA) == HIGH) {
     delay(50);
     stateA = digitalRead(buttonA);
@@ -52,6 +62,10 @@ void loop() {
     stateD = digitalRead(buttonD);
   }
   
+  //current method does not allow simultanious
+  //button presses to be sent, eg. *AC, also
+  //does not send button-up notification. May
+  //be usefull for other apps in the future.
   if ((stateA != lastA) && (stateA == HIGH)) {
     Serial.print ("*A");
   }
@@ -65,11 +79,13 @@ void loop() {
     Serial.print ("*D");
   }
   
-  while (sSerial.available())
-   Serial.print((char)sSerial.read());
+  //replicate anything coming from one serial
+  //interface to the other.
+  while (sSerial.available()) //listening for incoming xBee packets
+   Serial.print((char)sSerial.read()); //send to relayduino
     
-   while (Serial.available())
-    sSerial.print((char)Serial.read());
+   while (Serial.available()) //anything from relayduino?
+    sSerial.print((char)Serial.read()); //send out on xBee
 }
 
 

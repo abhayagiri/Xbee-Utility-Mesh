@@ -22,7 +22,7 @@ void setup () {
     for(int i=0; i<NUM_PSI_SAMPLES; i++)
         psiValues[i] = 210;
 
-    //open all valves
+    //close all valves
     lcd.clear(); 
     lcd.home(); 
     lcd.blink();
@@ -46,8 +46,8 @@ void loop ()  {
     updateTime();            //keeps track of seconds
     txandtr();               //get serial data and buttons
 
-    valvestate();
-    sensorCheck();
+    valvestate();            //sets the valve state string
+    sensorCheck();           //check the psi 
     menuOpt();
     updateLCD();
 }

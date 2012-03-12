@@ -1,8 +1,8 @@
 void sensorCheck() {
   if (newSecond && !testing) { //once a second, sample the psi sensor
-    //subtracting 4 to normalize reading from sensor 
-    psiValues[currSecond % NUM_PSI_SAMPLES] = (-4) + map(analogRead(psisensor), 0, 1024, 0, 250);
-    //get average psi, not counting samples not yet received (1st 30 seconds)
+    //subracting 4 to normalize reading from sensor 
+    psiValues[currSecond % NUM_PSI_SAMPLES] = map(analogRead(psisensor)-4, 0, 1024, 0, 250);
+    //get average psi
     for (int i=0; i<NUM_PSI_SAMPLES; i++)
       psi += psiValues[i];
     psi = psi/NUM_PSI_SAMPLES;
@@ -31,7 +31,7 @@ void sensorCheck() {
     else if (psi < 160 && currState <= 3 && currState > 0) {
       setValveState(0);
     }  
-    //4. wait till we get above 205, then prime inverter
+    //4. wait till we get above 200, then prime inverter
     else if (psi > 200 && currState == 0) {
       openFunct();
       valveWaitTimer = 270; //prime inverter for 4.5 sec.
