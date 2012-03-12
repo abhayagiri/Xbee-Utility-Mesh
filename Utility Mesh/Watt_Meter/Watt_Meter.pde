@@ -74,7 +74,7 @@ void loop() {
   unsigned int numSamples = 0;
   float current = 0;
   int watts = 0;
-  int avgWatts = 0;
+  long int avgWatts = 0;
 
   int sample; //sample for 1 sec.
   while(millis() < averagingTime) {

@@ -21,7 +21,7 @@ void checkForPacket() {
             Serial.print("~XB=");
             Serial.print(LOCATION_NAME);
             Serial.println(",PT=PONG~");
-            
+
             sendPacket();
         }
 
@@ -52,6 +52,10 @@ void checkForPacket() {
 }
 
 void sendPacket() {
+    long int avgWatts = 0;
+    
+    for (int i=0; i<AVG_SECS; i++) avgWatts += wattsAvgArray[i];
+    avgWatts /= AVG_SECS;
     Serial.print("~XB=GTS,PT=WTT,W="); 
     Serial.print(avgWatts);
     Serial.print(",T="); 
@@ -60,4 +64,5 @@ void sendPacket() {
     Serial.print(wattSecondsYesterday / (3600000.0));
     Serial.print('~');
 }
+
 
