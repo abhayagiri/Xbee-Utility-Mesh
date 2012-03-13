@@ -25,13 +25,16 @@ void printDefaultScreen (struct configStruct *cfg, struct timerStruct *t, struct
       //TODO: use older timestamp after hydro is up and running
       //get older of two timestamps
       //if (timePast(t, &(trbn->timeStamp)) > timePast(t, &(hydro->timeStamp)))
-        timePastStr(t, &(trbn->timeStamp), tmpStr);
+        
       //else
       //  timePastStr(t, &(hydro->timeStamp), tmpStr);
-      if (trbn->mode == 0) sprintf("auto", tmpStr);
-      else if (trbn->mode == 1) sprintf("man", tmpStr);
-      else sprintf("?", tmpStr);
+      if (trbn->mode == 0) {
+        sprintf(tmpStr, "auto");
+      } else if (trbn->mode == 1) {
+        sprintf(tmpStr, "man");
+      } else sprintf(tmpStr, "?");
       sprintf(line1, "Vs:%s%s", trbn->valves, tmpStr);
+      timePastStr(t, &(trbn->timeStamp), tmpStr);
       appendToEnd(line1, tmpStr, 16);
       //line 2
       sprintf(line2, "PSI:%03d", trbn->psi);
