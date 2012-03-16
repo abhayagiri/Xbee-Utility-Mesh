@@ -67,7 +67,7 @@ void handleValveOpPacket (struct dataStruct d[]) {
 }
 
 void handlePongPacket ( struct dataStruct d[]) {
-    if (keyExists(d, "XB")){
+    if (pingMode && keyExists(d, "XB")){ //don't bother if not in ping mode
         unsigned long int staleTime = (loopMillis + PONG_STALE_TIME);
         int i = 0;
         char *id = getDataVal(d,"XB");

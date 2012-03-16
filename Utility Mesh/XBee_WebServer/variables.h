@@ -1,4 +1,5 @@
 boolean debugMode = false;
+
 boolean timeSet = false;
 
 // Enter a MAC address and IP address for your controller below.

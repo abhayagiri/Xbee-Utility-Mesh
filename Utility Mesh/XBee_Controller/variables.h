@@ -137,14 +137,17 @@ struct buttonStruct {
 short backlightTimer = BACKLIGHT_TIME;
 
 bool pingMode = false;
-short pingThreshold = 0;
+bool blightPersistMode = false;
+unsigned int pingButtonTimer = 0;
+unsigned int blightButtonTimer = 0;
 
 struct pongTimer {
     char id[ID_LENGTH];
+    bool heardFrom;
     unsigned long int staleTime;
-} pongTimers[] = {"TRB",0, "TWT",0, "FWT",0, "RDG",0,
-                  "SNA",0, "VST",0, "HIS",0};
-char pongLine1[17], pongLine2[17] = "";
+} pongTimers[] = {"TRB",false,0, "TWT",false,0, "FWT",false,0, "RDG",false,0,
+                  "SNA",false,0, "VST",false,0, "GTS",false,0};
+char pongLine1[17]="", pongLine2[17] = "";
 short numPongTimers = sizeof(pongTimers)/sizeof(struct pongTimer);
 
 char elipsis[4] = "   ";   // moving elipsis for valve control wait screens

@@ -16,23 +16,24 @@ void printMainPage(Client client) {
   printlnEther_p(client, httpResponse200);
 
   // Page HTML goes here
-  printEther_p(client, openDocument);
-  printEther_p(client, PSTR("Abhayagiri XBee Utility Mesh</title>"
-                            "<meta http-equiv=\"REFRESH\" content=\"30; url="));
-  printEther_p(client, myUrl); client.println("\"/>");
   
-  printEther_p(client, PSTR("<style type=\"text/css\"> "
-                              "body {font-family:Verdana; height:100%;} td {text-align:center; vertical-align:middle;}"
-                              "</style></head>"
-                              "<body bgcolor=\"DarkGoldenRod\">"
-                              "<div align=center valign=middle>"
+  printEther_p(client, 6, openDocument,
+                          PSTR("Abhayagiri XBee Utility Mesh</title>"
+                               "<meta http-equiv=\"REFRESH\" content=\"30; url="),
+                          myUrl, 
+                          PSTR("\"/>"
+                          "<style type=\"text/css\"> "
+                          "body {font-family:Verdana; height:100%;} td {text-align:center; vertical-align:middle;}"
+                          "</style></head>"
+                          "<body bgcolor=\"DarkGoldenRod\">"
+                          "<div align=center valign=middle>"
 
-                              "<table cellspacing=15>"
+                          "<table cellspacing=15>"
 
-                              "<tr><td><input type=\"button\" value=\"Ping\" "
-                              "onClick=\"window.location.replace(\'"));
-  printEther_p(client, myUrl); 
-  printEther_p(client, PSTR("?ping=send\')\"/></td></tr>"));
+                          "<tr><td><input type=\"button\" value=\"Ping\" "
+                          "onClick=\"window.location.replace(\'"),
+                          myUrl, 
+                          PSTR("?ping=send\')\"/></td></tr>"));
   
   //Alerts////////////////////////////////////////////////////////////////////
   for (int i=0; i<NUM_ALERTS; i++) {
@@ -48,21 +49,21 @@ void printMainPage(Client client) {
                                 "<td><b>"));
                                 timeTmp = timePastMinutes(&timer,&(alerts[i]->timeStamp));
                                 client.print((timeTmp < 60 ? timeTmp : timeTmp / 60));
-                                printEther_p(client, (timeTmp<60 ? strMins : strHours)); 
-      printEther_p(client, PSTR(" Ago</b></td>"
+      printEther_p(client, 6,  (timeTmp<60 ? strMins : strHours),
+                           PSTR(" Ago</b></td>"
                                 "</tr>" 
 
                                 "<tr>"
-                                "<td colspan=\"2\"><b>"));
-                                printEther_p(client, alerts[i]->alertString);
-      printEther_p(client, PSTR("</b></td>"
+                                "<td colspan=\"2\"><b>"),
+                                alerts[i]->alertString,
+                           PSTR("</b></td>"
                                 "</tr>"
 
                                 "</table></td>"
            
-                                "<td><input type=\"button\" value=\"Dismiss\" onClick=\"window.location.replace(\'"));
-                                printEther_p(client, myUrl); 
-      printEther_p(client, PSTR("?dismiss="));
+                                "<td><input type=\"button\" value=\"Dismiss\" onClick=\"window.location.replace(\'"),
+                                myUrl,
+                           PSTR("?dismiss="));
                                 client.print(i+1);
       printEther_p(client, PSTR("\')\"/>"
                                 
@@ -104,8 +105,26 @@ void printMainPage(Client client) {
                               
                               "<tr>"
                               "<td>Status</td>"
-                              "<td>"));
-                              client.print(battery.status);
+                              "<td bgcolor=\""));
+                              switch (battery.status) {
+                                case 1:
+                                  client.print("Green\">Very Good");
+                                  break;
+                                case 0: 
+                                  client.print("RoyalBlue\">Good");
+                                  break;
+                                case -1: 
+                                  client.print("Pink\">Weak");
+                                  break;
+                                case -2: 
+                                  client.print("DarkRed\">Very Weak");
+                                  break;
+                                case -3: 
+                                  client.print("Red\">Yikes!!!");
+                                  break;
+                                default:
+                                  client.print("\">");
+                              }
     printEther_p(client, PSTR("</td>"
                               "</tr>"));
 
@@ -292,16 +311,11 @@ void printMainPage(Client client) {
                               "<td colspan=\"2\">No Data Received</td>"
                               "</tr>"));
   }
-  printEther_p(client, PSTR(//"</table></td>"
-                              
-                            //"<td>"
-                            //"<table>"
-                            "<tr>"
+  printEther_p(client, PSTR("<tr>"
                             "<td colspan=\"2\"><input type=\"button\" value=\"Pump On\" onClick=\"window.location.replace(\'"));
                             printEther_p(client, myUrl);
-  printEther_p(client, PSTR("?pumpOp=on\')\"/>"//</tr>"
+  printEther_p(client, PSTR("?pumpOp=on\')\"/>"
                             
-                            //"<tr><td>
                             "<nbsp><input type=\"button\" value=\"Pump Off\" onClick=\"window.location.replace(\'"));
                             printEther_p(client, myUrl); 
   printEther_p(client, PSTR("?pumpOp=off\')\"/>"
@@ -323,13 +337,14 @@ void printMainPage(Client client) {
                                 timeTmp = timePastMinutes(&timer,&(alerts[i]->timeStamp));
                                 client.print((timeTmp < 60 ? timeTmp : timeTmp / 60));
                                 printEther_p(client, (timeTmp<60 ? strMins : strHours)); 
-      printEther_p(client, PSTR(" Ago</b></td>"
+      printEther_p(client, 4, (timeTmp<60 ? strMins : strHours),
+                           PSTR(" Ago</b></td>"
                                 "</tr>" 
 
                                 "<tr>"
-                                "<td colspan=\"2\"><b>"));
-                                printEther_p(client, alerts[i]->alertString);
-      printEther_p(client, PSTR("</b></td>"
+                                "<td colspan=\"2\"><b>"),
+                                alerts[i]->alertString,
+                           PSTR("</b></td>"
                                 "</tr>"
 
                                 "</table></td></tr>"));
@@ -357,20 +372,20 @@ void printMainPage(Client client) {
 void printTimeSetPage(Client client) {
   printlnEther_p(client, httpResponse200);
 
-  printEther_p(client, openDocument);
-  printEther_p(client, PSTR("Set Time</title></head>"));
-  printEther_p(client, openBody);
-  printEther_p(client, openContainer);
-  printEther_p(client, PSTR("<div style=\"text-align:center; valign:middle; font-size:24pt;\">"
-                            "Set Time <br>"
-                            "<form name=\"timeSetForm\" action=\"/\" method=\"get\">"
-                            "Hour: "
-                            "<select name=\"hour\">"));
-                            for (int i=0; i<24; i++) {
-                              printEther_p(client, PSTR("<option>"));
-                              client.print(i);
-                              printEther_p(client, PSTR("</option>"));
-                            }
+  printEther_p(client, 5, openDocument,
+                  PSTR("Set Time</title></head>"),
+                       openBody,
+                       openContainer,
+                  PSTR("<div style=\"text-align:center; valign:middle; font-size:24pt;\">"
+                       "Set Time <br>"
+                       "<form name=\"timeSetForm\" action=\"/\" method=\"get\">"
+                       "Hour: "
+                       "<select name=\"hour\">"));
+                       for (int i=0; i<24; i++) {
+                         printEther_p(client, PSTR("<option>"));
+                         client.print(i);
+                         printEther_p(client, PSTR("</option>"));
+                       }
   printEther_p(client, PSTR("</select>"
                             " Minute: "
                             "<select name=\"minute\">"));
