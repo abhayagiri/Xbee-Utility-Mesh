@@ -27,9 +27,9 @@ void setup () {
     lcd.home(); 
     lcd.blink();
     lcd.print("Reset valves...");
-    adjValve (va, CLOSE); 
-    adjValve (vb, CLOSE); 
-    adjValve (vc, CLOSE);
+    adjValve (va, OPEN); 
+    adjValve (vb, OPEN); 
+    adjValve (vc, OPEN);
     lcd.clear(); 
     lcd.noBlink();
 

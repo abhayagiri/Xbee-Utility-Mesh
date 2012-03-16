@@ -1,7 +1,7 @@
 void sensorCheck() {
   if (newSecond && !testing) { //once a second, sample the psi sensor
     //subracting 4 to normalize reading from sensor 
-    psiValues[currSecond % NUM_PSI_SAMPLES] = map(analogRead(psisensor)-4, 0, 1024, 0, 250);
+    psiValues[currSecond % NUM_PSI_SAMPLES] = map(analogRead(psisensor), 0, 1024, 0, 250)-4;
     //get average psi
     for (int i=0; i<NUM_PSI_SAMPLES; i++)
       psi += psiValues[i];
@@ -18,7 +18,7 @@ void sensorCheck() {
   else if (controlMode == 0) { //handle valve changes in auto mode
    
     //1. back off the 1st few states aggressively
-    if (psi < 200 && currState >= 5) {
+    if (psi < 195 && currState >= 5) {
       closeFunct();
       valveWaitTimer = 300; //back in 5 min.
     }
@@ -28,7 +28,7 @@ void sensorCheck() {
       valveWaitTimer = 300;
     }
     //3. then close everything when we get below 160
-    else if (psi < 160 && currState <= 3 && currState > 0) {
+    else if (psi < 155 && currState <= 3 && currState > 0) {
       setValveState(0);
     }  
     //4. wait till we get above 200, then prime inverter
@@ -37,7 +37,7 @@ void sensorCheck() {
       valveWaitTimer = 270; //prime inverter for 4.5 sec.
     }
     //5. if still above 160 after priming, open AC
-    else if (psi > 160 && currState == 1) {
+    else if (psi > 155 && currState == 1) {
       setValveState(3);
     }
     //6. back to step 3. We should now be locked in this AC
