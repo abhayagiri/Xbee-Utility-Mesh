@@ -1,7 +1,7 @@
 // Selects which feilduino to program
 //#define TWT
 //#define FWT
-#define RDG
+//#define RDG
 
 #include <avr/interrupt.h>
 #include <avr/power.h>
@@ -23,16 +23,16 @@
 
 #ifdef RDG
 #define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
-#define SLEEP_HEARTBEAT 5000ul //wake up every 30min.
+#define SLEEP_HEARTBEAT 1800000ul //wake up every 30min.
 #define PIN_OFFSET	2
 #define	PIN_TOTAL	7
 #define PIN(p)		(PIN_OFFSET+p)
 #define	LOCATION_NAME	"RDG"
 #endif //RDG
 
-#define HEARTBEAT      10000ul //send at leaset every 5 min
+#define HEARTBEAT      300000ul //send at least every 5 min
 #define PACKET_INTERVAL  1000ul //pause 1 sec between each packet
-#define PACKETS_PER_SEND 2ul //send 60 packets each time
+#define PACKETS_PER_SEND 10ul //send 60 packets each time
 
 unsigned long nextHeartbeat = 0;
 unsigned long packetsToSend = 0;

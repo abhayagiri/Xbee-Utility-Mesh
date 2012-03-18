@@ -76,12 +76,14 @@ void handlePongPacket ( struct dataStruct d[]) {
         for (i=0; i<numPongTimers && pongTimers[i].id != NULL; i++) {
             if (strcmp(id, pongTimers[i].id) == 0) {
                 pongTimers[i].staleTime = staleTime;
+                pongTimers[i].heardFrom = true;
             }
         }
         
         if (i<numPongTimers) {
           strlcpy(pongTimers[i].id, id, ID_LENGTH);
           pongTimers[i].staleTime = staleTime;
+          pongTimers[i].heardFrom = true;
         }
   }
 }

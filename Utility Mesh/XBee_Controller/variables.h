@@ -138,6 +138,7 @@ short backlightTimer = BACKLIGHT_TIME;
 
 bool pingMode = false;
 bool blightPersistMode = false;
+unsigned int buttonTimer = 0;
 unsigned int pingButtonTimer = 0;
 unsigned int blightButtonTimer = 0;
 

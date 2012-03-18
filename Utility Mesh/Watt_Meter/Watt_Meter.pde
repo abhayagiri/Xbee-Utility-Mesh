@@ -79,21 +79,22 @@ void loop() {
   int sample; //sample for 1 sec.
   while(millis() < averagingTime) {
     sample = analogRead(A0) - calibratedNull;
-    accumulator += (sample>0 ? sample : 0); //expecting dc, ignoring negative components the rectifier output
+    accumulator += sample * sample;//(sample>0 ? sample : 0); //expecting dc, ignoring negative components the rectifier output
     numSamples++;
   }
     
-  //current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0); //for AC
-  current = (accumulator/(float)numSamples) * ampsPerUnitFromNull; //for DC
+  current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0); //for AC
+  //current = (accumulator/(float)numSamples) * ampsPerUnitFromNull; //for DC
   if (current < 0.5) current = 0;
-  if (current > 0) watts = (current * INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
+  if (current > 0) watts = (current * 287);//INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
   wattSecondsToday += watts;
   
   //handle timing
   averagingTime += 1000;
   todInSeconds = (todInSeconds + 1) % (86400ul);
   wattsAvgArray[todInSeconds%AVG_SECS] = watts;
-  for (int i=0; i<AVG_SECS; i++) avgWatts += wattsAvgArray[i];
+  for (int i=0; i<AVG_SECS; i++) 
+      avgWatts += wattsAvgArray[i];
   avgWatts /= AVG_SECS;
   
   //check for packets 
@@ -106,13 +107,15 @@ void loop() {
     wattSecondsToday = 0;
   }
   
-  //send packet every 5 min.
+  //send packet every 2 min.
   if (todInSeconds % 120 == 0)
      sendPacket();
   
   //update LCD
   lcd.clear();
   lcd.print("I: "); lcd.print(current);
+  lcd.print(' '); lcd.print(numSamples);
   lcd.setCursor(0,1); 
   lcd.print("P: "); lcd.print(avgWatts);
+  lcd.print(' '); lcd.print(accumulator);
 }

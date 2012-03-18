@@ -97,6 +97,10 @@ void loop() {
 
   updateTimer(&timer);
 
+//--------------------------------------------
+// Button stuff
+//--------------------------------------------
+
   // Read buttons and act based on their states, save last button states too
   buttonLast = button;
   readButtons(&button);
@@ -105,51 +109,50 @@ void loop() {
   if ( !blightPersistMode && (  //only set backlightTimer if we were not in persist mode on the button press
        (!buttonLast.a1 && button.a1) || (!buttonLast.a2 && button.a2) || 
        (!buttonLast.b1 && button.b1) || (!buttonLast.b2 && button.b2) || 
-       ((buttonLast.b1 || buttonLast.b2)&&(!button.b1 && !button.b2)))) {
+       ((buttonLast.b1 || buttonLast.b2)&&(!button.b1 && !button.b2))) &&
+       buttonTimer < 5000) {
     backlightTimer = BACKLIGHT_TIME;
     digitalWrite(BACKLIGHTL_PIN, HIGH);
   } 
 
+  // Change display modes based on button states
+  setDisplayMode(&config,&button,&buttonLast,DISPLAY_MODES);
+
   // Turbine setting for buttons
-  if	(config.displayMode == 1 && (button.a1 || button.a2) && valveCommandState == 0) { //send valve control packet if we are not already processing one
-    sendButtons(&config, &button, &buttonLast, XBEE, "TRB"); //if sent OK
-    button.a1 ? valveCommandState=1 : valveCommandState=3; //set valve command state
+  //send valve control packet if we are not already processing one
+  if (config.displayMode == 1 && 
+     ((buttonLast.a1 && !button.a1) || (buttonLast.a2 && !button.a2)) && 
+     valveCommandState == 0 && buttonTimer < 5000) {
+      sendButtons(&config, &button, &buttonLast, XBEE, "TRB");
+      buttonLast.a1 ? valveCommandState=1 : valveCommandState=3; //set valve command state
   }
 
-  //handle 1st rocker switch counter, used for ping mode
-  if ( config.displayMode == 0 && valveCommandState == 0 && buttonLast.a1 && button.a1)
-    pingButtonTimer += 1;
-  else
-    pingButtonTimer = 0;
-  
-  //handle 2nd rocker switch counter, used for backlight persistence
-  if ( config.displayMode == 0 && valveCommandState == 0 && buttonLast.a2 && button.a2)
-    blightButtonTimer += 1;
-  else
-    blightButtonTimer = 0;
-
   //Engage ping mode?
-  if (!pingMode && pingButtonTimer > 10000) {
+  if (!pingMode && config.displayMode == 0 && buttonTimer > 10000 && button.a1) {
     pingMode = true;
   }
   
-  //backlight always on?           
-  if (blightButtonTimer > 10000 && blightButtonTimer < 11000) { 
-    //toggle the bl mode
+  //backlight persist mode on?           
+  if (buttonTimer > 10000 && buttonTimer < 10100 && button.a2) { 
+    //got long a2 press - toggle the bl mode
     if (blightPersistMode) {
       blightPersistMode = false;
       digitalWrite(BACKLIGHTL_PIN, LOW);
     } else {
       blightPersistMode = true;
-      digitalWrite(BACKLIGHTL_PIN, HIGH);
+      
+      int i = 3; //blink 3x
+      while(i-->0) {
+          delay(50); digitalWrite(BACKLIGHTL_PIN, LOW);
+          delay(50); digitalWrite(BACKLIGHTL_PIN, HIGH);
+      } 
     }
-    blightButtonTimer = 11001; //avoids double-tripping the if
+    buttonTimer = 11000; //avoids double-tripping the if()
   }
-  else
-    blightPersistMode = false;
 
-  // Change display modes based on button states
-  setDisplayMode(&config,&button,&buttonLast,DISPLAY_MODES);
+//-------------------------------------------------------
+// Done with button stuff - except timer at very bottom!
+//-------------------------------------------------------
 
   // Set hydro program error flag
   if (hydroWatts.watts < WATTS_ERROR_LEVEL && hydroWatts.watts >= 0)
@@ -185,6 +188,7 @@ void loop() {
 
   }
 
+  
   if (valveCommandState > 0 && timer.justOverflowed) { //deal with valve command stuff
     char line1[17];
     char line2[17];
@@ -236,7 +240,7 @@ void loop() {
   if (pingMode) {
     char line1[17] = "";
     char line2[17] = "";
-    char idTmp[4];
+    char idTmp[5] = "";
     char *currLine;
     short numPongs = 0;
 
@@ -249,14 +253,15 @@ void loop() {
       else
         currLine = line2;
 
-      memset(idTmp, ' ', 4); //set string to blanks
-      if (pongTimers[i].heardFrom) //only put the string in if we have herad from them since the ping started
+      memset(idTmp, ' ', ID_LENGTH); //set string to blanks
+      if (pongTimers[i].heardFrom){ //only put the string in if we have herad from them since the ping started
         strlcpy(idTmp, pongTimers[i].id, ID_LENGTH);
-      idTmp[4] = '\0';
+      }
+      idTmp[3] = ' '; idTmp[4] = '\0';
       if ( loopMillis > pongTimers[i].staleTime ) //uppercase if we heard from them recently
         for (int j=0; j<strlen(idTmp); j++)
           idTmp[j] = tolower(idTmp[j]);
-      strlcat(currLine, idTmp, 16);    
+      strlcat(currLine, idTmp, 16);
     }
 
     appendToEnd(line2, progressor, 16); //progress indicator at end
@@ -275,12 +280,15 @@ void loop() {
       }
     }
 
-    if ( button.b1 || button.b2 || ((!buttonLast.a1 && button.a1) || (!buttonLast.a2 && button.a2)) ) {
-      pingMode = false;
+    if ( button.b1 || button.b2 || //either latching button will cancel
+        ((buttonLast.a1 && !button.a1) || (buttonLast.a2 && !button.a2)) &&
+        buttonTimer < 5000 ) { //either rocker state cancels on button-up
       for (int i=0; i<numPongTimers; i++) //reset all pong timers
         pongTimers[i].heardFrom = false;
       config.pauseCounter = 0; //allow display to be handled normally again
       config.dispChanged = true;
+      
+      pingMode = false;
     }
   }
 
@@ -345,12 +353,19 @@ void loop() {
     }
   }
 
+  //backlight auto-off
   if (timer.justOverflowed) {
     if (backlightTimer > 0 && !pingMode && !config.pauseCounter)
       --backlightTimer;
     else if (backlightTimer <= 0 && !blightPersistMode)
       digitalWrite(BACKLIGHTL_PIN,LOW);
   }
+  
+  //update timer for detecting long button presses
+  if ((buttonLast.a1 && button.a1) || (buttonLast.a2 && button.a2))
+      buttonTimer += 1;
+  else
+      buttonTimer = 0;
 }
 
 void updateElipsis() {
