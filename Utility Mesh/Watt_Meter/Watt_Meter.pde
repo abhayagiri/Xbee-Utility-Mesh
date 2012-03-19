@@ -8,15 +8,15 @@
 //numbers close to inverter display. sampling
 //showed a linear relationship:
 //inverter displayed watts = constant + (coeffecient * sensed amps)
-#define INVERTER_COEFFECIENT 274
-#define INVERTER_CONSTANT -170
+#define INVERTER_COEFFECIENT 326
+#define INVERTER_CONSTANT -441
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 int calibratedNull = 0;
 float ampsPerUnitFromNull = 72.0 / 256.0;
 float sqrt2 = 1.4142;
 
-unsigned long int averagingTime = 1000;
+unsigned long int samplingTime = 0;
 unsigned long int todInSeconds = 0;
 long int wattSecondsToday = 0;
 long  int wattSecondsYesterday = 0;
@@ -44,7 +44,12 @@ void setup() {
     delay(500);
   }
   
-  //calibrate
+  //calibration; simply finds the mean of a 5-second sample run
+  //and uses that as the 0 value; best to restart the unit with no
+  //current being registered, but it will probably be fine for AC
+  //currents; during testing, the null was usually 522ish, 521-524
+  //a perfect output from the sensor would be 512, but it may be off
+  //by +/-2% according to datasheet.
   timer0_millis=0;
   
   lcd.clear(); lcd.print("Calibrating"); lcd.blink();
@@ -65,8 +70,6 @@ void setup() {
   lcd.print("H "); lcd.print(high);
   lcd.print(" L "); lcd.print(low);
   delay(5000);
-  
-  timer0_millis = 0;
 }
 
 void loop() {
@@ -76,21 +79,21 @@ void loop() {
   int watts = 0;
   long int avgWatts = 0;
 
-  int sample; //sample for 1 sec.
-  while(millis() < averagingTime) {
-    sample = analogRead(A0) - calibratedNull;
-    accumulator += sample * sample;//(sample>0 ? sample : 0); //expecting dc, ignoring negative components the rectifier output
-    numSamples++;
+  samplingTime = millis() + 1000;
+  while(millis() < samplingTime) {
+    //accumulate the square of the reading for samplingTime;
+    accumulator += (analogRead(A0) - calibratedNull) ^ 2;
+    numSamples++; //divide by this to get the average
   }
-    
-  current = sqrt((accumulator/(float)numSamples)) * (72.0 / 256.0); //for AC
+  
+  //DC side was not working well - switched to PVP's AC output
+  current = sqrt((accumulator/(float)numSamples)) * ampsPerUnitFromNull; //get RMS value of average sensor reading
   //current = (accumulator/(float)numSamples) * ampsPerUnitFromNull; //for DC
   if (current < 0.5) current = 0;
-  if (current > 0) watts = (current * 287);//INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
+  if (current > 0) watts = (current*INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
   wattSecondsToday += watts;
   
   //handle timing
-  averagingTime += 1000;
   todInSeconds = (todInSeconds + 1) % (86400ul);
   wattsAvgArray[todInSeconds%AVG_SECS] = watts;
   for (int i=0; i<AVG_SECS; i++) 
@@ -102,7 +105,7 @@ void loop() {
   
   if (todInSeconds == 0) {
     timer0_millis = 0;
-    averagingTime = 1000;
+    samplingTime = 1000;
     wattSecondsYesterday = wattSecondsToday;
     wattSecondsToday = 0;
   }
