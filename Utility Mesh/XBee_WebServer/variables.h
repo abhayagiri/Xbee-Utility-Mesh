@@ -7,6 +7,10 @@ boolean timeSet = false;
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192,168,0,230 };
 prog_char myUrl[] PROGMEM = "http://xbee-mesh/";
+unsigned int ntpPort = 8888;      // local port to listen for NTP packets
+byte timeServer[] = {192,168,0,10}; //IP of windows 2008 server
+const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
+byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing NTP packets 
 
 // Minutes to wait until data is deemed old enough to warrent a warning
 #define MINUTES_UNTIL_OLD    10

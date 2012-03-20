@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include <Udp.h>
 #include <avr/pgmspace.h>
 #include "variables.h"
 
@@ -25,6 +25,7 @@ Server server(80);
 void setup() {
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip);
+  Udp.begin(ntpPort);
   server.begin();
 
   //setup alert LED
@@ -141,8 +142,12 @@ void loop() {
 
           if (!timeSet) {
 
-            if (!gotOpts) //request time from user
-              printTimeSetPage(client);
+            if (!gotOpts) {//request time from internet, else ask the user
+              if (setTimeViaNTP() != 0) //if we don't succeed with the IP method
+                printTimeSetPage(client); //do it manually
+              else //otherwise, proceed to main page
+                printMainPage(client);
+            }
 
             else if (strstr_P(optStr, PSTR("setTime=")) == optStr) { //process time string
               int hour=0, minute=0;
@@ -171,22 +176,22 @@ void loop() {
 
               boolean foundCommand = false;
             //check for valid option string
-//            if (strcmp_P(optStr, PSTR("valveOp=open")) == 0) {
-//              webCmdTimer.msgStr = valveOpenMsg;
-//              webCmdTimer.opStr = valveOpStr;
-//              webCmdTimer.packetStr = valveOpenPacket;
-//              webCmdTimer.timeout = 20;
-//              webCmdTimer.wrap = true;
-//              foundCommand = true;
-//            }
-//            else if (strcmp_P(optStr, PSTR("valveOp=close")) == 0) {
-//              webCmdTimer.msgStr = valveCloseMsg;
-//              webCmdTimer.opStr = valveOpStr;
-//              webCmdTimer.packetStr = valveClosePacket;
-//              webCmdTimer.timeout = 20;
-//              webCmdTimer.wrap = true;
-//              foundCommand = true;
-//            }
+            //            if (strcmp_P(optStr, PSTR("valveOp=open")) == 0) {
+            //              webCmdTimer.msgStr = valveOpenMsg;
+            //              webCmdTimer.opStr = valveOpStr;
+            //              webCmdTimer.packetStr = valveOpenPacket;
+            //              webCmdTimer.timeout = 20;
+            //              webCmdTimer.wrap = true;
+            //              foundCommand = true;
+            //            }
+            //            else if (strcmp_P(optStr, PSTR("valveOp=close")) == 0) {
+            //              webCmdTimer.msgStr = valveCloseMsg;
+            //              webCmdTimer.opStr = valveOpStr;
+            //              webCmdTimer.packetStr = valveClosePacket;
+            //              webCmdTimer.timeout = 20;
+            //              webCmdTimer.wrap = true;
+            //              foundCommand = true;
+            //            }
             if ((strstr_P(optStr, PSTR("valveOp=")) == optStr)
               && optStr[8]>='0' && optStr[8]<='7' && optStr[9]=='\0')
             {
@@ -251,7 +256,8 @@ void loop() {
                 if (pgm_read_byte(strPtr) == '%') {
                   Serial.print(webCmdTimer.stateReq); 
                   strPtr++;
-                } else
+                } 
+                else
                   Serial.print(pgm_read_byte(strPtr++));
               }
 
@@ -300,14 +306,15 @@ void loop() {
               myUrl,
               PSTR("2"), 
               webCmdTimer.wrap );
-              
+
               if (webCmdTimer.wrap == true) {//we have not heard from the turbine yes
                 prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
                 while (pgm_read_byte(strPtr) != 0x00) {
                   if (pgm_read_byte(strPtr) == '%') {
                     Serial.print(webCmdTimer.stateReq); 
                     strPtr++;
-                  } else
+                  } 
+                  else
                     Serial.print(pgm_read_byte(strPtr++));
                 }
               }
@@ -380,7 +387,7 @@ void loop() {
       if (webState == WEB_CMD_SENT) {
 
         if (webCmdTimer.opStr == valveOpStr ||
-            webCmdTimer.opStr == modeOpStr) {//waiting on valve op?
+          webCmdTimer.opStr == modeOpStr) {//waiting on valve op?
           if (strcmp(getDataVal(rx.data,"XB"),"TRB") == 0 ) {
             if (strcmp(getDataVal(rx.data,"PT"),"VOP") == 0) {
               webCmdTimer.timeout = 25;
@@ -455,7 +462,16 @@ void loop() {
     Serial.print(timer.min);
     Serial.print("~");
   }
+
+  //get time from NTP every so often - internal clock is junk
+  if (timer.justOverflowed &&
+    timer.min % 30 == 0 ) {
+    setTimeViaNTP();
+  }
+
 }
+
+
 
 
 
