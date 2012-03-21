@@ -1,4 +1,10 @@
 int setTimeViaNTP() {
+  
+  //flush anything still in the buffer
+  while(Udp.available()) {
+    Udp.readPacket(packetBuffer,NTP_PACKET_SIZE);
+  }
+
   sendNTPpacket(timeServer);
   
   unsigned long waitTime = 500 + millis(); //wait 500 millis for response
@@ -25,6 +31,7 @@ int setTimeViaNTP() {
   return -1; //didn't get it!
 }
 
+//taken from Udp NTP Client
 unsigned long sendNTPpacket(byte *address)
 {
   // set all bytes in the buffer to 0
