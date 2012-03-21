@@ -8,13 +8,12 @@
 //numbers close to inverter display. sampling
 //showed a linear relationship:
 //inverter displayed watts = constant + (coeffecient * sensed amps)
-#define INVERTER_COEFFECIENT 326
-#define INVERTER_CONSTANT -441
+#define INVERTER_COEFFECIENT 250
+#define INVERTER_CONSTANT 0
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 int calibratedNull = 0;
 float ampsPerUnitFromNull = 72.0 / 256.0;
-float sqrt2 = 1.4142;
 
 unsigned long int samplingTime = 0;
 unsigned long int todInSeconds = 0;
@@ -30,7 +29,7 @@ void setup() {
   pinMode(A0, INPUT);
   
   //kill digital input on A0
-  DIDR0 = 0x01;
+  DIDR0 = 0x01;  //will cause a compile error if board set to feilduino8
   
   //init watts avg array
   for (int i=0; i<AVG_SECS; i++)
@@ -82,7 +81,8 @@ void loop() {
   samplingTime = millis() + 1000;
   while(millis() < samplingTime) {
     //accumulate the square of the reading for samplingTime;
-    accumulator += (analogRead(A0) - calibratedNull) ^ 2;
+    int sample = (analogRead(A0) - calibratedNull);
+    accumulator += sample*sample;
     numSamples++; //divide by this to get the average
   }
   
@@ -117,8 +117,8 @@ void loop() {
   //update LCD
   lcd.clear();
   lcd.print("I: "); lcd.print(current);
-  lcd.print(' '); lcd.print(numSamples);
+  //lcd.print(' '); lcd.print(numSamples);
   lcd.setCursor(0,1); 
   lcd.print("P: "); lcd.print(avgWatts);
-  lcd.print(' '); lcd.print(accumulator);
+  //lcd.print(' '); lcd.print(accumulator);
 }

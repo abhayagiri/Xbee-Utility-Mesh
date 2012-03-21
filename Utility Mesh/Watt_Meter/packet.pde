@@ -20,7 +20,7 @@ void checkForPacket() {
             delay(random(0,100));
             Serial.print("~XB=");
             Serial.print(LOCATION_NAME);
-            Serial.println(",PT=PONG~");
+            Serial.print(",PT=PONG~");
 
             sendPacket();
         }
