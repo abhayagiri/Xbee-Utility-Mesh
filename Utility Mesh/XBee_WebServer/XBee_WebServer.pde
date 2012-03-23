@@ -465,7 +465,7 @@ void loop() {
 
   //get time from NTP every so often - internal clock is junk
   if (timer.justOverflowed &&
-    timer.min % 30 == 0 ) {
+    timer.sec == 30 ) {
     setTimeViaNTP();
   }
 
