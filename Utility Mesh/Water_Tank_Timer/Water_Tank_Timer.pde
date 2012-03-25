@@ -58,9 +58,6 @@ struct states {
 } 
 pinState;
 
-short packetsSent = 0;
-boolean sending = false;
-
 void setup() {
   Serial.begin(9600);
 
@@ -90,18 +87,15 @@ void loop() {
 
 #ifdef RDG //ridge pins are funny
       switch(lvl.crnt) {
-      case 6:
-        lvl.crnt = 3;
+      case 1:
+        lvl.crnt = 5;
         break;
       case 5:
-        lvl.crnt = 4;
-        break;
-      case 4:
-        lvl.crnt = 5;
-        break;      
+        lvl.crnt = 3;
+        break; 
       case 3:
-        lvl.crnt = 6;
-        break;   
+          lvl.crnt = 1;
+          break;
       }
 #endif            
     }  
@@ -199,10 +193,7 @@ void checkForPacket() {
       Serial.print(",PT=PONG~");
 
       //respond to pings with data as well, just one packet, pls!
-      if (!sending) {
-        sending = true; 
-        packetsSent = PACKETS_PER_SEND - 1;
-      }
+      packetsToSend += 1;
 
       //a little space between packets
       delay(100);
