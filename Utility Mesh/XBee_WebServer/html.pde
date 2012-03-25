@@ -22,16 +22,16 @@ void printMainPage(Client client) {
                                "<meta http-equiv=\"REFRESH\" content=\"30; url="),
                           myUrl, 
                           PSTR("\"/>"
-                          "<style type=\"text/css\"> "
-                          "body {font-family:Verdana; height:100%;} td {text-align:center; vertical-align:middle;}"
-                          "</style></head>"
-                          "<body bgcolor=\"DarkGoldenRod\">"
-                          "<div align=center valign=middle>"
+                               "<style type=\"text/css\"> "
+                               "body {font-family:Verdana; height:100%;} td {text-align:center; vertical-align:middle;}"
+                               "</style></head>"
+                               "<body bgcolor=\"DarkGoldenRod\">"
+                               "<div align=center valign=middle>"
 
-                          "<table cellspacing=15>"
+                               "<table cellspacing=15>"
 
-                          "<tr><td><input type=\"button\" value=\"Ping\" "
-                          "onClick=\"window.location.replace(\'"),
+                               "<tr><td><input type=\"button\" value=\"Ping\" "
+                               "onClick=\"window.location.replace(\'"),
                           myUrl, 
                           PSTR("?ping=send\')\"/></td></tr>"));
   
@@ -394,22 +394,23 @@ void printTimeSetPage(Client client) {
                               client.print(i);
                               printEther_p(client, PSTR("</option>"));
                             }
-  printEther_p(client, PSTR("</select> "
+  printEther_p(client, 5, PSTR("</select> "
                             
-                            "<br><br><input type=\"button\" value=\"Submit\" onClick=\"window.location.replace('"));
-                            printEther_p(client, myUrl); 
-  printEther_p(client, PSTR("?setTime=' + "
-                            "document.forms['timeSetForm'].elements[0].selectedIndex + "
-                            "'-' + document.forms['timeSetForm'].elements[1].selectedIndex)\""
-                            "/></form></div"));
-  printEther_p(client, closeContainer);
-  printEther_p(client, PSTR("</html>"));
+                               "<br><br><input type=\"button\" value=\"Submit\" onClick=\"window.location.replace('"),
+                          myUrl,
+                          PSTR("?setTime=' + "
+                               "document.forms['timeSetForm'].elements[0].selectedIndex + "
+                               "'-' + document.forms['timeSetForm'].elements[1].selectedIndex)\""
+                               "/></form></div"),
+                          closeContainer,
+                          PSTR("</html>"));
 }
 
 void printTime(Client client, unsigned long int mins) {
   client.print((mins<60 ? mins : mins/60.0),(mins>60 && mins/60 < 2 ? 1 : 0));
-  printEther_p(client, (mins<60 ? strMins : strHours));
-  printlnEther_p(client, strAgo);
+  printEther_p(client, 2, 
+               (mins<60 ? strMins : strHours),
+               strAgo);
 }
 
 //all strings should be PROGMEM strings
@@ -419,9 +420,9 @@ void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char 
  printRedirectHeader_p(client, title, targetUrl, timeout);
 
   //print body
-  printEther_p(client, openBody);
-  printEther_p(client, openContainer);
-  printEther_p(client, PSTR("<p>"));
+  printEther_p(client, 3, openBody,
+                          openContainer,
+                          PSTR("<p>"));
   
   if (wrap)
     printEther_p(client, PSTR("Sending <i>"));  
@@ -431,9 +432,9 @@ void printRedirect_p(Client client, prog_char *title, prog_char *msg, prog_char 
   if (wrap)
     printEther_p(client, PSTR(" </i>command, waiting for response..."));  
   
-  printEther_p(client, PSTR("</p><p><a style=\"font-size:12pt;\" href=\"http://xbee-mesh/?\">Cancel</a></p>"));
-  printEther_p(client, closeContainer);
-  printEther_p(client, PSTR("</body>\n</html>"));
+  printEther_p(client, 3, PSTR("</p><p><a style=\"font-size:12pt;\" href=\"http://xbee-mesh/?\">Cancel</a></p>"),
+                          closeContainer,
+                          PSTR("</body>\n</html>"));
 }
 
 //for dealing with ping packets
@@ -443,8 +444,8 @@ void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_c
  printRedirectHeader_p(client, title, targetUrl, timeout);
 
   //print body
-  printEther_p(client, openBody);
-  printEther_p(client, openContainer);
+  printEther_p(client, 2, openBody,
+                          openContainer);
   if (strlen(pongList) == 0) {
       printEther_p(client, PSTR("<p>Waiting for responses... </p>"));
   } else {
@@ -452,27 +453,28 @@ void printPingRedirect_p(Client client, prog_char *title, char *pongList, prog_c
     client.print(pongList);
     printEther_p(client, PSTR("</p>"));
   }
-  printEther_p(client, PSTR("<p><a style=\"font-size:12pt;\" href=\"http://xbee-mesh/?\">Finished</a></p>"));
-  printEther_p(client, closeContainer);
-  printEther_p(client, PSTR("</body>\n</html>"));
+  printEther_p(client, 3, PSTR("<p><a style=\"font-size:12pt;\" href=\"http://xbee-mesh/?\">Finished</a></p>"),
+                          closeContainer,
+                          PSTR("</body>\n</html>"));
 }
 
 void printRedirectHeader_p(Client client, prog_char *title, prog_char *targetUrl, prog_char *timeout)
 {
   printlnEther_p(client, httpResponse200);
-  printEther_p(client, openDocument);
-  printEther_p(client, title);
-  printEther_p(client, PSTR("</title>\n<meta http-equiv=\"REFRESH\" content=\""));
-  printEther_p(client, timeout);
-  printEther_p(client, PSTR("; url="));
-  printEther_p(client, targetUrl);
-  printEther_p(client,PSTR("\"></head>"));
+  printEther_p(client, 7, openDocument,
+                       title,
+                       PSTR("</title>\n<meta http-equiv=\"REFRESH\" content=\""),
+                       timeout,
+                       PSTR("; url="),
+                       targetUrl,
+                       PSTR("\"></head>"));
 }
 
 void printRedirect(Client client) {
-  printEther_p(client, PSTR("HTTP/1.1 303 See Other\n"
-                              "Location: "));
-                              printlnEther_p(client, myUrl);
+  printEther_p(client, 3, PSTR("HTTP/1.1 303 See Other\n"
+                               "Location: "),
+                               myUrl,
+                               PSTR("\n"));
 }
 
 

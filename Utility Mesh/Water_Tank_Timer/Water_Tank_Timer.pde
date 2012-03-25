@@ -1,7 +1,7 @@
 // Selects which feilduino to program
 //#define TWT
 //#define FWT
-//#define RDG
+#define RDG
 
 #include <avr/interrupt.h>
 #include <avr/power.h>
@@ -32,14 +32,11 @@
 
 #define HEARTBEAT      300000ul //send at least every 5 min
 #define PACKET_INTERVAL  1000ul //pause 1 sec between each packet
-#define PACKETS_PER_SEND 10ul //send 60 packets each time
+#define PACKETS_PER_SEND 10ul //send 10 packets each time
 
 unsigned long nextHeartbeat = 0;
 unsigned long packetsToSend = 0;
 unsigned long nextPacketSendTime = 0;
-
-//keep track of time of day
-//unsigned long int todInMillis = 0;
 
 #ifdef RDG
 boolean sleepMode = false;
@@ -52,7 +49,7 @@ struct {
 lvl = {
   -1,-1};
 
-// Reset timer
+// Make timer variable available for reset
 extern volatile unsigned long timer0_millis; 
 
 struct states {
@@ -114,7 +111,6 @@ void loop() {
     nextHeartbeat += HEARTBEAT;
     packetsToSend = PACKETS_PER_SEND;
     nextPacketSendTime = millis();
-    //updateTimers();
   }
 
   if (packetsToSend > 0)
@@ -129,13 +125,19 @@ void loop() {
       sendTimeReportPacket();
   }
 
+  if (millis() > 86400000) { //reset millis every day
+    timer0_millis = millis() % 86400000;
+    nextHeartbeat = 0;
+  }
+
 #ifdef RDG //put radio to sleep between 20:00 and 07:00 to save power
-  while (millis() > 72000000 || millis() < 25200000) {
-    unsigned int numPings = 6;
+  if ((millis() > 72000000 || millis() < 25200000) &&
+      packetsToSend == 0) { //go back to sleep after sending all normal update packets
+    unsigned int numPings = 15;
     unsigned long int delayMillis;
 
-    digitalWrite(SLEEP_PIN, LOW);
-    while (numPings-- > 0) {
+    digitalWrite(SLEEP_PIN, LOW);  //XBee wake up
+    while (numPings-- > 0) { //send some pings
       delayMillis = millis() + PACKET_INTERVAL;
       Serial.print("~XB="); 
       Serial.print(LOCATION_NAME); 
@@ -145,15 +147,9 @@ void loop() {
 
     }
     sendTimeReportPacket();
-    digitalWrite(SLEEP_PIN, HIGH);
+    digitalWrite(SLEEP_PIN, HIGH); //XBee power down
 
-    delay(SLEEP_HEARTBEAT);
-#endif //this happens even if we don't sleep
-    if (millis() > 86400000) { //reset millis every day
-      timer0_millis = millis() % 86400000;
-      nextHeartbeat = 0;
-    }
-#ifdef RDG
+    delay(SLEEP_HEARTBEAT); 
   }
 #endif
 }
@@ -239,6 +235,7 @@ void checkForPacket() {
     }
   }
 }
+
 
 
 

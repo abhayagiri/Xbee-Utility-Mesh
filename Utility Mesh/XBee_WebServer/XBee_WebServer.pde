@@ -109,10 +109,10 @@ void loop() {
           if ((c=client.read()) != httpGet[i])
             gotRequest = false;
 
-        if (gotRequest)
-          debugPrintln_p(PSTR("got request"));
-        else
-          debugPrintln_p(PSTR("not http"));
+//        if (gotRequest)
+//          debugPrintln_p(PSTR("got request"));
+//        else
+//          debugPrintln_p(PSTR("not http"));
 
         if (gotRequest) { //look for options
           while ( (c != '\n') && (c != '?') )
@@ -124,14 +124,14 @@ void loop() {
             while ( (c != ' ') && i < 31)
               optStr[i++] = (c = client.read());
             optStr[--i] = '\0'; //kill the trailing space character
-            debugPrint_p(PSTR("Option String: \""));
-            debugPrint(optStr);
-            debugPrintln_p(PSTR("\""));              
+//            debugPrint_p(PSTR("Option String: \""));
+//            debugPrint(optStr);
+//            debugPrintln_p(PSTR("\""));              
             while (c != ' ') //flush remaining option chars
               c = client.read(); 
           }
-          else
-            debugPrintln_p(PSTR("No option string"));
+//          else
+//            debugPrintln_p(PSTR("No option string"));
         }    
 
         while (client.available()) // print out the rest of the request
@@ -293,7 +293,7 @@ void loop() {
               webCmdTimer.opStr,
               webCmdTimer.pongList,
               myUrl,
-              PSTR("1") );
+              PSTR("2") );
 
               prog_char *strPtr = webCmdTimer.packetStr; //we are modifying the pointer during printout - see the PROGMEM functions tab
               while (pgm_read_byte(strPtr) != 0x00)
@@ -326,7 +326,7 @@ void loop() {
             PSTR("Command finished"),
             PSTR("Acknowlement received - command finished."),
             myUrl,
-            PSTR("5"),
+            PSTR("3"),
             false );
             webState = WEB_NORMAL;              
           }
