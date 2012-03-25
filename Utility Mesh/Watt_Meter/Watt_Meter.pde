@@ -114,8 +114,8 @@ void loop() {
   if (todInSeconds % 120 == 0)
      sendPacket();
   
-  //safety - if avgWatts > 4000, send step down command to turbine
-  if (avgWatts > 4000 && todInSeconds % 60 == 0) {//send once a minute @ most
+  //safety - if avgWatts > 3960, send step down command to turbine
+  if (avgWatts > 3960 && todInSeconds % 60 == 0) {//send once a minute @ most
     Serial.print("~XB=GTS,DST=TRB,PT=SVS,VS=-~");
   }
   
