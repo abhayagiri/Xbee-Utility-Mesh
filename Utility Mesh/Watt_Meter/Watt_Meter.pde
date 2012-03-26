@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 
 #define	LOCATION_NAME	"GTS"
-#define AVG_SECS        10 //10sec running avg. for display, etc.
+#define AVG_SECS        10 //# of sec. to smooth watt reading, for display, etc.
 
 //had to abandon [watts = amps * volts] to get
 //numbers close to inverter display. sampling
@@ -89,7 +89,7 @@ void loop() {
   //DC side was not working well - switched to PVP's AC output
   current = sqrt((accumulator/(float)numSamples)) * ampsPerUnitFromNull; //get RMS value of average sensor reading
   //current = (accumulator/(float)numSamples) * ampsPerUnitFromNull; //for DC
-  if (current < 0.5) current = 0;
+  if (current < 0.5) current = 0; //clamp spurious readings
   if (current > 0) watts = (current*INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
   wattSecondsToday += watts;
   
@@ -112,7 +112,7 @@ void loop() {
   
   //send packet every 2 min.
   if (todInSeconds % 120 == 0)
-     sendPacket();
+     sendStatusPacket();
   
   //safety - if avgWatts > 3960, send step down command to turbine
   if (avgWatts > 3960 && todInSeconds % 60 == 0) {//send once a minute @ most

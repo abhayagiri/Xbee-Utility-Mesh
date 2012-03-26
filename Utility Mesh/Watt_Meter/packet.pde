@@ -22,7 +22,8 @@ void checkForPacket() {
             Serial.print(LOCATION_NAME);
             Serial.print(",PT=PONG~");
 
-            sendPacket();
+            sendStatusPacket();
+            sendTimeReportPacket();
         }
 
         //got time-of-day packet?
@@ -51,7 +52,7 @@ void checkForPacket() {
     }
 }
 
-void sendPacket() {
+void sendStatusPacket() {
     long int avgWatts = 0;
     
     for (int i=0; i<AVG_SECS; i++) avgWatts += wattsAvgArray[i];
@@ -63,6 +64,15 @@ void sendPacket() {
     Serial.print(",Y="); 
     Serial.print(wattSecondsYesterday / (3600000.0));
     Serial.print('~');
+    
 }
 
-
+void sendTimeReportPacket() {
+  Serial.print("~XB="); 
+  Serial.print(LOCATION_NAME);
+  Serial.print(",PT=LTR,H="); //LTR = local time report
+  Serial.print(todInSeconds / 3600);
+  Serial.print(",M=");
+  Serial.print((todInSeconds % 3600) / 60);
+  Serial.print('~');
+}

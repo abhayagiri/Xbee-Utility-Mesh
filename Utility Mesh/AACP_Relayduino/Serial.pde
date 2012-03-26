@@ -65,7 +65,7 @@ int sendSerialStatus ()
 {
   char buf[BUF_SIZE];
   valvestate();
-  sprintf(buf,"~XB=%s,PT=TRB,V=%s,P=%d,M=%d%d~\n",XBEE,vopen,psi,controlMode,(int)testing);
+  sprintf(buf,"~XB=%s,PT=TRB,V=%s,P=%d,M=%d%d~",XBEE,vopen,psi,controlMode,(int)testing);
   Serial.print(buf);
   return 0;
 }

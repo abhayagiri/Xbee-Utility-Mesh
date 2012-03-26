@@ -56,6 +56,8 @@ void txandtr(){
       }//VSR
 
       //Set Testing Mode - test mode on or off
+      //not being used much - probably could go, along with the
+      //bit field associated in the status packet
       else if (strcmp(getDataVal(rx.data,"PT"),"STM") == 0 &&
         keyExists(rx.data,"M")) {
         if (strcmp(getDataVal(rx.data,"M"),"0") == 0) {
@@ -71,12 +73,6 @@ void txandtr(){
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
       }//STM
 
-      //allow setting the psi remotely in testing mode
-      else if(strcmp(getDataVal(rx.data,"PT"),"PSI") == 0 &&
-        keyExists(rx.data,"PSI")) {
-        if (testing) psi = atoi(getDataVal(rx.data,"PSI"));
-        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
-      }
     }//well formed
 
     //These packets have no DST field
