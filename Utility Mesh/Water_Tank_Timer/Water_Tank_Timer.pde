@@ -22,12 +22,24 @@
 #endif //FWT
 
 #ifdef RDG
-#define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
-#define SLEEP_HEARTBEAT 1800000ul //wake up every 30min.
 #define PIN_OFFSET	2
 #define	PIN_TOTAL	7
 #define PIN(p)		(PIN_OFFSET+p)
+#define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
+#define SLEEP_HEARTBEAT 10000//1800000ul //wake up every 30min.
 #define	LOCATION_NAME	"RDG"
+boolean sleepMode = false;
+struct pingResponse {
+  char id[4];
+  bool responded;
+};
+struct pingResponse pingResponses[] = { "TWT", false, 
+                                        "FWT", false, 
+                                        "TRB", false, 
+                                        "GTS", false, 
+                                        "VST", false, 
+                                        "SNA", false };
+unsigned short numPingResponses = sizeof(pingResponses) / sizeof(struct pingResponse);
 #endif //RDG
 
 #define HEARTBEAT      300000ul //send at least every 5 min
@@ -39,15 +51,14 @@ unsigned long packetsToSend = 0;
 unsigned long nextPacketSendTime = 0;
 
 #ifdef RDG
-boolean sleepMode = false;
+
 #endif
 
 struct {
   int old;
   int crnt;
 } 
-lvl = {
-  -1,-1};
+lvl = {-1,-1};
 
 // Make timer variable available for reset
 extern volatile unsigned long timer0_millis; 
@@ -124,21 +135,35 @@ void loop() {
     nextHeartbeat = 0;
   }
 
-#ifdef RDG //put radio to sleep between 20:00 and 07:00 to save power
+#ifdef RDG 
+  //put radio to sleep between 20:00 and 07:00 to save power
+  //wake up and ping every 30 min, for up to 15 min, or until
+  //all stations in waitForResponsesFrom[] array have been heard from;
   if ((millis() > 72000000 || millis() < 25200000) &&
       packetsToSend == 0) { //go back to sleep after sending all normal update packets
-    unsigned int numPings = 15;
-    unsigned long int delayMillis;
+    unsigned int maxNumPings = 450; //15min if using a 2-sec packet send interval
+    unsigned long int delayMillis = millis();
+    boolean heardFromAllStations = false;
+    
+    //set all responses to false
+    for (int i=0; i<numPingResponses; i++)
+      pingResponses[i].responded = false;
 
     digitalWrite(SLEEP_PIN, LOW);  //XBee wake up
-    while (numPings-- > 0) { //send some pings
-      delayMillis = millis() + PACKET_INTERVAL;
-      Serial.print("~XB="); 
-      Serial.print(LOCATION_NAME); 
+    while (!heardFromAllStations &&
+           maxNumPings-- > 0) { //send pings till all stations respond
+      delayMillis += 2000;
+      Serial.print("~XB=");
+      Serial.print(LOCATION_NAME);
       Serial.print(",PT=PING~");
-      while(millis() < delayMillis)
+      
+      while(millis() < delayMillis) //check for packets while we wait
         checkForPacket();
-
+      
+      heardFromAllStations = true; //see if we have heard from everyone
+      for (int i=0; i<numPingResponses; i++)
+        if (!pingResponses[i].responded)
+          heardFromAllStations = false;
     }
     sendTimeReportPacket();
     digitalWrite(SLEEP_PIN, HIGH); //XBee power down
@@ -176,7 +201,7 @@ void checkForPacket() {
     timeout += millis();
 
     Serial.read();
-    while ((Serial.available() || millis() < timeout) && i < 63) {
+    while ((Serial.available() || millis() < timeout) && i < 127) {
       if (Serial.available())
         buf[i++] = Serial.read();
       else if ( i>1 && buf[i-1] == '~')
@@ -185,6 +210,7 @@ void checkForPacket() {
 
     buf[i] = '\0';
 
+    //check for ping
     if (strstr(buf, "PT=PING") != NULL)
     {
       delay(random(0,2000));
@@ -197,6 +223,15 @@ void checkForPacket() {
 
       //a little space between packets
       delay(100);
+    }
+    
+    //check for pongs
+    if (strstr(buf, "PT=PONG") != NULL)
+    {
+      int numResponses = sizeof(pingResponses) / sizeof(struct pingResponse);
+      for (int i=0; i<numResponses; i++)
+        if (strstr(buf,pingResponses[i].id) != NULL)
+          pingResponses[i].responded = true;
     }
 
     //got time-of-day packet?

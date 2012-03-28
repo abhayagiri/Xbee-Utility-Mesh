@@ -156,18 +156,20 @@ struct batteryStruct {
         unsigned int dmin;
 } battery;
 
-struct packetStruct{
-	char str[BUF_SIZE];
-	struct dataStruct data[KEYS_MAX];
-};
-packetStruct rx = { };
-
 struct alertStruct {
   boolean active;
   boolean dismissed;
   prog_char *alertString;
   struct timerStruct timeStamp;
 };
+
+struct packetStruct{
+	char str[BUF_SIZE];
+	struct dataStruct data[KEYS_MAX];
+};
+packetStruct rx = { };
+
+
 
 #define NUM_ALERTS TANK_NUM + 2 //one for each tank, plus however many more
 #define ALERT_LED 3
