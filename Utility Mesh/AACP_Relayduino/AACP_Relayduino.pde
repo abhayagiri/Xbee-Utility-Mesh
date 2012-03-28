@@ -7,6 +7,7 @@
 LiquidCrystal lcd(15,12,16,17,18,10); 
 
 void setup () {
+    Serial.end(); //in case we are called from resetRelayduino();
     Serial.begin (9600);
     lcd.begin (20,4);
     pinMode (mRelay1,OUTPUT);
@@ -53,18 +54,8 @@ void loop ()  {
 }
 
 void menuOpt() {
-    if (ba==1) {               //ba was pressed
-        if (testing) {
-            testing = false;
-            sprintf(title, "Testing: off");
-            printInfo();
-        } 
-        else {
-            testing = true;
-            sprintf(title, "Testing: on");
-            printInfo();
-        }
-
+    if (ba==1) {               //ba was pressed - begin reset timer
+        resetRelayduino();
     }
     if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
         if (controlMode == 0) {
@@ -110,6 +101,23 @@ void resetAutoMode() {
     valveWaitTimer = 0;
     sprintf (title, "Auto Mode");
     printInfo ();
+}
+
+void resetRelayduino() {
+  ba = bb = bc = bd = 0; //reset buttons
+  unsigned char countDown = 5;
+  
+  //reset when countdown expires, unless a button is pressed
+  lcd.clear(); lcd.print("Reset in "); lcd.print( countDown );
+  while ( (!(ba||bb||bc||bd)) && (countDown > 0) ) {
+    if (newSecond) {
+      lcd.setCursor(0,9); lcd.print(countDown--);
+    }
+    txandtr(); //see if any buttons get pressed
+    updateTime(); // so seconds continue to get counted
+  }
+  if (!(ba||bb|bc||bd)) setup(); //reset if no buttons were presse
+  else nextLCDUpdate = millis(); //otherwise, force LCD update
 }
 
 void updateTime() {

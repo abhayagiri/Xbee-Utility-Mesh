@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 
 #define	LOCATION_NAME	"GTS"
-#define AVG_SECS        10 //# of sec. to smooth watt reading, for display, etc.
+#define NUM_SAMPLES        10 //# of samples to smooth watt reading, for display, etc.
 
 //had to abandon [watts = amps * volts] to get
 //numbers close to inverter display. sampling
@@ -16,10 +16,11 @@ int calibratedNull = 0;
 float ampsPerUnitFromNull = 72.0 / 256.0;
 
 unsigned long int samplingTime = 0;
-unsigned long int todInSeconds = 0;
+//unsigned long int todInSeconds = 0;
 long int wattSecondsToday = 0;
 long  int wattSecondsYesterday = 0;
-int wattsAvgArray[AVG_SECS];
+int wattsAvgArray[NUM_SAMPLES];
+unsigned char wattsAvgIndex = 0;
 
 extern volatile unsigned long timer0_millis;
 
@@ -32,7 +33,7 @@ void setup() {
   DIDR0 = 0x01;  //will cause a compile error if board set to feilduino8
   
   //init watts avg array
-  for (int i=0; i<AVG_SECS; i++)
+  for (int i=0; i<NUM_SAMPLES; i++)
       wattsAvgArray[i] = 0;
   
   //printMemoryProfile(300000);
@@ -93,29 +94,29 @@ void loop() {
   if (current > 0) watts = (current*INVERTER_COEFFECIENT) + INVERTER_CONSTANT;
   wattSecondsToday += watts;
   
-  //handle timing
-  todInSeconds = (todInSeconds + 1) % (86400ul);
-  wattsAvgArray[todInSeconds%AVG_SECS] = watts;
-  for (int i=0; i<AVG_SECS; i++) 
+  //do watt smoothing
+  wattsAvgArray[wattsAvgIndex] = watts;
+  wattsAvgIndex = (wattsAvgIndex + 1) % NUM_SAMPLES;
+  for (int i=0; i<NUM_SAMPLES; i++) 
       avgWatts += wattsAvgArray[i];
-  avgWatts /= AVG_SECS;
+  avgWatts /= NUM_SAMPLES;
   
   //check for packets 
   checkForPacket();
   
-  if (todInSeconds == 0) {
-    timer0_millis = 0;
-    samplingTime = 1000;
+  //roll-over timer if needed
+  if (millis() > 86400000) {
+    timer0_millis = millis() % 86400000;
     wattSecondsYesterday = wattSecondsToday;
     wattSecondsToday = 0;
   }
   
   //send packet every 2 min.
-  if (todInSeconds % 120 == 0)
+  if ((millis() / 1000) % 120 == 0)
      sendStatusPacket();
   
   //safety - if avgWatts > 3960, send step down command to turbine
-  if (avgWatts > 3960 && todInSeconds % 60 == 0) {//send once a minute @ most
+  if (avgWatts > 3960 && (millis() / 1000) % 60 == 0) {//send once a minute @ most
     Serial.print("~XB=GTS,DST=TRB,PT=SVS,VS=-~");
   }
   

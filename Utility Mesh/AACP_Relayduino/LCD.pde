@@ -1,4 +1,4 @@
-void updateLCD() {
+void updateLCD() { //redraw LCD every 1sec or on button presses
   if (LCDState == 0 && (millis() > nextLCDUpdate || ba||bb||bc||bd)) {
     nextLCDUpdate = millis() + (1000ul * 1ul); //1 second
     printStandardData();

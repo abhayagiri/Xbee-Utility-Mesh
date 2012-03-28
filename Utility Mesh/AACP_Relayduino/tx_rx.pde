@@ -73,6 +73,12 @@ void txandtr(){
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
       }//STM
 
+      //reset packet
+      else if(strcmp(getDataVal(rx.data,"PT"),"RST") == 0) {
+        sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
+        resetRelayduino();
+      }
+
     }//well formed
 
     //These packets have no DST field
