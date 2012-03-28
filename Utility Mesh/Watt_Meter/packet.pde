@@ -46,7 +46,7 @@ void checkForPacket() {
                     minLoc++;
                 }
 
-                todInSeconds = (hours*3600) + (mins*60);
+                timer0_millis = (hours*3600000) + (mins*60000);
             } 
         }
     }
@@ -55,8 +55,8 @@ void checkForPacket() {
 void sendStatusPacket() {
     long int avgWatts = 0;
     
-    for (int i=0; i<AVG_SECS; i++) avgWatts += wattsAvgArray[i];
-    avgWatts /= AVG_SECS;
+    for (int i=0; i<NUM_SAMPLES; i++) avgWatts += wattsAvgArray[i];
+    avgWatts /= NUM_SAMPLES;
     Serial.print("~XB=GTS,PT=WTT,W="); 
     Serial.print(avgWatts);
     Serial.print(",T="); 
@@ -64,15 +64,14 @@ void sendStatusPacket() {
     Serial.print(",Y="); 
     Serial.print(wattSecondsYesterday / (3600000.0));
     Serial.print('~');
-    
 }
 
 void sendTimeReportPacket() {
   Serial.print("~XB="); 
   Serial.print(LOCATION_NAME);
   Serial.print(",PT=LTR,H="); //LTR = local time report
-  Serial.print(todInSeconds / 3600);
+  Serial.print((millis() / 1000) / 3600);
   Serial.print(",M=");
-  Serial.print((todInSeconds % 3600) / 60);
+  Serial.print((millis() / 1000) / 60);
   Serial.print('~');
 }
