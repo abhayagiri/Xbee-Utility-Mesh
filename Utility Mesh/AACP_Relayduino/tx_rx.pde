@@ -91,7 +91,7 @@ void txandtr(){
 
       //WTT packet - ckeck for >4000 watts
       else if( strcmp(getDataVal(rx.data, "PT"), "WTT" == 0))  {
-        if (atoi(getDataVal(rx.data, "W")) > 3960)
+          if (atoi(getDataVal(rx.data, "W")) > 3850)
           closeFunct(); //step down if we hear about >4000 watt production
         //from the grid tie
       }//WTT
