@@ -1,11 +1,12 @@
 // Selects which feilduino to program
-//#define TWT
+#define TWT
 //#define FWT
-#define RDG
+//#define RDG
 
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <avr/sleep.h>
+//#include "WProgram.h"
 
 #ifdef TWT
 #define PIN_OFFSET	2
@@ -21,26 +22,27 @@
 #define	LOCATION_NAME	"FWT"
 #endif //FWT
 
-#ifdef RDG
-#define PIN_OFFSET	2
-#define	PIN_TOTAL	7
-#define PIN(p)		(PIN_OFFSET+p)
-#define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
-#define SLEEP_HEARTBEAT 10000//1800000ul //wake up every 30min.
-#define	LOCATION_NAME	"RDG"
-boolean sleepMode = false;
-struct pingResponse {
-  char id[4];
-  bool responded;
-};
-struct pingResponse pingResponses[] = { "TWT", false, 
-                                        "FWT", false, 
-                                        "TRB", false, 
-                                        "GTS", false, 
-                                        "VST", false, 
-                                        "SNA", false };
-unsigned short numPingResponses = sizeof(pingResponses) / sizeof(struct pingResponse);
-#endif //RDG
+//#ifdef RDG
+//#define PIN_OFFSET	2
+//#define	PIN_TOTAL	7
+//#define PIN(p)		(PIN_OFFSET+p)
+//#define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
+//#define SLEEP_HEARTBEAT 10000//1800000ul //wake up every 30min.
+//#define	LOCATION_NAME	"RDG"
+//
+//boolean sleepMode = false;
+//struct pingResponse {
+//  char id[4];
+//  bool responded;
+//};
+//struct pingResponse pingResponses[] = { "TWT", false, 
+//                                        "FWT", false, 
+//                                        "TRB", false, 
+//                                        "GTS", false, 
+//                                        "VST", false, 
+//                                        "SNA", false };
+//unsigned short numPingResponses = sizeof(pingResponses) / sizeof(struct pingResponse);
+//#endif //RDG
 
 #define HEARTBEAT      300000ul //send at least every 5 min
 #define PACKET_INTERVAL  1000ul //pause 1 sec between each packet
@@ -49,10 +51,6 @@ unsigned short numPingResponses = sizeof(pingResponses) / sizeof(struct pingResp
 unsigned long nextHeartbeat = 0;
 unsigned long packetsToSend = 0;
 unsigned long nextPacketSendTime = 0;
-
-#ifdef RDG
-
-#endif
 
 struct {
   int old;
@@ -225,6 +223,7 @@ void checkForPacket() {
       delay(100);
     }
     
+    #ifdef RDG
     //check for pongs
     if (strstr(buf, "PT=PONG") != NULL)
     {
@@ -233,6 +232,7 @@ void checkForPacket() {
         if (strstr(buf,pingResponses[i].id) != NULL)
           pingResponses[i].responded = true;
     }
+    #endif
 
     //got time-of-day packet?
     else if (strstr(buf, "PT=TOD") != NULL) {

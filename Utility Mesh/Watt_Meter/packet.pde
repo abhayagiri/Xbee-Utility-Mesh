@@ -72,6 +72,6 @@ void sendTimeReportPacket() {
   Serial.print(",PT=LTR,H="); //LTR = local time report
   Serial.print((millis() / 1000) / 3600);
   Serial.print(",M=");
-  Serial.print((millis() / 1000) / 60);
+  Serial.print(((millis() / 1000) % 3600) / 60);
   Serial.print('~');
 }
