@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>
-#include <MemoryTest.h>
+//#include <MemoryTest.h>
 //#include <PSTRUtils.h>
 
 #include "variables.h"
@@ -31,12 +31,13 @@ void setup () {
     adjValve (va, OPEN); 
     adjValve (vb, OPEN); 
     adjValve (vc, OPEN);
+    currState = 7;
     lcd.clear(); 
     lcd.noBlink();
 
     // for invoking the code in the Memory tab - 
     // usefull for troubleshooting string literal problems
-    printMemoryProfile(300000);
+//    printMemoryProfile(300000);
 }
 
 
@@ -107,7 +108,8 @@ void resetRelayduino() {
   unsigned char countDown = 5;
   
   //reset when countdown expires, unless a button is pressed
-  lcd.clear(); lcd.print("Reset in "); lcd.print( countDown );
+  lcd.clear(); lcd.home(); 
+  lcd.print("Reset in "); lcd.print( countDown );
   while ( (!(ba||bb||bc||bd)) && (countDown > 0) ) {
     if (newSecond) {
       lcd.setCursor(0,9); lcd.print(countDown--);

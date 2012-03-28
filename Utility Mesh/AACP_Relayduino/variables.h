@@ -1,6 +1,8 @@
 //change some behavior (timeouts, etc) during testing
 bool testing = false;
 
+//Threhold for safety step-down
+#define WATT_THRESHOLD 3900
 // Size of array for storing recieved serial data
 #define BUF_SIZE 128
 // Number of entries that can be recieved over serial
@@ -58,7 +60,7 @@ int symbol = 0;
 int numPacketsSent = 0; //number packets sent during send period
 unsigned long nextPacketTime = 15ul * 1000ul; //next packet send time in millis; initalize to 15 sec. just for fun...
 unsigned long delayTime;// hold time variables for "true" or "working"
-short currState = 7; //start with all open valves
+short currState = 0; //start with all open valves
 short controlMode = 0; //0 - Auto, 1 - Manual
 short LCDState = 0; //0 - normal display, 1 - temporary info display
 unsigned short psi = (testing ? 210 : 0); //initalize to 210 for testing, otherwise 0;
