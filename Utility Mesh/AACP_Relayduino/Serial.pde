@@ -63,25 +63,25 @@ int getSerialData(char s[BUF_SIZE]) {
 
 int sendSerialStatus ()
 {
-  char buf[BUF_SIZE];
+  char buf[64];
   valvestate();
-  sprintf(buf,"~XB=%s,PT=TRB,V=%s,P=%d,M=%d%d~",XBEE,vopen,psi,controlMode,(int)testing);
+  snprintf(buf, 64, "~XB=%s,PT=TRB,V=%s,P=%d,M=%d~",XBEE,vopen,psi,controlMode);
   Serial.print(buf);
   return 0;
 }
 
 int sendSerialValveOp (char *xbee, char *str)
 {
-  char tx[BUF_SIZE];
-  sprintf (tx, "~XB=%s,PT=VOP,%s~",xbee,str);
+  char tx[64];
+  snprintf (tx, 64, "~XB=%s,PT=VOP,%s~",xbee,str);
   Serial.print (tx);
   return 0;
 }
 
 int sendSerialAwk (char *xbee, char *dst)
 {
-  char tx[BUF_SIZE];
-  sprintf (tx,"~XB=%s,PT=AWK,DST=%s~",xbee,dst);
+  char tx[64];
+  snprintf (tx, 64, "~XB=%s,PT=AWK,DST=%s~",xbee,dst);
   Serial.print (tx);
   return 0;
 }

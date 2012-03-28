@@ -19,7 +19,7 @@ void closeFunct (){      //    CLOSE FUNCTION
         adjValve (va, CLOSE);
     }
     if (currState == 0){
-        sprintf (title, "All Valves Closed");
+        snprintf (title, 16, "All Valves Closd");
         printInfo();
         sendSerialValveOp(XBEE,"VLV=0,OP=ALLC");// 
         delay (2000);
@@ -48,7 +48,7 @@ void openFunct (){      //    OPEN FUNCTION
         adjValve (vc, OPEN);
     }
     if (currState == 7){
-        sprintf (title, "All Valves Open");
+        snprintf (title, 16, "All Valves Open");
         printInfo();  
         sendSerialValveOp(XBEE,"VLV=0,OP=ALLO");//
         delay (2000);
@@ -124,39 +124,39 @@ void adjValve (int valve, int action) {
     case va:
         if (!testing) setRelay (LOW, LOW );
         if (action == CLOSE){
-            sprintf (title, "Closing valve A");
-            sprintf (opPacket, "VLV=A,OP=CLOSE");
+            snprintf (title, 16, "Closing valve A");
+            snprintf (opPacket, 20, "VLV=A,OP=CLOSE");
             digitalWrite (ledA, LOW);
         } // these are settings for the master relays 
         else{
-            sprintf (title, "Opening valve A");
-            sprintf (opPacket, "VLV=A,OP=OPEN");
+            snprintf (title, 16, "Opening valve A");
+            snprintf (opPacket, 20, "VLV=A,OP=OPEN");
             digitalWrite (ledA, HIGH);
         } // these are settings for the master relays 
         break;
     case vb:
         if (!testing) setRelay (HIGH, LOW);
         if (action == CLOSE){
-            sprintf (title, "Closing valve B");
-            sprintf (opPacket, "VLV=B,OP=CLOSE");
+            snprintf (title, 16, "Closing valve B");
+            snprintf (opPacket, 20, "VLV=B,OP=CLOSE");
             digitalWrite (ledB, LOW);
         } // these are settings for the master relays 
         else{
-            sprintf (title, "Opening valve B");
-            sprintf (opPacket, "VLV=B,OP=OPEN");
+            snprintf (title, 16, "Opening valve B");
+            snprintf (opPacket, 20, "VLV=B,OP=OPEN");
             digitalWrite (ledB, HIGH);
         } // these are settings for the master relays 
         break;
     case vc:
         if (!testing) setRelay (HIGH, HIGH); 
         if (action == CLOSE){
-            sprintf (title, "Closing valve C");
-            sprintf (opPacket, "VLV=C,OP=CLOSE");
+            snprintf (title, 16, "Closing valve C");
+            snprintf (opPacket, 20, "VLV=C,OP=CLOSE");
             digitalWrite (ledC, LOW);
         }// these are settings for the master relays 
         else{
-            sprintf (title, "Opening valve C");
-            sprintf (opPacket, "VLV=C,OP=OPEN");
+            snprintf (title, 16, "Opening valve C");
+            snprintf (opPacket, 20, "VLV=C,OP=OPEN");
             digitalWrite (ledC, HIGH);
         } // these are settings for the master relays 
         break;

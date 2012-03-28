@@ -62,12 +62,12 @@ void txandtr(){
         keyExists(rx.data,"M")) {
         if (strcmp(getDataVal(rx.data,"M"),"0") == 0) {
           testing = false;
-          sprintf(title, "Testing: off");
+          snprintf(title, 16, "Testing: off");
           printInfo();
         }
         else if (strcmp(getDataVal(rx.data,"M"),"1") == 0) {
           testing = true;
-          sprintf(title, "Testing: on");
+          snprintf(title, 16, "Testing: on");
           printInfo();
         }
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));

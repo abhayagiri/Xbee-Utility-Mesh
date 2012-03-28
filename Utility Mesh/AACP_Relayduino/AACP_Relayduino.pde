@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>
-//#include <MemoryTest.h>
+#include <MemoryTest.h>
 //#include <PSTRUtils.h>
 
 #include "variables.h"
@@ -36,8 +36,7 @@ void setup () {
 
     // for invoking the code in the Memory tab - 
     // usefull for troubleshooting string literal problems
-    //  printMemoryProfile();
-    //  delay(300000);
+    printMemoryProfile(300000);
 }
 
 
@@ -60,7 +59,7 @@ void menuOpt() {
     if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
         if (controlMode == 0) {
             controlMode = 1;
-            sprintf (title, "Manual Mode");
+            snprintf (title, 16, "Manual Mode");
             printInfo ();
         } 
         else if (controlMode == 1) {
@@ -70,7 +69,7 @@ void menuOpt() {
 
     if (bc==1) {                 //bc was pressed
         if (controlMode == 0 || controlMode == 1) {
-            sprintf (title, "Step Up...");
+            snprintf (title, 16, "Step Up...");
             printInfo ();
             openFunct();
         }
@@ -78,7 +77,7 @@ void menuOpt() {
 
     if (bd==1) {                  //bd was pressed
         if (controlMode == 0 || controlMode == 1) {
-            sprintf (title, "Step Down...");
+            snprintf (title, 16, "Step Down...");
             printInfo ();
             closeFunct();
         }
@@ -86,20 +85,20 @@ void menuOpt() {
 }
 
 void valvestate(){ 
-    if (currState==0) sprintf (vopen, "NONE");
-    if (currState==1) sprintf (vopen, "A   ");
-    if (currState==2) sprintf (vopen, "C   ");
-    if (currState==3) sprintf (vopen, "AC  ");
-    if (currState==4) sprintf (vopen, "B   ");
-    if (currState==5) sprintf (vopen, "AB  ");
-    if (currState==6) sprintf (vopen, "BC  ");
-    if (currState==7) sprintf (vopen, "ABC ");
+    if (currState==0) snprintf (vopen, 16, "NONE");
+    if (currState==1) snprintf (vopen, 16, "A   ");
+    if (currState==2) snprintf (vopen, 16, "C   ");
+    if (currState==3) snprintf (vopen, 16, "AC  ");
+    if (currState==4) snprintf (vopen, 16, "B   ");
+    if (currState==5) snprintf (vopen, 16, "AB  ");
+    if (currState==6) snprintf (vopen, 16, "BC  ");
+    if (currState==7) snprintf (vopen, 16, "ABC ");
 }
 
 void resetAutoMode() {
     controlMode = 0;
     valveWaitTimer = 0;
-    sprintf (title, "Auto Mode");
+    snprintf (title, 16, "Auto Mode");
     printInfo ();
 }
 
