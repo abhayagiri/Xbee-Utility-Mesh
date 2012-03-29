@@ -1,5 +1,8 @@
 // Selects which feilduino to program
-#define TWT
+// one and only one must be uncommented
+// compiler will complain about undeclared PIN_TOTAL
+// if none are uncommented
+//#define TWT
 //#define FWT
 //#define RDG
 
@@ -22,27 +25,14 @@
 #define	LOCATION_NAME	"FWT"
 #endif //FWT
 
-//#ifdef RDG
-//#define PIN_OFFSET	2
-//#define	PIN_TOTAL	7
-//#define PIN(p)		(PIN_OFFSET+p)
-//#define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
-//#define SLEEP_HEARTBEAT 10000//1800000ul //wake up every 30min.
-//#define	LOCATION_NAME	"RDG"
-//
-//boolean sleepMode = false;
-//struct pingResponse {
-//  char id[4];
-//  bool responded;
-//};
-//struct pingResponse pingResponses[] = { "TWT", false, 
-//                                        "FWT", false, 
-//                                        "TRB", false, 
-//                                        "GTS", false, 
-//                                        "VST", false, 
-//                                        "SNA", false };
-//unsigned short numPingResponses = sizeof(pingResponses) / sizeof(struct pingResponse);
-//#endif //RDG
+#ifdef RDG
+#define PIN_OFFSET	2
+#define	PIN_TOTAL	7
+#define PIN(p)		(PIN_OFFSET+p)
+#define SLEEP_PIN       A0 //put the xbee to sleep on HIGH
+#define SLEEP_HEARTBEAT 10000//1800000ul //wake up every 30min.
+#define	LOCATION_NAME	"RDG"
+#endif //RDG
 
 #define HEARTBEAT      300000ul //send at least every 5 min
 #define PACKET_INTERVAL  1000ul //pause 1 sec between each packet
@@ -66,6 +56,17 @@ struct states {
   char last[PIN_TOTAL];
 } 
 pinState;
+
+#ifdef RDG
+boolean sleepMode = false; //current sleep state
+struct pingResponse { //holds responses during sleep cycle periodic wake and ping
+  char id[4];         //won't go back to sleep before hearing from all of the stations listed
+  bool responded;
+} pingResponses[] = { "TWT", false, "FWT", false, "TRB", false,
+                      "GTS", false, "VST", false, "SNA", false };
+//auto-calculate the length, for 'for' loops, etc.
+unsigned short numPingResponses = sizeof(pingResponses) / sizeof(struct pingResponse);
+#endif
 
 void setup() {
   Serial.begin(9600);
