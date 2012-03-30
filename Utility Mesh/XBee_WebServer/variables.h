@@ -43,16 +43,31 @@ prog_char openContainer[] PROGMEM = "<table height=100% width=100% border=0 styl
                                     "<tr><td align=center, valign=middle>";
 prog_char closeContainer[] PROGMEM = "</td></tr></table>";
 prog_char openData[] PROGMEM = "<td align=\"center\" valign=\"middle\">";
+prog_char turbineOptionGroup[] PROGMEM = "<optgroup label=\"Set Valves\">"
+                                         "<option value=0>None</option>"
+                                         "<option value=1>A</option>"
+                                         "<option value=2>C</option>"
+                                         "<option value=3>AC</option>"
+                                         "<option value=4>B</option>"
+                                         "<option value=5>AB</option>"
+                                         "<option value=6>BC</option>"
+                                         "<option value=7>ABC</option>"
+                                         "</optgroup>"
+                                         "<optgroup label=\"--------------------\">"
+                                         "<option value=8>Reset Turbine</option>"
+                                         "</optgroup>";
 prog_char strMins[] PROGMEM = " Minutes";
 prog_char strHours[] PROGMEM = " Hours";
 prog_char strAgo[] PROGMEM = " Ago</b></td></tr>";
 prog_char valveOpStr[] PROGMEM = "Valve Operation";
+prog_char resetOpStr[] PROGMEM = "Reset Operation";
 prog_char modeOpStr[] PROGMEM = "Change Mode";
 prog_char pumpOpStr[] PROGMEM = "Pump Operation";
 prog_char pingOpStr[] PROGMEM = "Ping Operation";
 prog_char valveOpenMsg[] PROGMEM = "valve open";
 prog_char valveCloseMsg[] PROGMEM = "valve close";
 prog_char valveSetMsg[] PROGMEM = "valve set";
+prog_char turbineResetMsg[] PROGMEM = "turbine reset";
 prog_char modeSetMsg[] PROGMEM = "change mode";
 prog_char pumpStartMsg[] PROGMEM = "pump start";
 prog_char pumpStopMsg[] PROGMEM = "pump stop";
@@ -64,6 +79,7 @@ prog_char valveSetPacket[] PROGMEM = "~XB=VST,PT=SVS,DST=TRB,VS=%~";
 prog_char modeSetPacket[] PROGMEM = "~XB=VST,DST=TRB,PT=SCM,M=%~";
 prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
+prog_char turbineResetPacket[] PROGMEM = "~XB=VST,DST=TRB,PT=RST~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
 prog_char twtAlertStr[] PROGMEM = "TWT - Water Level Low";
 prog_char fwtAlertStr[] PROGMEM = "FWT - Water Level Low";
@@ -120,8 +136,7 @@ struct turbineStruct {
 	char valves[5];		// holds valve status
         int psi;		// holds turbine psi
         unsigned char controlMode; //0-auto, 1-manual; see AACP-Relayduino
-        unsigned char testing;     //0-normal, 1-testing mode; see AACP-Relayduino     
-	struct timerStruct timeStamp; // timestamp to calculate time
+       	struct timerStruct timeStamp; // timestamp to calculate time
 					// since last data came in
         unsigned int dmin;
 } turbine;

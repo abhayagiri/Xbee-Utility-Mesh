@@ -74,7 +74,8 @@ void txandtr(){
       }//STM
 
       //reset packet
-      else if(strcmp(getDataVal(rx.data,"PT"),"RST") == 0) {
+      else if(strcmp(getDataVal(rx.data,"PT"),"RST") == 0 &&
+               millis() > 60000) { //disable reset for 60sec. after a reset
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
         resetRelayduino();
       }

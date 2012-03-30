@@ -39,10 +39,8 @@ int saveTurbineData(struct turbineStruct *t, struct dataStruct d[]) {
         
         //get controlmode and 'testing' flag
         char *modeStr = getDataVal(d,"M");
-        if ( (modeStr[0] == '0' || modeStr[0] == '1') &&
-             (modeStr[1] == '0' || modeStr[1] == '1')) {
+        if ( (modeStr[0] == '0' || modeStr[0] == '1') ) {
           t->controlMode = modeStr[0] - '0';
-          t->testing = modeStr[1] - '0';
         }
         
 	t->timeStamp = timer; // save current time to calculate difference later

@@ -19,6 +19,8 @@ void setup () {
     pinMode (ledB, OUTPUT);
     pinMode (ledC, OUTPUT);
 
+    controlMode = 1; //default to auto mode
+
     //init psi averageing array
     for(int i=0; i<NUM_PSI_SAMPLES; i++)
         psiValues[i] = 210;
@@ -28,12 +30,21 @@ void setup () {
     lcd.home(); 
     lcd.blink();
     lcd.print("Reset valves...");
-    adjValve (va, OPEN); 
-    adjValve (vb, OPEN); 
-    adjValve (vc, OPEN);
-    currState = 7;
-    lcd.clear(); 
+    setValveState(7);
+    
+    //send AWK packets
+    lcd.clear(); lcd.home();
+    lcd.print("Sending AWK packets");
+    for (int i=0; i<15; i++) {
+      sendSerialAwk(XBEE, "ANY");
+      delay(1000);
+    }
+    Serial.flush(); //clear buffer in case of extra reset pkts
+    lcd.clear();
     lcd.noBlink();
+    
+    nextSecond = 1000;
+    timer0_millis = 0;
 
     // for invoking the code in the Memory tab - 
     // usefull for troubleshooting string literal problems

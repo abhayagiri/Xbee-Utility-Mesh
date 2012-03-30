@@ -152,59 +152,41 @@ void printMainPage(Client client) {
                               "<select name=\"valveOp\" onChange=\"document.forms['valveSetForm'].submit()\">"
                               "<option>"));
                               client.print(turbine.valves); 
-    printEther_p(client, PSTR("</option>"
-                              "<optgroup label=\"Set Valves\">"
-                              "<option value=0>None</option>"
-                              "<option value=1>A</option>"
-                              "<option value=2>C</option>"
-                              "<option value=3>AC</option>"
-                              "<option value=4>B</option>"
-                              "<option value=5>AB</option>"
-                              "<option value=6>BC</option>"
-                              "<option value=7>ABC</option>"
-                              "</optgroup>"
-                              "</select>"
-                              "</form></td>"
-                              "</tr>"
+    printEther_p(client, 3, PSTR("</option>"),
+                                 turbineOptionGroup,
+                            PSTR("</select>"
+                                 "</form></td>"
+                                 "</tr>"
                               
-                              "<tr>"
-                              "<td>PSI</td>"
-                              "<td>"));
-                              client.print(turbine.psi);
-    printEther_p(client, PSTR("</td>"
-                              "</tr>"
+                                 "<tr>"
+                                 "<td>PSI</td>"
+                                 "<td>"));
+                                 client.print(turbine.psi);
+    printEther_p(client, 3, PSTR("</td>"
+                                 "</tr>"
                                
-                              "<tr>"
-                              "<td>Mode</td>"
-                              "<td><form name=\"modeSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"
-                              "<select name=\"modeOp\" onChange=\"document.forms['modeSetForm'].submit()\">"
-                              "<option>"));
-                              (turbine.controlMode == 0 ? client.print("Auto") : client.print("Manual"));
-    printEther_p(client, PSTR("</option>"
-                              "<optgroup label=\"Set Mode\">"
-                              "<option value=0>Auto</option>"
-                              "<option value=1>Manual</option>"
-                              "</optgroup>"
-                              "</select></form></td>"
-                              "</tr>")); 
+                                 "<tr>"
+                                 "<td>Mode</td>"
+                                 "<td><form name=\"modeSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"
+                                 "<select name=\"modeOp\" onChange=\"document.forms['modeSetForm'].submit()\">"
+                                 "<option>"),
+                                 (turbine.controlMode == 0 ? PSTR("Auto") : PSTR("Manual")),
+                             PSTR("</option>"
+                                 "<optgroup label=\"Set Mode\">"
+                                 "<option value=0>Auto</option>"
+                                 "<option value=1>Manual</option>"
+                                 "</optgroup>"
+                                 "</select></form></td>"
+                                 "</tr>")); 
   } else {
-    printEther_p(client, PSTR("<tr>"
-                              "<td colspan=\"2\">"
-                              "<form name=\"valveSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"
-                              "<select name=\"valveOp\" onChange=\"document.forms['valveSetForm'].submit()\">"
-                              "<option>No Data Received</option>"
-                              "<optgroup label=\"Set Valves\">"
-                              "<option value=0>None</option>"
-                              "<option value=1>A</option>"
-                              "<option value=2>C</option>"
-                              "<option value=3>AC</option>"
-                              "<option value=4>B</option>"
-                              "<option value=5>AB</option>"
-                              "<option value=6>BC</option>"
-                              "<option value=7>ABC</option>"
-                              "</optgroup>"
-                              "</select></form></td>"
-                              "</tr>"));
+    printEther_p(client, 3, PSTR("<tr>"
+                                 "<td colspan=\"2\">"
+                                 "<form name=\"valveSetForm\" action=\"/\" method=\"get\" style=\"height: 7px;\">"
+                                 "<select name=\"valveOp\" onChange=\"document.forms['valveSetForm'].submit()\">"
+                                 "<option>No Data Received</option>"),
+                                 turbineOptionGroup,
+                             PSTR("</select></form></td>"
+                                  "</tr>"));
   }
   printlnEther_p(client, PSTR("</table></td></tr>"));
   

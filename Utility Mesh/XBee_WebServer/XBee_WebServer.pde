@@ -203,6 +203,16 @@ void loop() {
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
+            else if ((strstr_P(optStr, PSTR("valveOp=")) == optStr)
+              && optStr[8] == '8' && optStr[9] == '\0')
+            { //reusing valveOp for reset packet as well
+              webCmdTimer.msgStr = turbineResetMsg;
+              webCmdTimer.opStr = resetOpStr;
+              webCmdTimer.packetStr = turbineResetPacket;
+              webCmdTimer.timeout = 60;
+              webCmdTimer.wrap = true;
+              foundCommand = true;
+            }
             else if ((strstr_P(optStr, PSTR("modeOp=")) == optStr)
               && (optStr[7]=='0' || optStr[7]=='1') && optStr[8]=='\0')
             {
@@ -387,7 +397,8 @@ void loop() {
       if (webState == WEB_CMD_SENT) {
 
         if (webCmdTimer.opStr == valveOpStr ||
-          webCmdTimer.opStr == modeOpStr) {//waiting on valve op?
+            webCmdTimer.opStr == modeOpStr  ||
+            webCmdTimer.opStr == resetOpStr) {//waiting on valve op?
           if (strcmp(getDataVal(rx.data,"XB"),"TRB") == 0 ) {
             if (strcmp(getDataVal(rx.data,"PT"),"VOP") == 0) {
               webCmdTimer.timeout = 25;
