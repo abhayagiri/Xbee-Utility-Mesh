@@ -176,22 +176,6 @@ void loop() {
 
               boolean foundCommand = false;
             //check for valid option string
-            //            if (strcmp_P(optStr, PSTR("valveOp=open")) == 0) {
-            //              webCmdTimer.msgStr = valveOpenMsg;
-            //              webCmdTimer.opStr = valveOpStr;
-            //              webCmdTimer.packetStr = valveOpenPacket;
-            //              webCmdTimer.timeout = 20;
-            //              webCmdTimer.wrap = true;
-            //              foundCommand = true;
-            //            }
-            //            else if (strcmp_P(optStr, PSTR("valveOp=close")) == 0) {
-            //              webCmdTimer.msgStr = valveCloseMsg;
-            //              webCmdTimer.opStr = valveOpStr;
-            //              webCmdTimer.packetStr = valveClosePacket;
-            //              webCmdTimer.timeout = 20;
-            //              webCmdTimer.wrap = true;
-            //              foundCommand = true;
-            //            }
             if ((strstr_P(optStr, PSTR("valveOp=")) == optStr)
               && optStr[8]>='0' && optStr[8]<='7' && optStr[9]=='\0')
             {
@@ -460,11 +444,12 @@ void loop() {
       digitalWrite(ALERT_LED, LOW);
   }
 
-  //send TOD packet once every 10 min. on the +9 minute minute
-  if (timer.justOverflowed && 
-    timer.min % 10 == 9 && 
-    timer.sec == 0 &&
-    timeSet) {
+  //get time from NTP every so often - internal clock is junk
+  if (timer.justOverflowed &&
+    timer.sec == 0 ) {
+    setTimeViaNTP();
+    
+    //send time packet
     Serial.print("~XB="); 
     Serial.print(XBEE);
     Serial.print(",PT=TOD,H="); 
@@ -472,12 +457,6 @@ void loop() {
     Serial.print(",M="); 
     Serial.print(timer.min);
     Serial.print("~");
-  }
-
-  //get time from NTP every so often - internal clock is junk
-  if (timer.justOverflowed &&
-    timer.sec == 30 ) {
-    setTimeViaNTP();
   }
 
 }

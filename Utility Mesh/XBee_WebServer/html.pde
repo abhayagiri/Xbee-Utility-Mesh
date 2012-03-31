@@ -47,13 +47,8 @@ void printMainPage(Client client) {
                                 "<tr>"
                                 "<td><b>ALERT</b></td>"
                                 "<td><b>"));
-                                timeTmp = timePastMinutes(&timer,&(alerts[i]->timeStamp));
-                                client.print((timeTmp < 60 ? timeTmp : timeTmp / 60));
-      printEther_p(client, 6,  (timeTmp<60 ? strMins : strHours),
-                           PSTR(" Ago</b></td>"
-                                "</tr>" 
-
-                                "<tr>"
+                                printTime(client, timePastMinutes(&timer,&(alerts[i]->timeStamp)));
+      printEther_p(client, 5, PSTR("<tr>"
                                 "<td colspan=\"2\"><b>"),
                                 alerts[i]->alertString,
                            PSTR("</b></td>"
@@ -307,6 +302,7 @@ void printMainPage(Client client) {
                             
                             "</tr>"));
 
+  //Dismissed but active alerts live at the bottom of the page////////////////////////////////////////////
   for (int i=0; i<NUM_ALERTS; i++) {
     if (alerts[i]->active && alerts[i]->dismissed) {
       char timestr[32] = "";
@@ -316,14 +312,9 @@ void printMainPage(Client client) {
                                 "<tr>"
                                 "<td><b>ALERT</b></td>"
                                 "<td><b>"));
-                                timeTmp = timePastMinutes(&timer,&(alerts[i]->timeStamp));
-                                client.print((timeTmp < 60 ? timeTmp : timeTmp / 60));
-                                printEther_p(client, (timeTmp<60 ? strMins : strHours)); 
-      printEther_p(client, 4, (timeTmp<60 ? strMins : strHours),
-                           PSTR(" Ago</b></td>"
-                                "</tr>" 
-
-                                "<tr>"
+                           printTime(client, timePastMinutes(&timer,&(alerts[i]->timeStamp)));
+      printEther_p(client, 3,
+                           PSTR("<tr>"
                                 "<td colspan=\"2\"><b>"),
                                 alerts[i]->alertString,
                            PSTR("</b></td>"
