@@ -74,3 +74,20 @@ int sendButtons ( struct configStruct *cfg, const struct buttonStruct *b, const 
 	return 0;
 } 
 
+void sendTurbineCommand() {
+  if (trbCmd.cmdType == Mode) {
+    Serial.print("~XB="); 
+    Serial.print(XBEE);
+    Serial.print(",PT=SCM,DST=TRB,M=");
+    Serial.print(trbCmd.cmdValue);
+    Serial.print("~");
+  }
+  else if (trbCmd.cmdType == ValveState) {
+    Serial.print("~XB="); 
+    Serial.print(XBEE);
+    Serial.print(",PT=SVS,DST=TRB,VS=");
+    Serial.print(trbCmd.cmdValue);
+    Serial.print("~");
+  }
+}
+

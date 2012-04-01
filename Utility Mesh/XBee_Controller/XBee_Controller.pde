@@ -88,7 +88,7 @@ void setup() {
 
   // Start serial port at 9600 bps, used for getting data from XBee
   Serial.begin(9600);
-
+  
   //printMemoryProfile();
   //delay(300000);
 }
@@ -102,6 +102,8 @@ void loop() {
 //--------------------------------------------
 
   // Read buttons and act based on their states, save last button states too
+  // stuff typically happens on the button-up, this allows us to use long
+  // button presses as special functions, eg. ping mode and backlight control
   buttonLast = button;
   readButtons(&button);
 
@@ -118,13 +120,21 @@ void loop() {
   // Change display modes based on button states
   setDisplayMode(&config,&button,&buttonLast,DISPLAY_MODES);
 
+//  // Turbine setting for buttons
+//  //send valve control packet if we are not already processing one
+//  if (config.displayMode == 1 && 
+//     ((buttonLast.a1 && !button.a1) || (buttonLast.a2 && !button.a2)) && 
+//     valveCommandState == 0 && buttonTimer < 5000) {
+//      sendButtons(&config, &button, &buttonLast, XBEE, "TRB");
+//      buttonLast.a1 ? valveCommandState=1 : valveCommandState=3; //set valve command state
+//  }
+
   // Turbine setting for buttons
   //send valve control packet if we are not already processing one
   if (config.displayMode == 1 && 
      ((buttonLast.a1 && !button.a1) || (buttonLast.a2 && !button.a2)) && 
-     valveCommandState == 0 && buttonTimer < 5000) {
-      sendButtons(&config, &button, &buttonLast, XBEE, "TRB");
-      buttonLast.a1 ? valveCommandState=1 : valveCommandState=3; //set valve command state
+      buttonTimer < 5000) {
+      turbineMenuButtonHandler(&button, &buttonLast);
   }
 
   //Engage ping mode?
@@ -189,51 +199,39 @@ void loop() {
   }
 
   
-  if (valveCommandState > 0 && timer.justOverflowed) { //deal with valve command stuff
-    char line1[17];
-    char line2[17];
-    updateElipsis();
-    switch (valveCommandState) {
-    case 1: //sent open command, waiting for valve op packet
-      config.pauseCounter = 10;
-      valveCommandState++;
-    case 2:
-      sprintf(line2, "Open Valve%s", elipsis);
-      printInfo("Sent Command:",line2, config.pauseCounter);
-      break;
-    case 3:
-      config.pauseCounter = 10;
-      valveCommandState++;
-    case 4:
-      sprintf(line2, "Close Valve%s", elipsis);
-      printInfo("Sent Command:", line2, config.pauseCounter);
-      break;
-    case 5:
-      config.pauseCounter = 25;
-      valveCommandState++;
-    case 6:
-      if (strcmp(valveOp.op, "ALLO") == 0)
-        sprintf(line2,"All Vavles Open");
-      else if (strcmp(valveOp.op, "ALLC") == 0)
-        sprintf(line2,"All Valves Closd");
-      else
-        sprintf(line2,"%sING Valve %s", valveOp.op, valveOp.valve);
-      sprintf(line1, "Response");
-      appendToEnd(line1, elipsis, 11);
-      printInfo(line1, line2, config.pauseCounter);
-      break;
-    case 7:
-      valveCommandState++;
-    case 8:
-      valveCommandState = 0; //do nothing for non-manual packets for now
-      break;
-    case 9: //got final awk - notice no break here, it falls through to case 10
-      valveCommandState++;
-    case 10:
-      valveCommandState = 0;
-      printInfo("Command complete", "", 5);
-      break;
-    }
+  if (trbCmd.cmdState >= Sending && config.displayMode == 1) { //deal with valve command stuff
+    if (timer.justOverflowed) {//per-second ops
+      config.pauseCounter = 2;
+      
+      //Update display
+      lcd.clear(); 
+      switch (trbCmd.cmdState) {
+        case Sending: 
+          lcd.print("Sending"); 
+          break;
+        case OpsInProg: 
+          lcd.print("Op in progress"); 
+          valveCommandTimer += 25; //add valve op time
+          break;
+        case AwkRcvd: 
+          lcd.print("Cmd complete"); 
+          trbCmd.cmdState = NotSending;
+          trbCmd.currField = 0;
+          config.pauseCounter = 5;
+          break;
+      } lcd.blink();
+      
+      //send packets until some response recv'd or timer exp.
+      if (trbCmd.cmdState == Sending && (timer.sec % 2) == 0)
+        sendTurbineCommand();
+      
+      //decrement, test timer
+      if (--valveCommandTimer == 0) { 
+        lcd.clear(); lcd.print("Cmd Timeout");
+        trbCmd.cmdState = NotSending;
+        trbCmd.currField = 0; //so cursor is not on "send"
+      }
+    }//per-second ops
   }
 
   //handle ping mode
@@ -344,13 +342,6 @@ void loop() {
   // count down until menu unpauses after command send or awknowledged
   if (config.pauseCounter && timer.justOverflowed) {
     config.pauseCounter--;
-    if (!config.pauseCounter && valveCommandState) {
-      if (valveCommandState == 2 || valveCommandState == 4)
-        printInfo("Command timeout:", "no response.", 5);
-      else if (valveCommandState == 6)
-        printInfo("Cmd. incomplete:", "no AWK received.", 5);
-      valveCommandState = 0;
-    }
   }
 
   //backlight auto-off

@@ -6,7 +6,7 @@ int updateDisplay (struct configStruct *cfg, struct timerStruct *t, struct turbi
       printDefaultScreen(cfg, t, trbn, hydro, batt);
       break;
     case 1:
-      print2lines("Valve Control", "step up/down");
+      printTurbineMenu();
       break;
     case 2:
       printTankScreen(cfg, t, tanks);
@@ -63,6 +63,91 @@ void printDefaultScreen (struct configStruct *cfg, struct timerStruct *t, struct
       lcd.print(line1);
       break;
   }
+}
+
+void printTurbineMenu() {
+  lcd.clear(); lcd.print("Set: ");
+  
+  switch (trbCmd.cmdType) {
+    case Mode:
+      lcd.print("mode");
+      lcd.setCursor(0,1); lcd.print("To: ");
+      switch(trbCmd.cmdValue) {
+        case 0: lcd.print("MANUAL"); break;
+        case 1: lcd.print("AUTO"); break;
+      }
+      break;
+    case ValveState:
+      lcd.print("valves");
+      lcd.setCursor(0,1); lcd.print("To: ");
+      switch(trbCmd.cmdValue) {
+        case 0: lcd.print("NONE"); break;
+        case 1: lcd.print("A"); break;
+        case 2: lcd.print("C"); break;
+        case 3: lcd.print("AC"); break;
+        case 4: lcd.print("B"); break;
+        case 5: lcd.print("AB"); break;
+        case 6: lcd.print("BC"); break;
+        case 7: lcd.print("ABC"); break;
+      }
+      break;
+  }
+  
+  lcd.setCursor(14,1); lcd.print("OK");  
+  switch (trbCmd.currField) {
+    case 0: lcd.setCursor(5,0); break;
+    case 1: lcd.setCursor(4,1); break;
+    case 2: lcd.setCursor(14,1); break;
+  }
+  lcd.blink();
+}
+
+void turbineMenuButtonHandler(struct buttonStruct *btns, struct buttonStruct *btnsLast) {
+  unsigned char field = trbCmd.currField; //easier to type...
+  boolean printMenu = true;
+  
+  if  (trbCmd.cmdState) { //cancel send on any a-button
+    trbCmd.cmdState = NotSending;
+    lcd.clear(); lcd.print("Cmd Canceled");
+    config.pauseCounter = 2;
+    trbCmd.currField = 0;
+    printMenu = false;
+  }  
+
+  else if (btnsLast->a1) { //otherwise, do menu change on button press
+    unsigned char modulus = 0;
+    switch (field) {
+      case 0:
+        if (trbCmd.cmdType == ValveState) {
+          trbCmd.cmdType = Mode;
+          trbCmd.cmdValue = max(0,turbine.mode); //catch the -9 initial state
+        }
+        else trbCmd.cmdType = ValveState;
+        break;
+      case 1:
+        if (trbCmd.cmdType == Mode) modulus = 2;
+        if (trbCmd.cmdType == ValveState) modulus = 8;
+        trbCmd.cmdValue += 1;
+        trbCmd.cmdValue %= modulus;
+        break;
+      case 2:
+        trbCmd.cmdState = Sending;
+        valveCommandTimer = 120; //try for two min. max
+        config.pauseCounter = 2; //hold the display
+        //sendValveComand(); //send the packet
+        lcd.clear(); lcd.print("Sending");
+        lcd.blink();
+        printMenu = false;
+        break;
+    }
+  }
+  else if (btnsLast->a2) {
+    trbCmd.currField += 1; //next field
+    trbCmd.currField %= 3;
+  }
+  
+  if (printMenu) printTurbineMenu();
+  
 }
 
 void printTankScreen(struct configStruct *cfg, struct timerStruct *t, struct tankStruct *tanks) { //takes array of tank structs

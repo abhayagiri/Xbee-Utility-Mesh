@@ -29,7 +29,7 @@ int saveTurbineData(struct turbineStruct *t, struct dataStruct d[]) {
         char *modeTmp = getDataVal(d,"M"); //sends 2 bits, one for auto/manual and one for testing state
         if (modeTmp[0] == '0' || modeTmp[0] == '1') //we just need the 1st bit for now
           t->mode = modeTmp[0] - '0';
-	
+
         t->timeStamp = timer; // save current time to calculate difference later
 	return 0;
 }
@@ -49,21 +49,10 @@ int saveBatteryData(struct batteryStruct *batt, struct dataStruct d[]) {
 
 //saves valve operation packet data and manages valveCommandState variable used for printing info on pending valve commands.
 void handleValveOpPacket (struct dataStruct d[]) {
-  if (strcmp(getDataVal(rx.data,"PT"),"VOP") == 0) {
-    if (valveCommandState > 0) {
-      valveCommandState = 5;
-      strlcpy(valveOp.valve, getDataVal(d,"VLV"),2);
-      strlcpy(valveOp.op, getDataVal(d,"OP"),6);
-    }
-    else 
-      valveCommandState = 7; //placeholder state for non-manual valve op packets
-  }
-  else if (strcmp(getDataVal(rx.data,"PT"),"AWK") == 0) {
-    if (valveCommandState > 0)
-      valveCommandState = 9;
-    else
-      printInfo("Unexpected AWK", "from turbine.", 10);
-  }
+  if (strcmp(getDataVal(rx.data,"PT"),"VOP") == 0)
+    trbCmd.cmdState = OpsInProg;
+  else if (strcmp(getDataVal(rx.data,"PT"),"AWK") == 0)
+    trbCmd.cmdState = AwkRcvd;
 }
 
 void handlePongPacket ( struct dataStruct d[]) {

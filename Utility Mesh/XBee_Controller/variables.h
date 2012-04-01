@@ -151,6 +151,16 @@ struct pongTimer {
 char pongLine1[17]="", pongLine2[17] = "";
 short numPongTimers = sizeof(pongTimers)/sizeof(struct pongTimer);
 
+
+enum turbineCommandType {Mode, ValveState};
+enum turbineCommandState {NotSending, Sending, OpsInProg, AwkRcvd};
+struct turbineCommandStruct {
+  turbineCommandType cmdType;
+  turbineCommandState cmdState;
+  unsigned short cmdValue;
+  unsigned short currField;
+} trbCmd = { ValveState, NotSending, 0, 0 };  
+
 char elipsis[4] = "   ";   // moving elipsis for valve control wait screens
 char progStr[5] = ".  ";
 char progressor = progStr[0];
@@ -158,14 +168,5 @@ unsigned long int progressTimer = 500; //next time to change the prog timer
 short progStrLength = strlen(progStr);
 short progressIndex = 0;
 
-int valveCommandState = 0; // controls valve command display sequence:
-                           // 0 - nothing happening
-                           // 1/2 - send open command, awaiting response(s)
-                           // 3/4 - send close command, awaiting response(s)
-                           // 5/6 - received individual valve op info, waiting on more or final AWK
-                           // 7/8 - final AWK received
-                           // 9/10 - automatic valve operation received
-                           // odd states - not printed to display yet
-                           // even sates - info printed, waiting on state change
-                           
-//unsigned long int pkts = 0; //total # packets processed
+//bool valveCommandMode = false; //true when sending to turbine
+unsigned int valveCommandTimer = 0;
