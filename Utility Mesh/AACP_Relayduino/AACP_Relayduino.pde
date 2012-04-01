@@ -44,6 +44,8 @@ void setup () {
     lcd.noBlink();
     
     nextSecond = 1000;
+    nextLCDUpdate = 0;
+    resetAutoMode();
     timer0_millis = 0;
 
     // for invoking the code in the Memory tab - 

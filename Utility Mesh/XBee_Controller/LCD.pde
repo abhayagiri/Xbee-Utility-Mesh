@@ -29,9 +29,9 @@ void printDefaultScreen (struct configStruct *cfg, struct timerStruct *t, struct
       //else
       //  timePastStr(t, &(hydro->timeStamp), tmpStr);
       if (trbn->mode == 0) {
-        sprintf(tmpStr, "auto");
+        sprintf(tmpStr, " auto");
       } else if (trbn->mode == 1) {
-        sprintf(tmpStr, "man");
+        sprintf(tmpStr, " man");
       } else sprintf(tmpStr, "?");
       sprintf(line1, "Vs:%s%s", trbn->valves, tmpStr);
       timePastStr(t, &(trbn->timeStamp), tmpStr);
@@ -73,8 +73,8 @@ void printTurbineMenu() {
       lcd.print("mode");
       lcd.setCursor(0,1); lcd.print("To: ");
       switch(trbCmd.cmdValue) {
-        case 0: lcd.print("MANUAL"); break;
-        case 1: lcd.print("AUTO"); break;
+        case 1: lcd.print("MANUAL"); break;
+        case 0: lcd.print("AUTO"); break;
       }
       break;
     case ValveState:

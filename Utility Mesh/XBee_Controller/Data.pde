@@ -49,10 +49,12 @@ int saveBatteryData(struct batteryStruct *batt, struct dataStruct d[]) {
 
 //saves valve operation packet data and manages valveCommandState variable used for printing info on pending valve commands.
 void handleValveOpPacket (struct dataStruct d[]) {
+  if (trbCmd.cmdState >= Sending) {
   if (strcmp(getDataVal(rx.data,"PT"),"VOP") == 0)
     trbCmd.cmdState = OpsInProg;
   else if (strcmp(getDataVal(rx.data,"PT"),"AWK") == 0)
     trbCmd.cmdState = AwkRcvd;
+  }
 }
 
 void handlePongPacket ( struct dataStruct d[]) {
