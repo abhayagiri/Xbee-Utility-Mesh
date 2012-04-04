@@ -17,13 +17,13 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing NTP 
 // Number of display modes for LCD
 #define DISPLAY_MODES	2
 // Size of array for storing recieved serial data
-#define BUF_SIZE  128
+#define BUF_SIZE  100
 //Size of the buffer for the http request
 #define HTTP_REQ_SIZE 64
 // Number of entries that can be recieved over serial
-#define KEYS_MAX 8
+#define KEYS_MAX 6
 // Max size of each entry
-#define ENT_SIZE 8
+#define ENT_SIZE 6
 // Number of water tanks
 #define	TANK_NUM 3
 // Length of id string that comes from remote source (ie: INV, TWT, FWT)
@@ -64,6 +64,8 @@ prog_char resetOpStr[] PROGMEM = "Reset Operation";
 prog_char modeOpStr[] PROGMEM = "Change Mode";
 prog_char pumpOpStr[] PROGMEM = "Pump Operation";
 prog_char pingOpStr[] PROGMEM = "Ping Operation";
+
+
 prog_char valveOpenMsg[] PROGMEM = "valve open";
 prog_char valveCloseMsg[] PROGMEM = "valve close";
 prog_char valveSetMsg[] PROGMEM = "valve set";
@@ -81,6 +83,13 @@ prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
 prog_char turbineResetPacket[] PROGMEM = "~XB=VST,DST=TRB,PT=RST~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
+prog_char pingPacketTWT[] PROGMEM = "~XB=VST,DST=TWT,PT=PING~";
+prog_char pingPacketTRB[] PROGMEM = "~XB=VST,DST=TRB,PT=PING~";
+prog_char pingPacketFWT[] PROGMEM = "~XB=VST,DST=FWT,PT=PING~";
+prog_char pingPacketRDG[] PROGMEM = "~XB=VST,DST=RDG,PT=PING~";
+prog_char pingPacketSNA[] PROGMEM = "~XB=VST,DST=SNA,PT=PING~";
+prog_char pingPacketGTS[] PROGMEM = "~XB=VST,DST=GTS,PT=PING~";
+
 prog_char twtAlertStr[] PROGMEM = "TWT - Water Level Low";
 prog_char fwtAlertStr[] PROGMEM = "FWT - Water Level Low";
 prog_char rdgAlertStr[] PROGMEM = "RDG - Water Level Low";

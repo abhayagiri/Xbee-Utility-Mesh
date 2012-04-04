@@ -109,10 +109,10 @@ void loop() {
           if ((c=client.read()) != httpGet[i])
             gotRequest = false;
 
-//        if (gotRequest)
-//          debugPrintln_p(PSTR("got request"));
-//        else
-//          debugPrintln_p(PSTR("not http"));
+        if (gotRequest)
+          debugPrintln_p(PSTR("got request"));
+        else
+          debugPrintln_p(PSTR("not http"));
 
         if (gotRequest) { //look for options
           while ( (c != '\n') && (c != '?') )
@@ -124,14 +124,14 @@ void loop() {
             while ( (c != ' ') && i < 31)
               optStr[i++] = (c = client.read());
             optStr[--i] = '\0'; //kill the trailing space character
-//            debugPrint_p(PSTR("Option String: \""));
-//            debugPrint(optStr);
-//            debugPrintln_p(PSTR("\""));              
+            debugPrint_p(PSTR("Option String: \""));
+            debugPrint(optStr);
+            debugPrintln_p(PSTR("\""));              
             while (c != ' ') //flush remaining option chars
               c = client.read(); 
           }
-//          else
-//            debugPrintln_p(PSTR("No option string"));
+          else
+            debugPrintln_p(PSTR("No option string"));
         }    
 
         while (client.available()) // print out the rest of the request
@@ -198,7 +198,7 @@ void loop() {
               foundCommand = true;
             }
             else if ((strstr_P(optStr, PSTR("modeOp=")) == optStr)
-              && (optStr[7]=='0' || optStr[7]=='1') && optStr[8]=='\0')
+              && (optStr[7]=='0' || optStr[7]=='1') && optStr[8]=='\0') // Auto (1) vs. manual mode at turbine
             {
               webCmdTimer.msgStr = modeSetMsg;
               webCmdTimer.opStr = modeOpStr;
@@ -208,7 +208,7 @@ void loop() {
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
-            else if (strcmp_P(optStr, PSTR("pumpOp=on")) == 0) {
+            else if (strcmp_P(optStr, PSTR("pumpOp=on")) == 0) { //unused at present, was intended for ridge pump.
               webCmdTimer.msgStr = pumpStartMsg;
               webCmdTimer.opStr = pumpOpStr;
               webCmdTimer.packetStr = pumpStartPacket;
@@ -234,7 +234,9 @@ void loop() {
               foundCommand = true;
             }
             else if ((strstr_P(optStr, PSTR("dismiss=")) == optStr)) {
+              // part of the "Alerts" function
               //foundCommand=false here, no timeout required
+              
               int i = atoi(&optStr[8])-1;
               if (i>=0 && i<NUM_ALERTS)
                 alerts[i]->dismissed=true;

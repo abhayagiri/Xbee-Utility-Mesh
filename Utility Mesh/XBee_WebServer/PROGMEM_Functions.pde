@@ -23,13 +23,6 @@ void printEther_p(Client client, unsigned int numArgs, ...)
   va_end(args);
 }
 
-//void printEther_p(Client client, prog_char *strs[])
-//{
-//  Serial.println(sizeof(strs));
-//  for (int i=0; i < 3; i++)
-//    printEther_p(client, strs[i]);
-//    
-//}
 
 void debugPrint_p(char *msg) {
   if (debugMode)

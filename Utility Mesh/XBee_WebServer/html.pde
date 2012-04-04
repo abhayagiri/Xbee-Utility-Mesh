@@ -17,7 +17,7 @@ void printMainPage(Client client) {
 
   // Page HTML goes here
   
-  printEther_p(client, 6, openDocument,
+  printEther_p(client, 4, openDocument,
                           PSTR("Abhayagiri XBee Utility Mesh</title>"
                                "<meta http-equiv=\"REFRESH\" content=\"30; url="),
                           myUrl, 
@@ -30,10 +30,22 @@ void printMainPage(Client client) {
 
                                "<table cellspacing=15>"
 
-                               "<tr><td><input type=\"button\" value=\"Ping\" "
-                               "onClick=\"window.location.replace(\'"),
-                          myUrl, 
-                          PSTR("?ping=send\')\"/></td></tr>"));
+                               "<tr><td>"
+                               "<form name=\"pingSetForm\" action=\"/\" methode=\"get\">"
+                               "<select name=\"ping\" onChange=\"document.forms['pingSetForm'].submit()\">"
+                               "<option>Select ping target</option>"
+                               "<optgroup label=\"Targets\">"
+                               "<option value=\"send\">All</option>"
+                               "<option>TWT</option>"
+                               "<option>TRB</option>"
+                               "<option>FWT</option>"
+                               "<option>RDG</option>"
+                               "<option>SNA</option>"
+                               "<option>GTS</option>"
+                               "</optgroup>"
+                               "</select>"
+                               "</form>"
+                               ));
   
   //Alerts////////////////////////////////////////////////////////////////////
   for (int i=0; i<NUM_ALERTS; i++) {
