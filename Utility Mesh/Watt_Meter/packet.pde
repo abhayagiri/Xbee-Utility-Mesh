@@ -55,10 +55,8 @@ void checkForPacket() {
 void sendStatusPacket() {
     long int avgWatts = 0;
     
-    for (int i=0; i<NUM_SAMPLES; i++) avgWatts += wattsAvgArray[i];
-    avgWatts /= NUM_SAMPLES;
     Serial.print("~XB=GTS,PT=WTT,W="); 
-    Serial.print(avgWatts);
+    Serial.print(packetWatts);
     Serial.print(",T="); 
     Serial.print(wattSecondsToday / (3600000.0));
     Serial.print(",Y="); 
