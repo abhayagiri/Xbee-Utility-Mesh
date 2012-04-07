@@ -45,6 +45,7 @@ void printMainPage(Client client) {
                                "</optgroup>"
                                "</select>"
                                "</form>"
+                               "</td></tr>"
                                ));
   
   //Alerts////////////////////////////////////////////////////////////////////

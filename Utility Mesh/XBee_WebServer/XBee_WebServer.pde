@@ -328,7 +328,6 @@ void loop() {
 
   //------------Serial Data-----------//
   if (getSerialData(rx.str) == 0) {
-    //Serial.println(rx.str);
     parseData(rx.data,rx.str);
     // Make sure this transmission includes a packet type and
     // XB identification tag

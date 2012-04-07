@@ -17,13 +17,13 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing NTP 
 // Number of display modes for LCD
 #define DISPLAY_MODES	2
 // Size of array for storing recieved serial data
-#define BUF_SIZE  100
+#define BUF_SIZE  128
 //Size of the buffer for the http request
 #define HTTP_REQ_SIZE 64
 // Number of entries that can be recieved over serial
-#define KEYS_MAX 6
+#define KEYS_MAX 8
 // Max size of each entry
-#define ENT_SIZE 6
+#define ENT_SIZE 8
 // Number of water tanks
 #define	TANK_NUM 3
 // Length of id string that comes from remote source (ie: INV, TWT, FWT)
