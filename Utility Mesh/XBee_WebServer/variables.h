@@ -190,11 +190,11 @@ packetStruct rx = { };
 #define ALERT_LED 3
 //tanks at the top, in same order as corresponding structs in tanks[]
 struct alertStruct *alerts[NUM_ALERTS];
-struct alertStruct twtAlert = {false, false, twtAlertStr};
-struct alertStruct fwtAlert = {false, false, fwtAlertStr};
-struct alertStruct rdgAlert = {false, false, rdgAlertStr};
-struct alertStruct battAlert = {false, false, battAlertStr};
-struct alertStruct psiAlert = {false, false, psiAlertStr};
+struct alertStruct twtAlert = {false, false, twtAlertStr, {0,0,0,0,false}};
+struct alertStruct fwtAlert = {false, false, fwtAlertStr, {0,0,0,0,false}};
+struct alertStruct rdgAlert = {false, false, rdgAlertStr, {0,0,0,0,false}};
+struct alertStruct battAlert = {false, false, battAlertStr, {0,0,0,0,false}};
+struct alertStruct psiAlert = {false, false, psiAlertStr, {0,0,0,0,false}};
 boolean ledOn = false;
 
 //this keeps track of timeouts for web commands
