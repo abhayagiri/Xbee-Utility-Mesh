@@ -75,7 +75,7 @@ void txandtr(){
 
       //reset packet
       else if(strcmp(getDataVal(rx.data,"PT"),"RST") == 0 &&
-               millis() > 60000) { //disable reset for 60sec. after a reset
+        millis() > 60000) { //disable reset for 60sec. after a reset
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
         resetRelayduino();
       }
@@ -90,16 +90,27 @@ void txandtr(){
         sendSerialStatus();
       }//PING
 
-      //WTT packet - ckeck for >4000 watts
-      else if( strcmp(getDataVal(rx.data, "PT"), "WTT" == 0))  {
-          if (atoi(getDataVal(rx.data, "W")) > WATT_THRESHOLD)
+      //WTT packet - ckeck for >4000 watts; step down immediately, 0r > 3800, step down if a sencond shows up > 3800
+      else if( strcmp(getDataVal(rx.data, "PT"), "WTT") == 0)  {
+        if (atoi(getDataVal(rx.data, "W")) > WATT_HARD_THRESHOLD)
           closeFunct(); //step down if we hear about >4000 watt production
-        //from the grid tie
-      }//WTT
+       
+        else if (seenSoftThreshold) { //step down if we see > soft threshold twice;
+          if (atoi(getDataVal(rx.data, "W")) > WATT_SOFT_THRESHOLD)
+            closeFunct();
+          else 
+            seenSoftThreshold = false;
+        }
+        
+        else if (atoi(getDataVal(rx.data, "W")) > WATT_SOFT_THRESHOLD)
+          seenSoftThreshold = true; 
+        
+      }
     }
 
   }//got data
 }//txandtr()
+
 
 
 

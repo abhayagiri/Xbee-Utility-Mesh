@@ -19,7 +19,8 @@ unsigned long int samplingTime = 0;
 //unsigned long int todInSeconds = 0;
 long int wattSecondsToday = 0;
 long  int wattSecondsYesterday = 0;
-int wattsAvgArray[NUM_SAMPLES];
+int lcdWattsAvgArray[NUM_SAMPLES]; //the array accumulating the 10 second avg. watts value shown on the LCD
+unsigned int packetWatts = 0; //the 5-minute avg. watts value sent over the radio
 unsigned char wattsAvgIndex = 0;
 
 extern volatile unsigned long timer0_millis;
@@ -95,11 +96,17 @@ void loop() {
   wattSecondsToday += watts;
   
   //do watt smoothing
-  wattsAvgArray[wattsAvgIndex] = watts;
+  lcdWattsAvgArray[wattsAvgIndex] = watts;
   wattsAvgIndex = (wattsAvgIndex + 1) % NUM_SAMPLES;
   for (int i=0; i<NUM_SAMPLES; i++) 
       avgWatts += wattsAvgArray[i];
   avgWatts /= NUM_SAMPLES;
+  // do Packet Watt smoothing - 5 minutes worth of 10-second smoothed samples
+  if (wattAvgIndex == (NUM_SAMPLES-1)) {
+     packetWatts *= 29;
+     packetWatts += avgWatts;
+     packetWatts /= 30;
+  }
   
   //check for packets 
   checkForPacket();
@@ -111,11 +118,11 @@ void loop() {
     wattSecondsToday = 0;
   }
   
-  //send packet every 2 min.
-  if ((millis() / 1000) % 120 == 0)
+  //send packet every 5 min.
+  if ((millis() / 1000) % 300 == 0)
      sendStatusPacket();
   
-  //safety - if avgWatts > 3960, send step down command to turbine
+//  safety - if avgWatts > 3960, send step down command to turbine
 //  if (avgWatts > 3850 && (millis() / 1000) % 60 == 0) {//send once a minute @ most
 //    Serial.print("~XB=GTS,DST=TRB,PT=SVS,VS=-~");
 //  }

@@ -2,7 +2,8 @@
 bool testing = false;
 
 //Threhold for safety step-down
-#define WATT_THRESHOLD 3800
+#define WATT_SOFT_THRESHOLD 3800
+#define WATT_HARD_THRESHOLD 4000
 // Size of array for storing recieved serial data
 #define BUF_SIZE 128
 // Number of entries that can be recieved over serial
@@ -63,6 +64,7 @@ short currState; //start with all open valves
 short controlMode; //0 - Auto, 1 - Manual
 short LCDState = 0; //0 - normal display, 1 - temporary info display
 unsigned short psi = (testing ? 210 : 0); //initalize to 210 for testing, otherwise 0;
+bool seenSoftThreshold = false;
 
 //some timing variables
 unsigned long nextSecond;
