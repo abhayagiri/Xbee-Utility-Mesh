@@ -49,7 +49,6 @@ packetStruct rx = {
 #define psisensor  A0 
 #define rainsensor 19 // Not yet in use with Relayduino
 
-extern volatile unsigned long timer0_millis;
 unsigned long lastSerialTX = 0;
 unsigned long lastDataUpdateTime = 0;
 unsigned long nextLCDUpdate = 0;
@@ -60,14 +59,14 @@ int symbol = 0;
 int numPacketsSent = 0; //number packets sent during send period
 unsigned long nextPacketTime = 15ul * 1000ul; //next packet send time in millis; initalize to 15 sec. just for fun...
 unsigned long delayTime;// hold time variables for "true" or "working"
-short currState; //start with all open valves
-short controlMode; //0 - Auto, 1 - Manual
+short currState = 7; //start with all open valves
+short controlMode = 0; //0 - Auto, 1 - Manual
 short LCDState = 0; //0 - normal display, 1 - temporary info display
 unsigned short psi = (testing ? 210 : 0); //initalize to 210 for testing, otherwise 0;
 bool seenSoftThreshold = false;
 
 //some timing variables
-unsigned long nextSecond;
+unsigned long nextSecond = 1000;
 bool newSecond = false;
 unsigned long currSecond = 0;
 unsigned int valveWaitTimer = 0;

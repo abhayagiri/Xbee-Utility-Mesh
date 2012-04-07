@@ -19,8 +19,6 @@ void setup () {
     pinMode (ledB, OUTPUT);
     pinMode (ledC, OUTPUT);
 
-    controlMode = 1; //default to auto mode
-
     //init psi averageing array
     for(int i=0; i<NUM_PSI_SAMPLES; i++)
         psiValues[i] = 210;
@@ -30,23 +28,11 @@ void setup () {
     lcd.home(); 
     lcd.blink();
     lcd.print("Reset valves...");
-    setValveState(7);
-    
-    //send AWK packets
-    lcd.clear(); lcd.home();
-    lcd.print("Sending AWK packets");
-    for (int i=0; i<15; i++) {
-      sendSerialAwk(XBEE, "ANY");
-      delay(1000);
-    }
-    Serial.flush(); //clear buffer in case of extra reset pkts
-    lcd.clear();
+    adjValve (va, OPEN); 
+    adjValve (vb, OPEN); 
+    adjValve (vc, OPEN);
+    lcd.clear(); 
     lcd.noBlink();
-    
-    nextSecond = 1000;
-    nextLCDUpdate = 0;
-    resetAutoMode();
-    timer0_millis = 0;
 
     // for invoking the code in the Memory tab - 
     // usefull for troubleshooting string literal problems
@@ -67,8 +53,8 @@ void loop ()  {
 }
 
 void menuOpt() {
-    if (ba==1) {               //ba was pressed - begin reset timer
-        resetRelayduino();
+    if (ba==1) {               //ba was pressed
+    
     }
     if (bb==1){                //bb was pressed - cycle manual and auto conrtrol modes
         if (controlMode == 0) {
@@ -114,24 +100,6 @@ void resetAutoMode() {
     valveWaitTimer = 0;
     snprintf (title, 16, "Auto Mode");
     printInfo ();
-}
-
-void resetRelayduino() {
-  ba = bb = bc = bd = 0; //reset buttons
-  unsigned char countDown = 5;
-  
-  //reset when countdown expires, unless a button is pressed
-  lcd.clear(); lcd.home(); 
-  lcd.print("Reset in "); lcd.print( countDown );
-  while ( (!(ba||bb||bc||bd)) && (countDown > 0) ) {
-    if (newSecond) {
-      lcd.setCursor(0,9); lcd.print(countDown--);
-    }
-    txandtr(); //see if any buttons get pressed
-    updateTime(); // so seconds continue to get counted
-  }
-  if (!(ba||bb|bc||bd)) setup(); //reset if no buttons were presse
-  else nextLCDUpdate = millis(); //otherwise, force LCD update
 }
 
 void updateTime() {

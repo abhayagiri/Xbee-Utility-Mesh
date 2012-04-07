@@ -51,11 +51,7 @@ prog_char turbineOptionGroup[] PROGMEM = "<optgroup label=\"Set Valves\">"
                                          "<option value=4>B</option>"
                                          "<option value=5>AB</option>"
                                          "<option value=6>BC</option>"
-                                         "<option value=7>ABC</option>"
-                                         "</optgroup>"
-                                         "<optgroup label=\"--------------------\">"
-                                         "<option value=8>Reset Turbine</option>"
-                                         "</optgroup>";
+                                         "<option value=7>ABC</option>";
 prog_char strMins[] PROGMEM = " Minutes";
 prog_char strHours[] PROGMEM = " Hours";
 prog_char strAgo[] PROGMEM = " Ago</b></td></tr>";
@@ -81,7 +77,6 @@ prog_char valveSetPacket[] PROGMEM = "~XB=VST,PT=SVS,DST=TRB,VS=%~";
 prog_char modeSetPacket[] PROGMEM = "~XB=VST,DST=TRB,PT=SCM,M=%~";
 prog_char pumpStartPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=ON~";
 prog_char pumpStopPacket[] PROGMEM = "~XB=VST,DST=RDG,PT=POP,OP=OFF~";
-prog_char turbineResetPacket[] PROGMEM = "~XB=VST,DST=TRB,PT=RST~";
 prog_char pingPacket[] PROGMEM = "~XB=VST,PT=PING~";
 prog_char pingPacketTWT[] PROGMEM = "~XB=VST,DST=TWT,PT=PING~";
 prog_char pingPacketTRB[] PROGMEM = "~XB=VST,DST=TRB,PT=PING~";
