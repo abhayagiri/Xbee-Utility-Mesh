@@ -32,7 +32,7 @@ void txandtr(){
       else if (strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
         Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
         sendSerialStatus();
-
+      }
       //set control mode, 0 for auto, 1 for manual
       else if(strcmp(getDataVal(rx.data,"PT"),"SCM") == 0 &&
         keyExists(rx.data,"M")) {

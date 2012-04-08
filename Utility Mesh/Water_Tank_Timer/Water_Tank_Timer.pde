@@ -201,11 +201,13 @@ void checkForPacket() {
 
     Serial.read();
     while ((Serial.available() || millis() < timeout) && i < 127) {
-      if (Serial.available()) {
-        if (Serial.peek() == '~')
-            timeout = millis();
-        else
-            buf[i++] = Serial.read();
+        if (Serial.available()) {
+            if (Serial.peek() == '~') {
+                timeout = millis();
+                Serial.read();
+            }
+            else
+                buf[i++] = Serial.read();
       }
     }
 
