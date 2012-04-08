@@ -8,7 +8,7 @@
 //numbers close to inverter display. sampling
 //showed a linear relationship:
 //inverter displayed watts = constant + (coeffecient * sensed amps)
-#define INVERTER_COEFFECIENT 250
+#define INVERTER_COEFFECIENT 240
 #define INVERTER_CONSTANT 0
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
@@ -35,7 +35,7 @@ void setup() {
   
   //init watts avg array
   for (int i=0; i<NUM_SAMPLES; i++)
-      wattsAvgArray[i] = 0;
+      lcdWattsAvgArray[i] = 0;
   
   //printMemoryProfile(300000);
   
@@ -99,10 +99,10 @@ void loop() {
   lcdWattsAvgArray[wattsAvgIndex] = watts;
   wattsAvgIndex = (wattsAvgIndex + 1) % NUM_SAMPLES;
   for (int i=0; i<NUM_SAMPLES; i++) 
-      avgWatts += wattsAvgArray[i];
+      avgWatts += lcdWattsAvgArray[i];
   avgWatts /= NUM_SAMPLES;
   // do Packet Watt smoothing - 5 minutes worth of 10-second smoothed samples
-  if (wattAvgIndex == (NUM_SAMPLES-1)) {
+  if (wattsAvgIndex == (NUM_SAMPLES-1)) {
      packetWatts *= 29;
      packetWatts += avgWatts;
      packetWatts /= 30;
