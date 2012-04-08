@@ -3,7 +3,7 @@
 // compiler will complain about undeclared PIN_TOTAL
 // if none are uncommented
 //#define TWT
-//#define FWT
+#define FWT
 //#define RDG
 
 #include <avr/interrupt.h>
@@ -201,16 +201,19 @@ void checkForPacket() {
 
     Serial.read();
     while ((Serial.available() || millis() < timeout) && i < 127) {
-      if (Serial.available())
-        buf[i++] = Serial.read();
-      else if ( i>1 && buf[i-1] == '~')
-        timeout = millis(); //done
+      if (Serial.available()) {
+        if (Serial.peek() == '~')
+            timeout = millis();
+        else
+            buf[i++] = Serial.read();
+      }
     }
 
     buf[i] = '\0';
 
     //check for ping
-    if (strstr(buf, "PT=PING") != NULL)
+    if (strstr(buf, "PT=PING") != NULL && 
+       (strstr(buf, "DST") == NULL || strstr(buf, LOCATION_NAME) != NULL))
     {
       delay(random(0,2000));
       Serial.print("~XB=");

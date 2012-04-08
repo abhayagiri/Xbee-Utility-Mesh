@@ -15,6 +15,7 @@ void txandtr(){
       keyExists(rx.data,"DST") && 
       strcmp(getDataVal(rx.data,"DST"),XBEE) == 0)) {
 
+         
       //BTN packet type - old method for controlling valves,
       //send from the controller
       if (strcmp(getDataVal(rx.data,"PT"),"BTN") == 0) {
@@ -25,6 +26,12 @@ void txandtr(){
           closeFunct();
         sendSerialAwk(XBEE,getDataVal(rx.data,"XB"));
       }//BTN
+
+
+      //Destinational ping request
+      else if (strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
+        Serial.print("~XB=TRB,PT=PONG~"); //respond to pings
+        sendSerialStatus();
 
       //set control mode, 0 for auto, 1 for manual
       else if(strcmp(getDataVal(rx.data,"PT"),"SCM") == 0 &&

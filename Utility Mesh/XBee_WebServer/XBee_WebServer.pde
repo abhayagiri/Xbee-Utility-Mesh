@@ -73,7 +73,7 @@ void setup() {
 
   // Start serial port at 9600 bps, used for getting data from XBee
   Serial.begin(9600);
-  debugPrintln_p(PSTR("Setup finished"));
+//  debugPrintln_p(PSTR("Setup finished"));
 
   //    printMemoryProfile();
   //    delay(300000);
@@ -109,10 +109,10 @@ void loop() {
           if ((c=client.read()) != httpGet[i])
             gotRequest = false;
 
-        if (gotRequest)
-          debugPrintln_p(PSTR("got request"));
-        else
-          debugPrintln_p(PSTR("not http"));
+//        if (gotRequest)
+//         debugPrintln_p(PSTR("got request"));
+//        else
+//          debugPrintln_p(PSTR("not http"));
 
         if (gotRequest) { //look for options
           while ( (c != '\n') && (c != '?') )
@@ -124,18 +124,18 @@ void loop() {
             while ( (c != ' ') && i < 31)
               optStr[i++] = (c = client.read());
             optStr[--i] = '\0'; //kill the trailing space character
-            debugPrint_p(PSTR("Option String: \""));
-            debugPrint(optStr);
-            debugPrintln_p(PSTR("\""));              
+//            debugPrint_p(PSTR("Option String: \""));
+//            debugPrint(optStr);
+//            debugPrintln_p(PSTR("\""));              
             while (c != ' ') //flush remaining option chars
               c = client.read(); 
           }
-          else
-            debugPrintln_p(PSTR("No option string"));
+//          else
+//            debugPrintln_p(PSTR("No option string"));
         }    
 
         while (client.available()) // print out the rest of the request
-          debugPrint((char)client.read());
+//          debugPrint((char)client.read());
 
         //now serve the request  
         if (gotRequest) { 
@@ -214,6 +214,8 @@ void loop() {
               webCmdTimer.wrap = true;
               foundCommand = true;
             }
+            
+            // Following  if statements handle the various ping options; all or selected destination.
             else if (strcmp_P(optStr, PSTR("ping=send")) == 0) {
               webCmdTimer.msgStr = pingMsg;
               webCmdTimer.opStr = pingOpStr;
@@ -223,6 +225,68 @@ void loop() {
               webCmdTimer.wrap = false;
               foundCommand = true;
             }
+            
+            else if (strcmp_P(optStr, PSTR("ping=TWT")) == 0) {
+              webCmdTimer.msgStr = pingMsg;
+              webCmdTimer.opStr = pingOpStr;
+              webCmdTimer.packetStr = pingPacketTWT;
+              webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 300;
+              webCmdTimer.wrap = false;
+              foundCommand = true;
+            }
+            
+                        
+            else if (strcmp_P(optStr, PSTR("ping=TRB")) == 0) {
+              webCmdTimer.msgStr = pingMsg;
+              webCmdTimer.opStr = pingOpStr;
+              webCmdTimer.packetStr = pingPacketTRB;
+              webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 300;
+              webCmdTimer.wrap = false;
+              foundCommand = true;
+            }
+       
+            
+            else if (strcmp_P(optStr, PSTR("ping=FWT")) == 0) {
+              webCmdTimer.msgStr = pingMsg;
+              webCmdTimer.opStr = pingOpStr;
+              webCmdTimer.packetStr = pingPacketFWT;
+              webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 300;
+              webCmdTimer.wrap = false;
+              foundCommand = true;
+            }
+                 
+            else if (strcmp_P(optStr, PSTR("ping=RDG")) == 0) {
+              webCmdTimer.msgStr = pingMsg;
+              webCmdTimer.opStr = pingOpStr;
+              webCmdTimer.packetStr = pingPacketRDG;
+              webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 300;
+              webCmdTimer.wrap = false;
+              foundCommand = true;
+            }
+            else if (strcmp_P(optStr, PSTR("ping=SNA")) == 0) {
+              webCmdTimer.msgStr = pingMsg;
+              webCmdTimer.opStr = pingOpStr;
+              webCmdTimer.packetStr = pingPacketSNA;
+              webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 300;
+              webCmdTimer.wrap = false;
+              foundCommand = true;
+            }
+            else if (strcmp_P(optStr, PSTR("ping=GTS")) == 0) {
+              webCmdTimer.msgStr = pingMsg;
+              webCmdTimer.opStr = pingOpStr;
+              webCmdTimer.packetStr = pingPacketGTS;
+              webCmdTimer.pongList[0] = '\0';
+              webCmdTimer.timeout = 300;
+              webCmdTimer.wrap = false;
+              foundCommand = true;
+            }
+            
+            
             else if ((strstr_P(optStr, PSTR("dismiss=")) == optStr)) {
               // part of the "Alerts" function
               //foundCommand=false here, no timeout required
@@ -363,7 +427,9 @@ void loop() {
           saveHydroWattsData(&hydroWatts,rx.data);
       }
 
-      if (strcmp(getDataVal(rx.data,"PT"),"PING") == 0) {
+      // Check for ping request
+      if (strcmp(getDataVal(rx.data,"PT"),"PING") == 0 &&
+        (!keyExists(rx.data,"DST") || strcmp(getDataVal(rx.data,"DST"),XBEE) == 0)) {
         Serial.print("~XB=");
         Serial.print(XBEE);
         Serial.print(",PT=PONG~");
